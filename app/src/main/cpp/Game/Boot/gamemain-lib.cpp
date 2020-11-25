@@ -1,0 +1,73 @@
+﻿//
+// Created by 葵ユメ on 2018/09/08.
+//
+
+
+#include <EntityManager.h>
+#include <Entity.h>
+#include <SceneLauncher.h>
+#include "../Engine/Engine.h"
+#include <SceneManager.h>
+
+EXTERN_C
+
+static EntityManager* s_EntityMgr = nullptr;
+
+//--------------------------------------------------------
+JNIEXPORT void JNICALL
+Java_com_aoiyume_Game_GameMainRender_SurfaceCreate(
+        JNIEnv *env, jobject jobj
+)
+{
+    DEBUG_LOG("Call GameMain SurfaceCreate");
+	s_EntityMgr = new EntityManager();
+	{
+		Entity* pCamera = new Entity();
+		Entity::CreateCameraComponent(pCamera);
+		pCamera->Update(eGameMessage_Setup, nullptr);
+		s_EntityMgr->AttachEntity(pCamera);
+	}
+	{
+		SceneManager::CreateSceneMaanger(new SceneLauncher());
+		SCENE_MANAGER()->Update(eGameMessage_Setup, nullptr);
+		s_EntityMgr->AttachEntity(SCENE_MANAGER());
+	}
+}
+//--------------------------------------------------------
+JNIEXPORT void JNICALL
+Java_com_aoiyume_Game_GameMainRender_SurfaceChanged(
+        JNIEnv *env, jobject jobj,
+		jint w, jint h
+)
+{
+	DEBUG_LOG("Call GameMain SurfaceChanged");
+
+	const float aspect = (float) w / (float)h;
+	glViewport(0, 0, w, h);
+	Engine::GetEngine()->SetScreenInfo(w, h, aspect);
+
+	s_EntityMgr->Update(eGameMessage_ChangeCamera, nullptr);
+}
+//--------------------------------------------------------
+JNIEXPORT void JNICALL
+Java_com_aoiyume_Game_GameMainRender_SurfaceDraw(
+        JNIEnv *env, jobject jobj
+)
+{
+    //DEBUG_LOG("Call GameMain SurfaceDraw");
+
+	s_EntityMgr->Update(eGameMessage_Update, nullptr);
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glEnable(GL_DEPTH_TEST);
+
+	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+
+	s_EntityMgr->Update(eGameMessage_Draw, nullptr);
+
+	//glDisable(GL_DEPTH_TEST);
+	Engine::GetEngine()->CheckTouchUpdate();
+
+}
+
+END_EXTERN_C

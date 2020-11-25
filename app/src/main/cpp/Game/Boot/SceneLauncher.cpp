@@ -1,0 +1,159 @@
+﻿//
+// Created by 葵ユメ on 2018/09/17.
+//
+
+
+#include <LayoutComponent.h>
+#include <SceneManager.h>
+#include <Button/ButtonManager.h>
+#include <Button/DebugButton.h>
+#include <CameraComponent.h>
+#include <CollisionComponent.h>
+#include <TransformComponent.h>
+#include "SceneLauncher.h"
+#include "../App/Scene/SceneTitle.h"
+#include "../App/Scene/SceneAdv.h"
+#include "../App/Scene/SceneSpendTime.h"
+#include "../App/Scene/SceneWork.h"
+#include "../App/Scene/SceneShop.h"
+
+class SceneGameMain{
+public:
+	static SceneBase* CreateScene();
+};
+
+//------------------------------------------
+//------------------------------------------
+SceneLauncher::SceneLauncher()
+: SceneBase("launcher")
+, m_pSimpleBtnMgr(nullptr)
+{
+}
+
+//------------------------------------------
+//------------------------------------------
+SceneLauncher::~SceneLauncher()
+{
+	delete m_pSimpleBtnMgr;
+}
+
+//------------------------------------------
+//------------------------------------------
+void SceneLauncher::SceneSetup()
+{
+	Super::SceneSetup();
+	DEBUG_LOG("Launcher Call Setup");
+	{
+		const float fBtnWidth = 400.0f;
+		const float fBtnHeight = 120.0f;
+		const float fMarginY = 25.0f;
+		const float fScreenX = (float)Engine::GetEngine()->GetScreenInfo().m_nScreenX;
+		const float fScreenY = (float)Engine::GetEngine()->GetScreenInfo().m_nScreenY;
+		const int nBtnXNum = (int)(fScreenX / fBtnWidth);
+		float fBtnX = -fScreenX * 0.5f;
+		float fBtnY = fScreenY * 0.5f - fBtnHeight;
+
+		const char* pSceneName[] = {
+				"Title",
+				"Main",
+				"Adv",
+				"SpendTime",
+				"Work",
+				"Shop",
+				NULL
+		};
+		m_pSimpleBtnMgr = new ButtonManager();
+		int nXBtnCnt = 0;
+		for(int i = 0; pSceneName[i] != NULL; ++i){
+			DebugButton* pBtn = m_pSimpleBtnMgr->CreateDebugButton(pSceneName[i], fBtnWidth, fBtnHeight,
+										VEC4(0.8f, 0.8f, 0.8f, 1.0f),
+										VEC4(0.0f, 0.0f, 0.0f, 1.0f),
+										VEC4(0.5f, 0.5f, 0.0f, 1.0f));
+			fBtnX += fBtnWidth;
+			nXBtnCnt++;
+			if(nXBtnCnt >= nBtnXNum){
+				nXBtnCnt = 0;
+				fBtnX = -fScreenX * 0.5f + fBtnWidth;
+				fBtnY -= (fBtnHeight + fMarginY);
+			}
+			pBtn->SetPosition(fBtnX, fBtnY, 0.0f);
+		}
+	}
+	DEBUG_LOG("Setup End");
+}
+
+//------------------------------------------
+//------------------------------------------
+void SceneLauncher::SceneUpdate()
+{
+	Super::SceneUpdate();
+	//DEBUG_LOG("Launcher Call Update");
+
+	if(Engine::GetEngine()->GetTouchInputInfo().m_nTouchEvent == -1){
+		m_pSimpleBtnMgr->Reset();
+	}
+#if 1
+	switch (m_pSimpleBtnMgr->GetDecide()){
+		case eButton_Title:{ SCENE_MANAGER()->AddNextCallScene(SceneTitle::CreateScene()); break; }
+		case eButton_GameMain:{ SCENE_MANAGER()->AddNextCallScene(SceneGameMain::CreateScene()); break;}
+		case eButton_Adv:{ SCENE_MANAGER()->AddNextCallScene(SceneAdv::CreateScene()); break; }
+		case eButton_SpendTime:{ SCENE_MANAGER()->AddNextCallScene(SceneSpendTime::CreateScene()); break; }
+		case eButton_Work:{ SCENE_MANAGER()->AddNextCallScene(SceneWork::CreateScene()); break; }
+		case eButton_Shop:{ SCENE_MANAGER()->AddNextCallScene(SceneShop::CreateScene()); break; }
+		default: { break; }
+	}
+#endif
+}
+
+//------------------------------------------
+//------------------------------------------
+void SceneLauncher::SceneFinalize()
+{
+	Super::SceneFinalize();
+	DEBUG_LOG("Launcher Call Finalize");
+}
+
+//------------------------------------------
+//------------------------------------------
+void SceneLauncher::EntityUpdate(GameMessage message, const void* param)
+{
+	switch(message){
+		case eGameMessage_Setup:
+		{
+			SceneSetup();
+			break;
+		}
+		case eGameMessage_Update:
+		{
+			SceneUpdate();
+			break;
+		}
+		case eGameMessage_PostUpdate:
+		{
+			break;
+		}
+		case eGameMessage_ChangeCamera:
+		{
+			break;
+		}
+		case eGameMessage_Draw:
+		{
+			break;
+		}
+		case eGameMessage_Pause:
+		{
+			break;
+		}
+		case eGameMessage_Destroy:
+		{
+			SceneFinalize();
+			break;
+		}
+		default:{
+			break;
+		}
+	}
+	if(message != eGameMessage_Setup) {
+		m_pSimpleBtnMgr->Update(message, param);
+	}
+}
