@@ -13,6 +13,7 @@ Dice::Dice()
 : GameEntity()
 , m_bDiceStart(false)
 , m_nCurrentDiceIdx(0)
+, m_nCurrentDiceNo(1)
 , m_nDiceChangeInterval(10)
 , m_uDiceRoulette()
 {
@@ -54,6 +55,7 @@ void Dice::GameEntityUpdate(const void* param)
 		for(int i = 0; i < eDICE_MAX; ++i){
 			SetVisible(i, (i + 1) == m_uDiceRoulette[m_nCurrentDiceIdx]);
 		}
+		m_nCurrentDiceNo = m_uDiceRoulette[m_nCurrentDiceIdx];
 		m_nCurrentDiceIdx = (m_nCurrentDiceIdx + 1) % eDICE_MAX;
 		// 1週したらパターン変更
 		if(m_nCurrentDiceIdx == 0){
@@ -89,6 +91,11 @@ void Dice::StartDice()
 void Dice::StopDice()
 {
 	m_bDiceStart = false;
+}
+
+uint8_t Dice::GetDice() const
+{
+	return m_nCurrentDiceNo;
 }
 
 void Dice::shuffleDicePattern()

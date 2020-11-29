@@ -62,6 +62,7 @@ add_library(	game-lib SHARED
 
 
 add_library(	app_entity-lib SHARED
+				src/main/cpp/Game/App/Entity/Character.cpp
 				src/main/cpp/Game/App/Entity/InformationPlate.cpp
 				src/main/cpp/Game/App/Entity/Dice.cpp)
 

@@ -13,6 +13,7 @@
 #include "SceneBase.h"
 
 class ComponentBase;
+class Character;
 class InformationPlate;
 class MessageWindow;
 class Dice;
@@ -44,6 +45,16 @@ private:
 	void updateBattleStep();
 
 private:
+	struct CharaInfo{
+		Character* 	pChara = nullptr;
+		Dice*		pDice = nullptr;
+
+		~CharaInfo(){
+			delete pChara;
+			delete pDice;
+		}
+	};
+
 	int 		m_nStep;
 	int 		m_nNextStep;
 	int 		m_nStepCnt;
@@ -52,12 +63,12 @@ private:
 	int 		m_nSubStepCnt;
 
 	Entity*		m_pBgImage;
-	Entity*		m_pChara;		// TODO キャラクラスに変更
+	CharaInfo	m_Chara;
+	CharaInfo	m_Enemy;
 
 	ButtonManager*	m_pBtnManager;
 	InformationPlate* m_pInformationPlate;
 	MessageWindow* m_pMessageWindow;
-	Dice* m_pDice;
 };
 
 #endif

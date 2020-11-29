@@ -33,12 +33,15 @@ public:
 	void StartDice();
 	void StopDice();
 
+	uint8_t GetDice() const;
+
 private:
 	void shuffleDicePattern();
 
 private:
 	bool m_bDiceStart;
 	int m_nCurrentDiceIdx;
+	int m_nCurrentDiceNo;
 	int m_nDiceChangeInterval;
 	uint8_t  m_uDiceRoulette[eDICE_MAX];
 };
