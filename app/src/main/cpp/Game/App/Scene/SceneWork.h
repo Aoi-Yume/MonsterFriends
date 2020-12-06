@@ -13,12 +13,16 @@
 #include "SceneBase.h"
 
 class ComponentBase;
+class Character;
+class InformationPlate;
+class MessageWindow;
 
 class SceneWork : public SceneBase
 {
 	typedef SceneBase Super;
 public:
 	static SceneBase* CreateScene();
+
 public:
 	SceneWork();
 	virtual ~SceneWork();
@@ -33,7 +37,11 @@ private:
 	int 		m_nNextStep;
 	int 		m_nStepCnt;
 
-	Entity*		m_pSceneName;
+	Entity*		m_pBgImage;
+	Character*	m_pChara;
+
+	InformationPlate* m_pInformationPlate;
+	MessageWindow* m_pMessageWindow;
 };
 
 #endif

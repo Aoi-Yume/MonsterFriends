@@ -19,6 +19,12 @@ public:
 		eCHARA_01,		// スライム
 	};
 
+	enum State{
+		eState_None,
+		eState_Wait,
+		eState_Work,
+	};
+
 public:
 	Character(CHARA_ID charaId);
 	virtual ~Character();
@@ -30,6 +36,7 @@ public:
 public:
 
 private:
+	void actWorkState();
 
 private:
 	CHARA_ID m_nCharaId;

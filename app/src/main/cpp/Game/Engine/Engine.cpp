@@ -195,6 +195,19 @@ bool Engine::IsShowSofrwareKeyboard() const
 
 //-----------------------------------------
 //-----------------------------------------
+void Engine::GetInputText(char* pText, int nSize) const
+{
+	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SYSTEM);
+	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SYSTEM, "GetInputText");
+	jstring obj = (jstring)GetEnv()->CallStaticObjectMethod(classID, methodID_1);
+	const char* pInputText = GetEnv()->GetStringUTFChars(obj, nullptr);
+	std::snprintf(pText, nSize, "%s", pInputText);
+	pText[nSize - 1] = '\0';
+	GetEnv()->ReleaseStringUTFChars(obj, pInputText);
+}
+
+//-----------------------------------------
+//-----------------------------------------
 Engine* Engine::GetEngine()
 {
 	return s_AoYumeEngine;

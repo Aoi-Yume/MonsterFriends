@@ -176,6 +176,7 @@ void ObjectLoader::SetDefaultLoad() {
 		s_ObjectLoader->SetClassID(pClassName);
 		s_ObjectLoader->SetMethodID(pClassName, "ShowSoftwareKeyboard", "()V", true);
 		s_ObjectLoader->SetMethodID(pClassName, "IsShowSoftwareKeyboard", "()Z", true);
+		s_ObjectLoader->SetMethodID(pClassName, "GetInputText", "()Ljava/lang/String;", true);
 	}
     // Class Utility
     {

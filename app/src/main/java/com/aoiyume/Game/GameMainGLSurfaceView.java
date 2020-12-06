@@ -75,6 +75,7 @@ class GameMainRender implements GLSurfaceView.Renderer {
         System.loadLibrary("game-lib");
         System.loadLibrary("app_entity-lib");
         System.loadLibrary("app_scene-lib");
+        System.loadLibrary( "app_param-lib");
         System.loadLibrary("boot-lib");
     }
 

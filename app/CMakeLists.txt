@@ -18,6 +18,7 @@ include_directories(	src/main/cpp/Game/Game	)
 include_directories(	src/main/cpp/Game/Game/Manager	)
 include_directories(	src/main/cpp/Game/Scene	)
 include_directories(	src/main/cpp/Game/Boot	)
+include_directories(	src/main/cpp/Game/App/Param		)
 include_directories(	src/main/cpp/Game/App/Entity	)
 include_directories(	src/main/cpp/Game/App/Entity/Manager	)
 
@@ -37,7 +38,8 @@ add_library(	base-lib SHARED
 				src/main/cpp/Game/Base/ComponentBase.cpp
                 src/main/cpp/Game/Base/EntityBase.cpp
                 src/main/cpp/Game/Base/SceneBase.cpp
-                src/main/cpp/Game/Base/SceneManager.cpp )
+                src/main/cpp/Game/Base/SceneManager.cpp
+				src/main/cpp/Game/Base/Singleton.cpp)
 
 add_library(	component-lib SHARED
 				src/main/cpp/Game/Component/DrawComponent.cpp
@@ -73,6 +75,9 @@ add_library(	app_scene-lib SHARED
 				src/main/cpp/Game/App/Scene/SceneSpendTime.cpp
 				src/main/cpp/Game/App/Scene/SceneWork.cpp
 				src/main/cpp/Game/App/Scene/SceneShop.cpp)
+
+add_library(	app_param-lib SHARED
+				src/main/cpp/Game/App/Param/AppParam.cpp)
 
 add_library(	boot-lib SHARED
 				src/main/cpp/Game/Boot/gamemain-lib.cpp
@@ -116,6 +121,7 @@ target_link_libraries( base-lib math-lib aoiyume_engine-lib )
 target_link_libraries( component-lib base-lib)
 target_link_libraries( entity-lib component-lib )
 target_link_libraries( game-lib entity-lib)
-target_link_libraries( app_entity-lib game-lib )
-target_link_libraries( app_scene-lib app_entity-lib )
+target_link_libraries( app_param-lib base-lib )
+target_link_libraries( app_entity-lib game-lib app_param-lib)
+target_link_libraries( app_scene-lib app_entity-lib app_param-lib )
 target_link_libraries( boot-lib app_scene-lib )

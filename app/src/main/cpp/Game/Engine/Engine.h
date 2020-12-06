@@ -68,6 +68,7 @@ public:
 
 	void ShowSoftwareKeyboard();
 	bool IsShowSofrwareKeyboard() const;
+	void GetInputText(char* pText, int nSize) const;
 public:
 	static void Create();
 	static void Destroy();

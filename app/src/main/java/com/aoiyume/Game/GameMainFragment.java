@@ -126,4 +126,5 @@ public class GameMainFragment extends Fragment {
     {
         return m_bShowKeyboard;
     }
+    public static String GetInputText() { return m_InputText.getText().toString(); }
 }

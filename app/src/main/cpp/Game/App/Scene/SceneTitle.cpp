@@ -6,6 +6,7 @@
 #include <LayoutComponent.h>
 #include <TransformComponent.h>
 #include <SceneManager.h>
+#include <AppParam.h>
 #include "SceneTitle.h"
 #include "Button/SimpleButton.h"
 #include "SceneGameMain.h"
@@ -118,6 +119,9 @@ void SceneTitle::SceneUpdate() {
 	}
 	else if(m_nStep == 2){
 		if(!Engine::GetEngine()->IsShowSofrwareKeyboard()){
+			char charName[64];
+			Engine::GetEngine()->GetInputText(charName, sizeof(charName));
+			AppParam::Get()->SetCharaName(charName);
 			m_nNextStep = 3;
 		}
 	}

@@ -13,6 +13,7 @@
 #include <MessageWindow/MessageWindow.h>
 #include <Dice.h>
 #include <SceneManager.h>
+#include <AppParam.h>
 
 SceneBase* SceneAdv::CreateScene()
 {
@@ -269,7 +270,9 @@ void SceneAdv::updateBattleStep()
 		}
 	}
 	else if(m_nSubStep == 4){
+		// TODO キズナ値調整
 		m_pMessageWindow->SetDirectMessage("キズナが10増えた！");
+		AppParam::Get()->AddKizunaPoint(10);
 		Engine::GetEngine()->ResetTouchEvent();
 		m_nSubStep = 5;
 	}

@@ -7,6 +7,7 @@
 #include <Entity.h>
 #include <SceneLauncher.h>
 #include "../Engine/Engine.h"
+#include "../App/Param/AppParam.h"
 #include <SceneManager.h>
 
 EXTERN_C
@@ -32,6 +33,10 @@ Java_com_aoiyume_Game_GameMainRender_SurfaceCreate(
 		SCENE_MANAGER()->Update(eGameMessage_Setup, nullptr);
 		s_EntityMgr->AttachEntity(SCENE_MANAGER());
 	}
+	{
+		AppParam::Initialize();
+	}
+	// TODO Engine に解放コールバックを設定する
 }
 //--------------------------------------------------------
 JNIEXPORT void JNICALL
