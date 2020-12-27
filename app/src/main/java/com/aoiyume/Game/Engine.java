@@ -6,4 +6,6 @@ package com.aoiyume.Game;
 
 public class Engine {
     public static native void SetTouchInputInfo(int nEvent, float fTouchX, float fTouchY);
+    public static native void AccecpNearEndPoint(String endPoint, String Name);
+    public static native void ReceiveNearbyData(String endPoint, byte[] data);
 }

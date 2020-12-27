@@ -177,6 +177,11 @@ void ObjectLoader::SetDefaultLoad() {
 		s_ObjectLoader->SetMethodID(pClassName, "ShowSoftwareKeyboard", "()V", true);
 		s_ObjectLoader->SetMethodID(pClassName, "IsShowSoftwareKeyboard", "()Z", true);
 		s_ObjectLoader->SetMethodID(pClassName, "GetInputText", "()Ljava/lang/String;", true);
+		s_ObjectLoader->SetMethodID(pClassName, "StartNearbyAdvertising", "(Ljava/lang/String;)V", true);
+		s_ObjectLoader->SetMethodID(pClassName,"StopNearbyAdvertising", "()V", true);
+		s_ObjectLoader->SetMethodID(pClassName, "StartNearbyDiscovery", "(Ljava/lang/String;)V", true);
+		s_ObjectLoader->SetMethodID(pClassName,"StopNearbyDiscovery", "()V", true);
+		s_ObjectLoader->SetMethodID(pClassName,"SendData", "(Ljava/lang/String;[B)V", true);
 	}
     // Class Utility
     {
@@ -211,8 +216,14 @@ JNIEnv* GetEnv()
 
 JNIEnv* GetThreadEnv()
 {
-    //TODO
-    return nullptr;
+	JNIEnv* env = nullptr;
+    s_vm->AttachCurrentThread(&env, NULL);
+    return env;
+}
+
+void DetachThreadEnv()
+{
+	s_vm->DetachCurrentThread();
 }
 
 void CheckEnvThrow()

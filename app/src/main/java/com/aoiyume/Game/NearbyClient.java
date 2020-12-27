@@ -1,8 +1,9 @@
-package com.aoiyume.monsterfriends;
+package com.aoiyume.Game;
 
 import android.util.Log;
 import android.widget.Toast;
 
+import com.aoiyume.monsterfriends.MainActivity;
 import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.nearby.connection.AdvertisingOptions;
 import com.google.android.gms.nearby.connection.ConnectionInfo;
@@ -23,11 +24,12 @@ import androidx.annotation.NonNull;
  * Created by 葵ユメ on 2020/11/03.
  */
 
-interface MessageReceiveCallBack{
-    void receive(String endPointId, String str);
+interface ReceiveCallBack{
+    void accept(String endPointId, String Name);
+    void receive(String endPointId, byte[] data);
 }
 
-class NearbyClient {
+public class NearbyClient {
     private static final Strategy STRATEGY = Strategy.P2P_STAR;
     private static final String TAG = "MonsterFriends";
 
@@ -35,8 +37,7 @@ class NearbyClient {
     private ConnectionsClient m_ConnectionsClient;
     private String m_ConnectName;
 
-    private  String m_OpponentId = "";
-    private  MessageReceiveCallBack m_MessageCallback;
+    private  ReceiveCallBack m_ReceiveCallback;
 
     // Callbacks for finding other devices
     private final EndpointDiscoveryCallback endpointDiscoveryCallback =
@@ -57,7 +58,7 @@ class NearbyClient {
                 @Override
                 public void onPayloadReceived(@NonNull String endPointId, @NonNull Payload payload) {
                     if(payload.getType() != Payload.Type.BYTES){ return; }
-                    m_MessageCallback.receive(endPointId, new String(payload.asBytes()));
+                    m_ReceiveCallback.receive(endPointId, payload.asBytes());
                 }
 
                 @Override
@@ -71,10 +72,10 @@ class NearbyClient {
             new ConnectionLifecycleCallback() {
                 @Override
                 public void onConnectionInitiated(String endpointId, ConnectionInfo connectionInfo) {
-//                    Log.i(TAG, "onConnectionInitiated: accepting connection");
                     Toast.makeText(MainActivity.GetContext(), "onConnectionInitiated: accepting connection", Toast.LENGTH_SHORT).show();
+                    Log.i(TAG, "onConnectionInitiated: accepting connection");
                     m_ConnectionsClient.acceptConnection(endpointId, payloadCallback);
-                    Log.i(TAG, connectionInfo.getEndpointName());
+                    m_ReceiveCallback.accept(endpointId, connectionInfo.getEndpointName());
                 }
 
                 @Override
@@ -82,14 +83,8 @@ class NearbyClient {
                     if (result.getStatus().isSuccess()) {
                         Toast.makeText(MainActivity.GetContext(), "onConnectionResult: connection successful", Toast.LENGTH_SHORT).show();
                         Log.i(TAG, "onConnectionResult: connection successful");
-
-                        m_ConnectionsClient.stopDiscovery();
-                        m_ConnectionsClient.stopAdvertising();
-
-                        m_OpponentId = endpointId;
                     } else {
                         Toast.makeText(MainActivity.GetContext(), "onConnectionResult: connection failed", Toast.LENGTH_SHORT).show();
-                        //                       Log.i(TAG, "onConnectionResult: connection failed");
                     }
                 }
 
@@ -109,9 +104,9 @@ class NearbyClient {
         m_ConnectName = connectName;
     }
 
-    public void SetMessageCallBack(MessageReceiveCallBack callback)
+    public void SetReceiveCallBack(ReceiveCallBack callback)
     {
-        m_MessageCallback = callback;
+        m_ReceiveCallback = callback;
     }
 
     /** Starts looking for other players using Nearby Connections. */
@@ -120,6 +115,10 @@ class NearbyClient {
         m_ConnectionsClient.startDiscovery(
                 MainActivity.GetContext().getPackageName(), endpointDiscoveryCallback,
                 new DiscoveryOptions.Builder().setStrategy(STRATEGY).build());
+    }
+
+    public void StopDiscovery() {
+        m_ConnectionsClient.stopDiscovery();
     }
 
     /** Broadcasts our presence using Nearby Connections so other players can find us. */
@@ -131,8 +130,12 @@ class NearbyClient {
                 new AdvertisingOptions.Builder().setStrategy(STRATEGY).build());
     }
 
-    public void SendData(String str)
+    public void StopAdvertising() {
+        m_ConnectionsClient.stopAdvertising();
+    }
+
+    public void SendData(String Id, byte[] data)
     {
-        m_ConnectionsClient.sendPayload(m_OpponentId, Payload.fromBytes(str.getBytes()));
+        m_ConnectionsClient.sendPayload(Id, Payload.fromBytes(data));
     }
 }

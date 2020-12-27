@@ -10,6 +10,8 @@
 #include "SceneTitle.h"
 #include "Button/SimpleButton.h"
 #include "SceneGameMain.h"
+#include <../Net/TransferManager.h>
+#include <../Net/TransferBase.h>
 
 SceneBase* SceneTitle::CreateScene()
 {
@@ -122,6 +124,15 @@ void SceneTitle::SceneUpdate() {
 			char charName[64];
 			Engine::GetEngine()->GetInputText(charName, sizeof(charName));
 			AppParam::Get()->SetCharaName(charName);
+			if(strcmp(charName, "親") == 0) {
+				Engine::GetEngine()->StartNearbyAdvertising(charName);
+				DEBUG_LOG("親NEarby\n");
+			}
+			else {
+				Engine::GetEngine()->StartNearbyDiscovery(charName);
+				DEBUG_LOG("子NEarby\n");
+			}
+			TransferManager::Get()->StartTransfer(TransferManager::eTransferKind_Connect);
 			m_nNextStep = 3;
 		}
 	}
@@ -138,8 +149,12 @@ void SceneTitle::SceneUpdate() {
 		else{
 			pTextImage->SetText("接続中・", 5.0f);
 		}
-		// TODO 通信接続完了
-		if(m_nStepCnt >= 180 * 5) {
+		// 通信接続完了
+		auto pTransfer = TransferManager::Get()->GetTransfer<TransferBase>(TransferManager::eTransferKind_Connect);
+		if(pTransfer->IsEnd()) {
+			pTransfer->Dump();
+			Engine::GetEngine()->StopNearbyAdvertising();
+			Engine::GetEngine()->StopNearbyDiscovery();
 			m_nNextStep = 4;
 		}
 	}

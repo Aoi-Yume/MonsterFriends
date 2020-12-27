@@ -4,7 +4,7 @@
 
 
 #include "AppParam.h"
-template<> AppParam* Singleton<AppParam>::s_pSingleton = nullptr;
+USE_SINGLETON_VARIABLE(AppParam);
 
 AppParam::AppParam()
 : Singleton<AppParam>()

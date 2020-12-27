@@ -8,6 +8,7 @@
 
 #include "../Engine/Engine.h"
 
+
 template <class T>
 class Singleton
 {
@@ -40,4 +41,19 @@ private:
 	static T* s_pSingleton;
 };
 
+#define USE_SINGLETON(classtype) \
+private: \
+	friend class Singleton<classtype>; \
+	classtype(const classtype&) = delete; \
+	void operator=(const classtype&) = delete; \
+	\
+protected: \
+	classtype(); \
+	virtual ~classtype(); \
+	\
+private: \
+
+
+#define USE_SINGLETON_VARIABLE(classtype) \
+template<> classtype* Singleton<classtype>::s_pSingleton = nullptr;
 #endif

@@ -30,6 +30,14 @@ add_library(    math-lib SHARED
 				src/main/cpp/Math/math_Vector.cpp
 				src/main/cpp/Math/math_Matrix.cpp  )
 
+add_library(	algorithm-lib SHARED
+				src/main/cpp/Game/Base/Singleton.cpp)
+
+add_library(	net-lib SHARED
+				src/main/cpp/Game/Net/TransferBase.cpp
+				src/main/cpp/Game/Net/TransferManager.cpp
+				src/main/cpp/Game/Net/TransferConnect.cpp)
+
 add_library(	aoiyume_engine-lib SHARED
 				src/main/cpp/Game/Engine/engine-lib.cpp
 				src/main/cpp/Game/Engine/Engine.cpp	)
@@ -38,8 +46,7 @@ add_library(	base-lib SHARED
 				src/main/cpp/Game/Base/ComponentBase.cpp
                 src/main/cpp/Game/Base/EntityBase.cpp
                 src/main/cpp/Game/Base/SceneBase.cpp
-                src/main/cpp/Game/Base/SceneManager.cpp
-				src/main/cpp/Game/Base/Singleton.cpp)
+                src/main/cpp/Game/Base/SceneManager.cpp )
 
 add_library(	component-lib SHARED
 				src/main/cpp/Game/Component/DrawComponent.cpp
@@ -62,6 +69,8 @@ add_library(	game-lib SHARED
 		        src/main/cpp/Game/Game/Button//ButtonManager.cpp
 				src/main/cpp/Game/Game/MessageWindow/MessageWindow.cpp)
 
+add_library(	app_param-lib SHARED
+				src/main/cpp/Game/App/Param/AppParam.cpp)
 
 add_library(	app_entity-lib SHARED
 				src/main/cpp/Game/App/Entity/Character.cpp
@@ -75,9 +84,6 @@ add_library(	app_scene-lib SHARED
 				src/main/cpp/Game/App/Scene/SceneSpendTime.cpp
 				src/main/cpp/Game/App/Scene/SceneWork.cpp
 				src/main/cpp/Game/App/Scene/SceneShop.cpp)
-
-add_library(	app_param-lib SHARED
-				src/main/cpp/Game/App/Param/AppParam.cpp)
 
 add_library(	boot-lib SHARED
 				src/main/cpp/Game/Boot/gamemain-lib.cpp
@@ -114,14 +120,16 @@ find_library(
 
 target_link_libraries( aoiyume_pch-lib ${log-lib} ${android-lib} )
 target_link_libraries( math-lib aoiyume_pch-lib )
-target_link_libraries( aoiyume_engine-lib aoiyume_pch-lib ${opengl-lib} )
+target_link_libraries( algorithm-lib aoiyume_pch-lib math-lib)
+target_link_libraries( net-lib algorithm-lib)
+target_link_libraries( aoiyume_engine-lib net-lib ${opengl-lib} )
 target_link_libraries( jni_main-lib aoiyume_engine-lib )
 
-target_link_libraries( base-lib math-lib aoiyume_engine-lib )
+target_link_libraries( base-lib aoiyume_engine-lib )
 target_link_libraries( component-lib base-lib)
 target_link_libraries( entity-lib component-lib )
 target_link_libraries( game-lib entity-lib)
 target_link_libraries( app_param-lib base-lib )
 target_link_libraries( app_entity-lib game-lib app_param-lib)
-target_link_libraries( app_scene-lib app_entity-lib app_param-lib )
+target_link_libraries( app_scene-lib app_entity-lib )
 target_link_libraries( boot-lib app_scene-lib )

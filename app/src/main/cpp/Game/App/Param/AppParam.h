@@ -11,8 +11,7 @@
 
 class AppParam : public Singleton<AppParam>
 {
-	friend  class Singleton<AppParam>;
-
+	USE_SINGLETON(AppParam)
 public:
 	struct CharacterInfo {
 		char charaName[64];
@@ -25,14 +24,6 @@ public:
 
 	void AddKizunaPoint(int nAdd);
 	int GetKizunaPoint() const;
-
-protected:
-	AppParam();
-	virtual ~AppParam();
-
-private:
-	AppParam(const AppParam&) = delete;
-	void operator=(const AppParam&) = delete;
 
 private:
 	CharacterInfo m_CharaInfo;

@@ -208,6 +208,57 @@ void Engine::GetInputText(char* pText, int nSize) const
 
 //-----------------------------------------
 //-----------------------------------------
+void Engine::StartNearbyAdvertising(const char* pConnectName)
+{
+	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SYSTEM);
+	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SYSTEM, "StartNearbyAdvertising");
+	jstring connectName = GetEnv()->NewStringUTF(pConnectName);
+	GetEnv()->CallStaticVoidMethod(classID, methodID_1, connectName);
+}
+
+//-----------------------------------------
+//-----------------------------------------
+void Engine::StopNearbyAdvertising()
+{
+	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SYSTEM);
+	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SYSTEM, "StopNearbyAdvertising");
+	GetEnv()->CallStaticVoidMethod(classID, methodID_1);
+}
+
+//-----------------------------------------
+//-----------------------------------------
+void Engine::StartNearbyDiscovery(const char* pConnectName)
+{
+	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SYSTEM);
+	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SYSTEM, "StartNearbyDiscovery");
+	jstring connectName = GetEnv()->NewStringUTF(pConnectName);
+	GetEnv()->CallStaticVoidMethod(classID, methodID_1, connectName);
+}
+
+//-----------------------------------------
+//-----------------------------------------
+void Engine::StopNearbyDiscovery()
+{
+	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SYSTEM);
+	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SYSTEM, "StopNearbyDiscovery");
+	GetEnv()->CallStaticVoidMethod(classID, methodID_1);
+}
+
+//-----------------------------------------
+//-----------------------------------------
+void Engine::SendData(const char* pId, jbyte* pData, int nSize)
+{
+	jbyteArray byteData = GetEnv()->NewByteArray(nSize);
+	GetEnv()->SetByteArrayRegion(byteData, 0, nSize, pData);
+
+	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SYSTEM);
+	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SYSTEM, "SendData");
+	jstring Id = GetEnv()->NewStringUTF(pId);
+	GetEnv()->CallStaticVoidMethod(classID, methodID_1, Id, byteData);
+}
+
+//-----------------------------------------
+//-----------------------------------------
 Engine* Engine::GetEngine()
 {
 	return s_AoYumeEngine;

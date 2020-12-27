@@ -59,15 +59,6 @@ public class LoginFragment extends Fragment {
 
         final MainActivity activity = MainActivity.GetContext();
         m_UserNameEdit.setOnFocusChangeListener(onUserNameFocus);
-        m_JoinButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                activity.GetNearbyClient().SetConnectName(m_UserNameEdit.getText().toString());
-                activity.GetNearbyClient().StartAdvertising();
-                activity.GetNearbyClient().StartDiscovery();
-                m_StartButton.setVisibility(View.VISIBLE);
-            }
-        });
 
         m_StartButton.setOnClickListener(new View.OnClickListener() {
             @Override

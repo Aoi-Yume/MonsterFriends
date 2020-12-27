@@ -13,8 +13,13 @@ import android.view.WindowManager;
 
 import com.aoiyume.monsterfriends.MainActivity;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -124,4 +129,34 @@ public class Utility {
         disp.getSize(size);
         return  size;
     }
+
+    public static  byte[] ToByteArray(Object obj) {
+        byte[] ret = null;
+        try {
+            ByteArrayOutputStream byteOutStream = new ByteArrayOutputStream();
+            ObjectOutputStream objOutStream = new ObjectOutputStream(byteOutStream);
+            objOutStream.writeObject(obj);
+            objOutStream.close();
+            byteOutStream.close();
+            ret = byteOutStream.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return ret;
+    }
+
+    public static <T> T ToObject(byte[] data){
+        T ret = null;
+        try {
+            ByteArrayInputStream byteInputStream = new ByteArrayInputStream(data);
+            ObjectInputStream objInputStream = new ObjectInputStream(byteInputStream);
+            ret = (T)objInputStream.readObject();
+            objInputStream.close();
+            byteInputStream.close();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return ret;
+    }
+
 }

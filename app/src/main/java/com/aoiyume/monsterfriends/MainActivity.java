@@ -5,7 +5,6 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.app.ActionBar;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 
@@ -13,7 +12,7 @@ import com.aoiyume.Game.GameMainFragment;
 
 public class MainActivity extends AppCompatActivity {
     private static MainActivity m_Instance = null;
-    private NearbyClient m_NearbyClient = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,9 +21,6 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.main);
         m_Instance = this;
-
-        m_NearbyClient = new NearbyClient();
-        m_NearbyClient.Initialize();
 
         /*
         LoginFragment fragment = new LoginFragment();
@@ -65,9 +61,5 @@ public class MainActivity extends AppCompatActivity {
 
     public static MainActivity GetContext() {
         return m_Instance;
-    }
-
-    public NearbyClient GetNearbyClient(){
-        return m_NearbyClient;
     }
 }

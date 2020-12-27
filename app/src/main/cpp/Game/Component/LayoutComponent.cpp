@@ -533,12 +533,16 @@ void TextImageComponent::setupTexture(float &fSizeW, float &fSizeH)
 	jmethodID  methodID_2 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_UTILITY, "GetTextImageSize");
 
 	jstring text = GetEnv()->NewStringUTF(m_Text.c_str());
-	jobject imageBufferObj = GetEnv()->CallStaticObjectMethod(classID, methodID_1, text, m_nFontSize);
-	jfloatArray imageInfoArrayObj = (jfloatArray)GetEnv()->CallStaticObjectMethod(classID, methodID_2, text, m_nFontSize);
-	jboolean jTrue = JNI_TRUE;
-	jfloat* pTextImageInfo = GetEnv()->GetFloatArrayElements(imageInfoArrayObj, &jTrue);
-	jint imageSize[2] = {(int)*(pTextImageInfo + 0), (int)*(pTextImageInfo + 1)};
+	int imageSize[2] = {};
+	{
+		jfloatArray imageInfoArrayObj = (jfloatArray)GetEnv()->CallStaticObjectMethod(classID, methodID_2, text, m_nFontSize);
+		jfloat *pTextImageInfo = GetEnv()->GetFloatArrayElements(imageInfoArrayObj, nullptr);
+		imageSize[0] = (int)*(pTextImageInfo + 0);
+		imageSize[1] = (int)*(pTextImageInfo + 1);
+		GetEnv()->ReleaseFloatArrayElements(imageInfoArrayObj, pTextImageInfo, 0);
+	}
 
+	jobject imageBufferObj = GetEnv()->CallStaticObjectMethod(classID, methodID_1, text, m_nFontSize);
 	void* pBuffer = GetEnv()->GetDirectBufferAddress(imageBufferObj);
 	uint size = (uint)GetEnv()->GetDirectBufferCapacity(imageBufferObj);
 	unsigned char* pColorData = reinterpret_cast<unsigned char*>(pBuffer);

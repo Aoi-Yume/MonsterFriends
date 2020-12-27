@@ -18,4 +18,6 @@
 		eTouchEvent_BUTTON_RELEASE
 	};
 
+	#define NET_CONNECT_MAX (4)
+
 #endif

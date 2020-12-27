@@ -53,6 +53,7 @@ private:
 void SetVM(JavaVM* pVM);
 JNIEnv* GetEnv();
 JNIEnv* GetThreadEnv();
+void DetachThreadEnv();
 void CheckEnvThrow();
 
 END_EXTERN_C

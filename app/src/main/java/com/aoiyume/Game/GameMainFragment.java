@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.aoiyume.monsterfriends.MainActivity;
 import com.aoiyume.monsterfriends.R;
+import com.google.android.gms.nearby.connection.Payload;
 
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -29,6 +30,7 @@ import androidx.fragment.app.Fragment;
 public class GameMainFragment extends Fragment {
     static boolean m_bShowKeyboard = false;
     static EditText m_InputText = null;
+    static NearbyClient m_NearbyClient = null;
 
     static Runnable ShowSoftKeyborad = new Runnable() {
         @Override
@@ -93,21 +95,19 @@ public class GameMainFragment extends Fragment {
             }
         });
 
-        //Log.d("Monster Friends", "result:" + Boolean.toString(result));
-
-        /*
-        ImageButton titleButton = (ImageButton) view.findViewById(R.id.TitleButtton);
-        titleButton.setOnClickListener(new View.OnClickListener() {
+        m_NearbyClient = new NearbyClient();
+        m_NearbyClient.Initialize();
+        m_NearbyClient.SetReceiveCallBack(new ReceiveCallBack() {
             @Override
-            public void onClick(View view) {
-                FragmentManager mgr = ((MainActivity)MainActivity.GetContext()).getSupportFragmentManager();
-                FragmentTransaction transaction =  mgr.beginTransaction();
+            public void accept(String endPointId, String Name) {
+                Engine.AccecpNearEndPoint(endPointId, Name);
+            }
 
-                transaction.replace(R.id.container, new ButtonFragment());
-                transaction.commit();
+            @Override
+            public void receive(String endPointId, byte[] data) {
+                Engine.ReceiveNearbyData(endPointId, data);
             }
         });
-        */
     }
 
     public static void ShowSoftwareKeyboard()
@@ -127,4 +127,27 @@ public class GameMainFragment extends Fragment {
         return m_bShowKeyboard;
     }
     public static String GetInputText() { return m_InputText.getText().toString(); }
+
+    public static void StartNearbyAdvertising(String ConnectName)
+    {
+        m_NearbyClient.SetConnectName(ConnectName);
+        m_NearbyClient.StartAdvertising();
+    }
+    public static void StopNearbyAdvertising()
+    {
+        m_NearbyClient.StopAdvertising();
+    }
+    public static void StartNearbyDiscovery(String ConnectName)
+    {
+        m_NearbyClient.SetConnectName(ConnectName);
+        m_NearbyClient.StartDiscovery();
+    }
+    public static void StopNearbyDiscovery()
+    {
+        m_NearbyClient.StopDiscovery();
+    }
+    public static void SendData(String Id, byte[] data)
+    {
+        m_NearbyClient.SendData(Id, data);
+    }
 }

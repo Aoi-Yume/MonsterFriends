@@ -54,7 +54,7 @@ void InformationPlate::GameEntitySetup(const void* param) {
 		pointStr[sizeof(pointStr) - 1] = '\0';
 		pText->SetText(pointStr);
 		const int nLength = strlen(pointStr);
-		// TODO 内部的にセンタリングや左揃え指定出来るようにする
+		// TODO 内部的にセンタリングや左揃え指定出来るようにする(現状多少ずれる)
 		pEntity->SetPosition(200.0f - ((float)nLength * 0.5f) * 16.0f, 0.0f, 0);
 		pText->SetOrtho(true);
 		AddChild(pEntity);
