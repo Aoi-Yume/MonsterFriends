@@ -19,14 +19,19 @@ public:
 	virtual ~TransferBase();
 
 	void RequestEnd();
+	bool IsStart() const;
 	bool IsEnd() const;
 
 protected:
 	void startTransfer();
 	void stopTransfer();
 
-	virtual void updateTransfer() = 0;
-	virtual void updateReceive(const char* Id, void* pData) = 0;
+	int getSendCnt() const;
+	int getReceiveCnt() const;
+
+	virtual void initialize() = 0;
+	virtual bool updateTransfer() = 0;
+	virtual void updateReceive(const char* Id, void* pData);
 	
 private:
 	void onThread();

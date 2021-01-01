@@ -68,6 +68,7 @@ class GameMainRender implements GLSurfaceView.Renderer {
         System.loadLibrary("aoiyume_pch-lib");
         System.loadLibrary("math-lib");
         System.loadLibrary("algorithm-lib");
+        System.loadLibrary("input-lib");
         System.loadLibrary( "net-lib");
         System.loadLibrary("aoiyume_engine-lib");
         System.loadLibrary("jni_main-lib");

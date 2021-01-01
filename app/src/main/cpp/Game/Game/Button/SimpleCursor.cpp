@@ -7,11 +7,14 @@
 #include <CollisionComponent.h>
 #include <TransformComponent.h>
 #include <CameraComponent.h>
+#include <Button/ButtonManager.h>
+#include <DelayInput.h>
 #include "SimpleCursor.h"
 
-SimpleCursor::SimpleCursor(const char* pResName)
+SimpleCursor::SimpleCursor(const char* pResName, ButtonManager* pManager)
 : Super()
 , m_pLayoutComponent(nullptr)
+, m_pButtonManager(pManager)
 {
 #if 0
 	{
@@ -37,8 +40,14 @@ SimpleCursor::~SimpleCursor()
 
 void SimpleCursor::EntityUpdate(GameMessage message, const void *param) {
 	if(message == eGameMessage_Update){
-		const float fTouchX = Engine::GetEngine()->GetTouchInputInfo().m_fTouchX;
-		const float fTouchY = Engine::GetEngine()->GetTouchInputInfo().m_fTouchY;
+		const auto pEngine = Engine::GetEngine();
+		const int nPlayerId = m_pButtonManager->GetControlPlayerId();
+		TouchInputInfo info = {};
+		if(!pEngine->FindDelayTouchInfo(info, eTouchEvent_DOWN, nPlayerId)){
+			!pEngine->FindDelayTouchInfo(info, eTouchEvent_MOVE, nPlayerId);
+		}
+		const float fTouchX = info.fTouchX;
+		const float fTouchY = info.fTouchY;
 		const float fScreenX = Engine::GetEngine()->GetScreenInfo().m_nScreenX;
 		const float fScreenY = Engine::GetEngine()->GetScreenInfo().m_nScreenY;
 		auto pCamera = (CameraComponent *) Engine::GetEngine()->GetCameraComponent();

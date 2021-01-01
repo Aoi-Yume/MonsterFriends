@@ -5,6 +5,7 @@
 
 #include <LayoutComponent.h>
 #include <sstream>
+#include <DelayInput.h>
 #include "MessageWindow.h"
 
 MessageWindow::MessageWindow(const char* pResName)
@@ -12,6 +13,7 @@ MessageWindow::MessageWindow(const char* pResName)
 , m_bNextMessage(false)
 , m_nNextMessageCnt(0)
 , m_nCurrentUseLine(0)
+, m_nControlPlayerId(-1)
 , m_cResPath()
 , m_fTextScale(1.0f)
 , m_pLayoutComponent(nullptr)
@@ -54,7 +56,9 @@ void MessageWindow::GameEntityUpdate(const void* param)
 	Super::GameEntityUpdate(param);
 
 	if(!m_bNextMessage){
-		if(Engine::GetEngine()->GetTouchInputInfo().m_nTouchEvent == 0){
+		TouchInputInfo info = {};
+		const bool bFind = Engine::GetEngine()->FindDelayTouchInfo(info, eTouchEvent_DOWN, m_nControlPlayerId);
+		if(bFind){
 			m_bNextMessage = true;
 			m_nNextMessageCnt = 0;
 		}
@@ -78,6 +82,11 @@ void MessageWindow::SetVisible(bool bVisible)
 	for(int i = 0; i < eLINE_MAX; ++i) {
 		m_pTextComponent[i]->SetVisible(bVisible);
 	}
+}
+
+void MessageWindow::SetControlPlayerId(int nPlayerId)
+{
+	m_nControlPlayerId = nPlayerId;
 }
 
 void MessageWindow::SetTextScale(float fScale)

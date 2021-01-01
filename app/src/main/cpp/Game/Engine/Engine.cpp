@@ -4,6 +4,8 @@
 
 
 #include "Engine.h"
+#include <TransferManager.h>
+#include <DelayInput.h>
 
 static Engine* s_AoYumeEngine = nullptr;
 
@@ -11,7 +13,6 @@ static Engine* s_AoYumeEngine = nullptr;
 //-----------------------------------------
 Engine::Engine()
 : m_nRef(0)
-, m_touchInputInfo()
 , m_AssetManagerObjRef(nullptr)
 , m_pAssetMaanger(nullptr)
 {
@@ -30,6 +31,8 @@ void Engine::Create()
 	if( !s_AoYumeEngine ){
 		s_AoYumeEngine = new Engine();
 	}
+	DELAY_INPUT()->Initialize(10);
+	DELAY_INPUT()->StartDelayInput();
 	s_AoYumeEngine->AddRef();
 }
 
@@ -83,40 +86,25 @@ const ScreenInfo& Engine::GetScreenInfo() const
 
 //-----------------------------------------
 //-----------------------------------------
-void Engine::SetTouchInputInfo(int nEvent, float fTouchX, float fTouchY)
+void Engine::SetTouchInputInfo(int nEvent, float fTouchX, float fTouchY, int nPlayerId)
 {
-	m_touchInputInfo.m_nPreTouchEvent = m_touchInputInfo.m_nTouchEvent;
-	m_touchInputInfo.m_nTouchEvent = nEvent;
-	m_touchInputInfo.m_fTouchX = fTouchX;
-	m_touchInputInfo.m_fTouchY = fTouchY;
-	m_touchInputInfo.m_nTouchCnt = 0;
+	nPlayerId = fixNetPlayerId(nPlayerId);
+
+	TouchInputInfo info = {};
+	info.nTouchEvent = nEvent;
+	info.fTouchX = fTouchX;
+	info.fTouchY = fTouchY;
+	info.nTouchCnt = 0;
+
+	DELAY_INPUT()->AddTouchInfo(info, nPlayerId);
 }
 
 //-----------------------------------------
 //-----------------------------------------
-const TouchInputInfo& Engine::GetTouchInputInfo() const
+bool Engine::FindDelayTouchInfo(TouchInputInfo& info, int nEvent, int nPlayerId) const
 {
-	return m_touchInputInfo;
-}
-
-//-----------------------------------------
-//-----------------------------------------
-void Engine::CheckTouchUpdate()
-{
-	m_touchInputInfo.m_nTouchCnt++;
-	if(m_touchInputInfo.m_nTouchCnt >= 5){
-		// TouchEventがない状態で一定フレーム経過した
-		m_touchInputInfo.m_nTouchEvent = -1;
-	}
-}
-
-//-----------------------------------------
-//-----------------------------------------
-void Engine::ResetTouchEvent()
-{
-	m_touchInputInfo.m_nPreTouchEvent = m_touchInputInfo.m_nTouchEvent;
-	m_touchInputInfo.m_nTouchEvent = -1;
-	m_touchInputInfo.m_nTouchCnt = 0;
+	nPlayerId = fixNetPlayerId(nPlayerId);
+	return DELAY_INPUT()->FindDelayTouchInfo(info, nEvent, nPlayerId);
 }
 
 //-----------------------------------------
@@ -262,4 +250,20 @@ void Engine::SendData(const char* pId, jbyte* pData, int nSize)
 Engine* Engine::GetEngine()
 {
 	return s_AoYumeEngine;
+}
+
+//-----------------------------------------
+//-----------------------------------------
+int Engine::fixNetPlayerId(int nPlayerId) const
+{
+	if(nPlayerId == -1){
+		auto pManager = TransferManager::Get();
+		nPlayerId = 0;
+		if(pManager->IsConnectSucess()){
+			if(pManager->GetSelfConnect().nPlayerId >= 0){
+				nPlayerId = pManager->GetSelfConnect().nPlayerId;
+			}
+		}
+	}
+	return nPlayerId;
 }

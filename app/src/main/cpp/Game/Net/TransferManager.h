@@ -18,29 +18,43 @@ class TransferManager : public Singleton<TransferManager>
 public:
 	enum TransferKind : uint8_t {
 		eTransferKind_Connect,
+		eTransferKind_PlayerId,
+		eTransferKind_GameInfo,
+		eTransferKind_TouchInfo,
 		eTransferKind_Max
 	};
 
 	struct ConnectInfo {
+		bool bHost = false;
+		int nPlayerId = -1;
 		std::string Id = "";
 		std::string	Name = "";
 
 		ConnectInfo()
-		: Id("")
+		: bHost(false)
+		, nPlayerId(-1)
+		, Id("")
 		, Name("")
 		{}
 
 		ConnectInfo(const char* pId, const char* pName)
-		: Id(pId)
+		: bHost(false)
+		, nPlayerId(-1)
+		, Id(pId)
 		, Name(pName)
 		{}
 	};
 	
 public:
-	
+	void Initialize(bool bHost);
+
+	void SetConnectSuccess(bool bConnect);
+	bool IsConnectSucess() const;
+
 	void SetTransfer(int nKind, TransferBase* pTransfer);
 	void StartTransfer(int nKind);
 	void StopTransfer(int nKind);
+	bool IsStartTransfer(int nKind) const;
 	
 	template<class T>
 	T* GetTransfer(int nKind) {
@@ -48,14 +62,34 @@ public:
 		return reinterpret_cast<T*>(m_aTransfer[nKind]);
 	}
 
+	bool IsHost() const;
+
+	void SetSelfConnect(const ConnectInfo& info);
+	const ConnectInfo& GetSelfConnect() const;
+
 	void AddConnect(const ConnectInfo& info);
 	const ConnectInfo& GetConnect(int nNo) const;
+	const ConnectInfo& GetHostConnect() const;
 	int GetConnectNum() const;
 
+	void SetConnectHost(const char* id, bool bHost);
+	void SetConnectPlayerId(const char* id, int nPlayerId);
+
+	void SendHost(jbyte* pData, int nSize);
 	void BroadCast(jbyte* pData, int nSize);
 	void ReceiveData(const char* id, jbyte* pData, int nSize);
 
+	bool IsSeldConnectId(const char* id) const;
+	int GetConnectNoFromNetId(const char* id) const;
+	int GetPlayerIdFromNetId(const char* id) const;
+
 private:
+	void sendData(const char* id, jbyte* pData, int nSize);
+
+private:
+	bool m_bHost;
+	bool m_bConnectSucess;
+	ConnectInfo	m_SelfInfo;
 
 	std::vector<TransferBase*>	m_aTransfer;
 	std::vector<ConnectInfo>	m_aConnectInfo;

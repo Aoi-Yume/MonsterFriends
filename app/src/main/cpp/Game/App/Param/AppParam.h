@@ -13,8 +13,17 @@ class AppParam : public Singleton<AppParam>
 {
 	USE_SINGLETON(AppParam)
 public:
+	struct GameNetworkInfo {
+		int8_t  nCurrentPlayerId;
+		int8_t  nCurrentTurn;
+		struct CharaInfo {
+			int nKizunaPoint;
+		};
+		CharaInfo	ChharaInfo[NET_CONNECT_MAX];
+	};
+
 	struct CharacterInfo {
-		char charaName[64];
+		char cCharaName[32];
 		int nKizunaPoint;
 	};
 
@@ -25,8 +34,12 @@ public:
 	void AddKizunaPoint(int nAdd);
 	int GetKizunaPoint() const;
 
+	GameNetworkInfo& GetNetworkInfo();
+	void DumpNetworkInfo();
+
 private:
-	CharacterInfo m_CharaInfo;
+	CharacterInfo 		m_CharaInfo;
+	GameNetworkInfo		m_NetworkGameInfo;
 };
 
 #endif

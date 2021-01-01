@@ -10,6 +10,8 @@ cmake_minimum_required(VERSION 3.4.1)
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
 
+include_directories(	src/main/cpp/Game/Input)
+include_directories(	src/main/cpp/Game/Net)
 include_directories(	src/main/cpp/Game/Engine )
 include_directories(	src/main/cpp/Game/Base )
 include_directories(	src/main/cpp/Game/Component	)
@@ -33,10 +35,16 @@ add_library(    math-lib SHARED
 add_library(	algorithm-lib SHARED
 				src/main/cpp/Game/Base/Singleton.cpp)
 
+add_library(    input-lib SHARED
+				src/main/cpp/Game/Input/DelayInput.cpp)
+
 add_library(	net-lib SHARED
 				src/main/cpp/Game/Net/TransferBase.cpp
 				src/main/cpp/Game/Net/TransferManager.cpp
-				src/main/cpp/Game/Net/TransferConnect.cpp)
+				src/main/cpp/Game/Net/TransferConnect.cpp
+				src/main/cpp/Game/Net/TransferPlayerId.cpp
+				src/main/cpp/Game/Net/TransferGameInfo.cpp
+				src/main/cpp/Game/Net/TransferTouchInfo.cpp)
 
 add_library(	aoiyume_engine-lib SHARED
 				src/main/cpp/Game/Engine/engine-lib.cpp
@@ -121,7 +129,8 @@ find_library(
 target_link_libraries( aoiyume_pch-lib ${log-lib} ${android-lib} )
 target_link_libraries( math-lib aoiyume_pch-lib )
 target_link_libraries( algorithm-lib aoiyume_pch-lib math-lib)
-target_link_libraries( net-lib algorithm-lib)
+target_link_libraries( input-lib algorithm-lib)
+target_link_libraries( net-lib input-lib)
 target_link_libraries( aoiyume_engine-lib net-lib ${opengl-lib} )
 target_link_libraries( jni_main-lib aoiyume_engine-lib )
 

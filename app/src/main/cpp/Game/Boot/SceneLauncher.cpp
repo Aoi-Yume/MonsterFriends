@@ -3,6 +3,7 @@
 //
 
 
+#include <DelayInput.h>
 #include <LayoutComponent.h>
 #include <SceneManager.h>
 #include <Button/ButtonManager.h>
@@ -89,9 +90,6 @@ void SceneLauncher::SceneUpdate()
 	Super::SceneUpdate();
 	//DEBUG_LOG("Launcher Call Update");
 
-	if(Engine::GetEngine()->GetTouchInputInfo().m_nTouchEvent == -1){
-		m_pSimpleBtnMgr->Reset();
-	}
 #if 1
 	switch (m_pSimpleBtnMgr->GetDecide()){
 		case eButton_Title:{ SCENE_MANAGER()->AddNextCallScene(SceneTitle::CreateScene()); break; }
@@ -100,7 +98,7 @@ void SceneLauncher::SceneUpdate()
 		case eButton_SpendTime:{ SCENE_MANAGER()->AddNextCallScene(SceneSpendTime::CreateScene()); break; }
 		case eButton_Work:{ SCENE_MANAGER()->AddNextCallScene(SceneWork::CreateScene()); break; }
 		case eButton_Shop:{ SCENE_MANAGER()->AddNextCallScene(SceneShop::CreateScene()); break; }
-		default: { break; }
+		default: { 	m_pSimpleBtnMgr->Reset(); break; }
 	}
 #endif
 }

@@ -10,15 +10,19 @@ TransferConnect::TransferConnect()
 : TransferBase(TransferManager::eTransferKind_Connect, 500 * 1000 * 1000)
 , m_Data()
 {
-	m_Data.uKind = TransferManager::eTransferKind_Connect;
 }
 
 TransferConnect::~TransferConnect()
 {
 }
 
+void TransferConnect::initialize()
+{
+	m_Data.uKind = TransferManager::eTransferKind_Connect;
+	m_Data.bHost = TransferManager::Get()->IsHost();
+}
 
-void TransferConnect::updateTransfer()
+bool TransferConnect::updateTransfer()
 {
 	const int nConnectNum = TransferManager::Get()->GetConnectNum();
 	for(int i = 0; i < nConnectNum; ++i){
@@ -27,14 +31,17 @@ void TransferConnect::updateTransfer()
 		m_Data.IDInfo[i].OpponentId[sizeof(m_Data.IDInfo[i].OpponentId) - 1] = '\0';
 	}
 	TransferManager::Get()->BroadCast((jbyte*)&m_Data, sizeof(m_Data));
+	return true;
 }
 void TransferConnect::updateReceive(const char* Id, void* pData)
 {
 	if(IsEnd()){ return; }
 	if(std::strlen(m_Data.SelfId) > 0){ return; }
+	TransferBase::updateReceive(Id, pData);
 
+	auto pManager = TransferManager::Get();
 	Data* pReceiveData = (Data*)pData;
-	const int nConnectNum = TransferManager::Get()->GetConnectNum();
+	const int nConnectNum = pManager->GetConnectNum();
 	for(int i = 0; i < nConnectNum; ++i){
 		const auto& idInfo = pReceiveData->IDInfo[i];
 		bool bHit = false;
@@ -49,8 +56,12 @@ void TransferConnect::updateReceive(const char* Id, void* pData)
 		}
 		std::snprintf(m_Data.SelfId, sizeof(m_Data.SelfId), "%s", idInfo.OpponentId);
 		m_Data.SelfId[sizeof(m_Data.SelfId) - 1] = '\0';
+
+		TransferManager::ConnectInfo info(m_Data.SelfId, "");
+		pManager->SetSelfConnect(info);
 		RequestEnd();
 	}
+	pManager->SetConnectHost(Id, pReceiveData->bHost);
 }
 
 void TransferConnect::Dump()

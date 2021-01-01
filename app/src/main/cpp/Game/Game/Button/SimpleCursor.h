@@ -10,13 +10,14 @@
 
 class Collision2DRectComponent;
 class LayoutComponent;
+class ButtonManager;
 
 class SimpleCursor : public Entity
 {
 	typedef Entity Super;
 
 public:
-	SimpleCursor(const char* pResName);
+	SimpleCursor(const char* pResName, ButtonManager* pManager);
 	virtual ~SimpleCursor();
 
 public:
@@ -24,6 +25,7 @@ public:
 
 private:
 	LayoutComponent*	m_pLayoutComponent;
+	ButtonManager*		m_pButtonManager;
 };
 
 #endif

@@ -6,6 +6,7 @@
 #include "SceneBase.h"
 #include <SceneManager.h>
 #include <LayoutComponent.h>
+#include <DelayInput.h>
 
 //------------------------------------------
 //------------------------------------------
@@ -79,11 +80,11 @@ void SceneBase::SceneUpdate()
 {
 	// 継承先で実装
 
-	auto touchInfo = Engine::GetEngine()->GetTouchInputInfo();
-	auto scrennInfo = Engine::GetEngine()->GetScreenInfo();
-	if(touchInfo.m_nTouchEvent == 0){
-		if(	touchInfo.m_fTouchX >= scrennInfo.m_nScreenX - 20 &&
-			touchInfo.m_fTouchY <= 20){
+	TouchInputInfo touchInfo = {};
+	const bool bFind = Engine::GetEngine()->FindDelayTouchInfo(touchInfo,eTouchEvent_DOWN);
+	if(bFind){
+		if(	touchInfo.fTouchX <= 20 &&
+			touchInfo.fTouchY <= 20){
 			// TODO Launcher以外のシーンを削除するようにする
 			SCENE_MANAGER()->EndScene();
 		}

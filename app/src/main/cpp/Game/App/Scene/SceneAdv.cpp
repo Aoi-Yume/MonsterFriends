@@ -87,6 +87,7 @@ void SceneAdv::SceneSetup() {
 		pBtn->Disable();
 		pBtn->SetVisible(false);
 		pBtn->SetPosition(VEC3(0, -400.0f, 0));
+		m_pBtnManager->SetControlPlayerId(AppParam::Get()->GetNetworkInfo().nCurrentPlayerId);
 	}
 	{
 		m_pInformationPlate = new InformationPlate();
@@ -98,6 +99,7 @@ void SceneAdv::SceneSetup() {
 		m_pMessageWindow->SetTextScale(1.5f);
 		m_pMessageWindow->SetDirectMessage("敵のスライムが現れた！");
 		m_pMessageWindow->SetVisible(true);
+		m_pMessageWindow->SetControlPlayerId(AppParam::Get()->GetNetworkInfo().nCurrentPlayerId);
 	}
 	DEBUG_LOG("Setup End");
 }
@@ -192,7 +194,7 @@ void SceneAdv::updateAppearEnemyStep()
 	}
 	else if(m_nSubStep == 1){
 		m_pMessageWindow->SetDirectMessage("サイコロで勝負！");
-		Engine::GetEngine()->ResetTouchEvent();
+//		Engine::GetEngine()->ResetTouchEvent();
 		m_nSubStep = 2;
 	}
 	else if(m_nSubStep == 2){
@@ -219,7 +221,7 @@ void SceneAdv::updateBattleStep()
 		pBtn->SetVisible(true);
 		pBtn->Enable();
 		m_pBtnManager->Reset();
-		Engine::GetEngine()->ResetTouchEvent();
+//		Engine::GetEngine()->ResetTouchEvent();
 		m_Chara.pDice->SetVisible(0, true);
 		m_Chara.pDice->StartDice();
 		m_Enemy.pDice->SetVisible(0, true);
@@ -254,7 +256,7 @@ void SceneAdv::updateBattleStep()
 			cText[sizeof(cText) - 1] = '\0';
 			m_pMessageWindow->SetDirectMessage(cText);
 			m_pMessageWindow->SetVisible(true);
-			Engine::GetEngine()->ResetTouchEvent();
+//			Engine::GetEngine()->ResetTouchEvent();
 			m_nSubStep = 3;
 		}
 	}
@@ -273,7 +275,7 @@ void SceneAdv::updateBattleStep()
 		// TODO キズナ値調整
 		m_pMessageWindow->SetDirectMessage("キズナが10増えた！");
 		AppParam::Get()->AddKizunaPoint(10);
-		Engine::GetEngine()->ResetTouchEvent();
+//		Engine::GetEngine()->ResetTouchEvent();
 		m_nSubStep = 5;
 	}
 	else if(m_nSubStep == 5){

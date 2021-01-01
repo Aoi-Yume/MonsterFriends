@@ -33,11 +33,20 @@ protected:
 
 private:
 	enum {
+		eSTEP_NetworkInfoUpdate,
+		eSTEP_NetworkInfoUpdateWait,
+		eSTEP_ControlPlayer,
+		eSTEP_MAX
+	};
+
+	enum {
 		eBtn_Adv,
 		eBtn_SpendTime,
 		eBtn_Work,
 		eBtn_Max
 	};
+
+	int 		m_nStep;
 
 	Entity*		m_pBgImage;
 	Entity*		m_pChara;		// TODO キャラクラスに変更

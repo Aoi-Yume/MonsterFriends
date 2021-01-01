@@ -14,6 +14,10 @@
 #include <SceneManager.h>
 #include <InformationPlate.h>
 #include <MessageWindow/MessageWindow.h>
+#include <../Net/TransferManager.h>
+#include <../Net/TransferGameInfo.h>
+#include <../Net/TransferTouchInfo.h>
+#include <AppParam.h>
 
 SceneBase* SceneGameMain::CreateScene()
 {
@@ -58,6 +62,7 @@ void SceneGameMain::SceneSetup() {
 	}
 	{
 		m_pChara = new Entity();
+		const char* pResName = "image/chara_01.png";
 		Entity::CreateLayoutComponent(m_pChara, "image/chara_01.png");
 		auto pLayoutComponent = (LayoutComponent *) m_pChara->GetComponent(eComponentKind_Layout);
 		pLayoutComponent->SetOrtho(true);
@@ -87,6 +92,14 @@ void SceneGameMain::SceneSetup() {
 		m_pMessageWindow->SetDirectMessage("てすと\nててててすと");
 		m_pMessageWindow->SetVisible(false);
 	}
+	m_nStep = eSTEP_ControlPlayer;
+	auto pManager = TransferManager::Get();
+	if(pManager->IsConnectSucess()) {
+		if(!pManager->IsStartTransfer(TransferManager::eTransferKind_TouchInfo)) {
+			pManager->StartTransfer(TransferManager::eTransferKind_TouchInfo);
+		}
+		m_nStep = eSTEP_NetworkInfoUpdate;
+	}
 	DEBUG_LOG("Setup End");
 }
 
@@ -97,12 +110,49 @@ void SceneGameMain::SceneUpdate()
 	Super::SceneUpdate();
 	//DEBUG_LOG("Launcher Call Update");
 
-	switch (m_pBtnManager->GetDecide()){
-		case eBtn_Adv: { SCENE_MANAGER()->ChangeScene(SceneAdv::CreateScene()); break; }
-		case eBtn_SpendTime: { SCENE_MANAGER()->ChangeScene(SceneSpendTime::CreateScene()); break; }
-		case eBtn_Work: { SCENE_MANAGER()->ChangeScene(SceneWork::CreateScene()); break; }
-		default:{ break; }
+	auto pManager = TransferManager::Get();
+	if(m_nStep == eSTEP_NetworkInfoUpdate){
+		// ゲーム情報の送受信設定
+		auto pInfo = pManager->GetTransfer<TransferGameInfo>(TransferManager::eTransferKind_GameInfo);
+		pInfo->SetGameInfoData(&AppParam::Get()->GetNetworkInfo(), sizeof(AppParam::GameNetworkInfo));
+		pInfo->SetReceiveCallBack([](void* pData){
+			auto& pParam = AppParam::Get()->GetNetworkInfo();
+			pParam = *reinterpret_cast<AppParam::GameNetworkInfo*>(pData);
+		});
+		pInfo->SetDumpCallBack([](){ AppParam::Get()->DumpNetworkInfo(); });
+		pManager->StartTransfer(TransferManager::eTransferKind_GameInfo);
+		m_nStep = eSTEP_NetworkInfoUpdateWait;
 	}
+	else if(m_nStep == eSTEP_NetworkInfoUpdateWait){
+		// ゲーム情報送受信待ち
+		auto pTransfer = pManager->GetTransfer<TransferBase>(TransferManager::eTransferKind_GameInfo);
+		if(pTransfer->IsEnd()){
+			DELAY_INPUT()->ResetDelayInput();
+			pTransfer->Dump();
+			m_pBtnManager->SetControlPlayerId(AppParam::Get()->GetNetworkInfo().nCurrentPlayerId);
+			m_nStep = eSTEP_ControlPlayer;
+		}
+	}
+	else if(m_nStep == eSTEP_ControlPlayer) {
+		switch (m_pBtnManager->GetDecide()){
+			case eBtn_Adv: {
+				SCENE_MANAGER()->ChangeScene(SceneAdv::CreateScene());
+				break;
+			}
+			case eBtn_SpendTime: {
+				SCENE_MANAGER()->ChangeScene(SceneSpendTime::CreateScene());
+				break;
+			}
+			case eBtn_Work: {
+				SCENE_MANAGER()->ChangeScene(SceneWork::CreateScene());
+				break;
+			}
+			default:{ break; }
+		}
+	}
+
+	//auto pTouchInput = Engine::GetEngine()->GetTouchInputInfoPtr(0);
+	//DEBUG_LOG_A("TouchEvent[%d], X[%.2f], Y[%.2f]\n", pTouchInput->nTouchEvent, pTouchInput->fTouchX, pTouchInput->fTouchY);
 }
 
 //------------------------------------------

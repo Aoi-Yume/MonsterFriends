@@ -95,13 +95,11 @@ void SceneWork::SceneUpdate() {
 	if(m_nStep == 0){
 		if(m_nStepCnt >= 180){
 			m_pMessageWindow->SetVisible(true);
-			Engine::GetEngine()->ResetTouchEvent();
 			m_nNextStep = 1;
 		}
 	}
 	else if(m_nStep == 1){
 		if(m_pMessageWindow->IsNextMessage()) {
-			Engine::GetEngine()->ResetTouchEvent();
 			// TODO キズナ値調整
 			m_pMessageWindow->SetDirectMessage("キズナが10増えた！");
 			AppParam::Get()->AddKizunaPoint(10);

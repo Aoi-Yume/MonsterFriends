@@ -1,10 +1,10 @@
 ﻿//
-// Created by 葵ユメ on 2020/12/27.
+// Created by 葵ユメ on 2020/12/31.
 //
 
 
-#ifndef AOIYUME_TRANSFER_CONNECT_H
-#define AOIYUME_TRANSFER_CONNECT_H
+#ifndef AOIYUME_TRANSFER_PLAYERID_H
+#define AOIYUME_TRANSFER_PLAYERID_H
 
 #include <thread>
 #include "../Engine/Engine.h"
@@ -12,15 +12,15 @@
 
 class TransferManager;
 
-class TransferConnect : public TransferBase
+class TransferPlayerId : public TransferBase
 {
 	friend class TransferManager;
 public:
-	TransferConnect();
-	virtual ~TransferConnect();
+	TransferPlayerId();
+	virtual ~TransferPlayerId();
 
 protected:
-	void initialize() override;
+	void initialize() override ;
 	bool updateTransfer() override;
 	void updateReceive(const char* Id, void* pData) override;
 
@@ -30,13 +30,14 @@ public:
 private:
 	struct Data {
 		uint8_t  	uKind;
-		bool bHost;
-		char SelfId[16];
+		bool 		bReqEnd;
 		struct IDInfo {
-			char OpponentId[16];
+			int8_t	nPlayerId;
+			char 	cNetId[16];
 		};
-		IDInfo		IDInfo[NET_CONNECT_MAX - 1];
+		IDInfo		IDInfo[NET_CONNECT_MAX];
 	};
+	bool m_bReceive[NET_CONNECT_MAX];
 	Data m_Data;
 };
 

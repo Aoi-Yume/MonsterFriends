@@ -126,10 +126,12 @@ void SceneTitle::SceneUpdate() {
 			AppParam::Get()->SetCharaName(charName);
 			if(strcmp(charName, "親") == 0) {
 				Engine::GetEngine()->StartNearbyAdvertising(charName);
+				TransferManager::Get()->Initialize(true);
 				DEBUG_LOG("親NEarby\n");
 			}
 			else {
 				Engine::GetEngine()->StartNearbyDiscovery(charName);
+				TransferManager::Get()->Initialize(false);
 				DEBUG_LOG("子NEarby\n");
 			}
 			TransferManager::Get()->StartTransfer(TransferManager::eTransferKind_Connect);
@@ -155,10 +157,32 @@ void SceneTitle::SceneUpdate() {
 			pTransfer->Dump();
 			Engine::GetEngine()->StopNearbyAdvertising();
 			Engine::GetEngine()->StopNearbyDiscovery();
+			TransferManager::Get()->StartTransfer(TransferManager::eTransferKind_PlayerId);
 			m_nNextStep = 4;
 		}
 	}
 	else if(m_nStep == 4){
+		const int nSubCnt = m_nStepCnt % 180;
+		auto pTextImage = (TextImageComponent *) (m_pPlayerName->GetComponent(eComponentKind_Layout));
+		pTextImage->SetVisible(true);
+		if(nSubCnt >= 120) {
+			pTextImage->SetText("接続中・・・", 5.0f);
+		}
+		else if(nSubCnt >= 60){
+			pTextImage->SetText("接続中・・", 5.0f);
+		}
+		else{
+			pTextImage->SetText("接続中・", 5.0f);
+		}
+		// プレイヤーID通信完了
+		auto pTransfer = TransferManager::Get()->GetTransfer<TransferBase>(TransferManager::eTransferKind_PlayerId);
+		if(pTransfer->IsEnd()) {
+			pTransfer->Dump();
+			TransferManager::Get()->SetConnectSuccess(true);
+			m_nNextStep = 5;
+		}
+	}
+	else if(m_nStep == 5){
 		SCENE_MANAGER()->ChangeScene(SceneGameMain::CreateScene());
 	}
 	if(m_nStep != m_nNextStep){

@@ -11,22 +11,7 @@
 #include <GLES2/gl2.h>
 #include <android/asset_manager_jni.h>
 
-struct TouchInputInfo{
-	int		m_nPreTouchEvent;
-	int		m_nTouchEvent;
-	int 	m_nTouchCnt;
-	float	m_fTouchX;
-	float	m_fTouchY;
-	
-	TouchInputInfo()
-	: m_nPreTouchEvent(0)
-	, m_nTouchEvent(-1)
-	, m_nTouchCnt(0)
-	, m_fTouchX(0.0f)
-	, m_fTouchY(0.0f)
-	{
-	}
-};
+struct TouchInputInfo;
 
 struct ScreenInfo{
 	int 	m_nScreenX;
@@ -54,10 +39,8 @@ public:
 	void SetScreenInfo(int nWidth, int nHeight, float fAspect);
 	const ScreenInfo& GetScreenInfo() const;
 
-	void SetTouchInputInfo(int nEvent, float fTouchX, float fTouchY);
-	const TouchInputInfo& GetTouchInputInfo() const;
-	void CheckTouchUpdate();
-	void ResetTouchEvent();
+	void SetTouchInputInfo(int nEvent, float fTouchX, float fTouchY, int nPlayerId = -1);
+	bool FindDelayTouchInfo(TouchInputInfo& info, int nEvent, int nPlayerId = -1) const;
 
 	void SetCameraComponent(void* pComponent);
 	void* GetCameraComponent() const;
@@ -82,8 +65,10 @@ public:
 	static Engine* GetEngine();
 
 private:
+	int fixNetPlayerId(int nPlayerId) const;
+
+private:
 	int				m_nRef;
-	TouchInputInfo	m_touchInputInfo;
 	ScreenInfo		m_screenInfo;
 
 	void*	m_pCameraComponent;

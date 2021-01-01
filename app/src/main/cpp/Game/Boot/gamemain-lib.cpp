@@ -9,6 +9,7 @@
 #include "../Engine/Engine.h"
 #include "../App/Param/AppParam.h"
 #include <SceneManager.h>
+#include <DelayInput.h>
 
 EXTERN_C
 
@@ -71,8 +72,7 @@ Java_com_aoiyume_Game_GameMainRender_SurfaceDraw(
 	s_EntityMgr->Update(eGameMessage_Draw, nullptr);
 
 	//glDisable(GL_DEPTH_TEST);
-	Engine::GetEngine()->CheckTouchUpdate();
-
+	DELAY_INPUT()->Update();
 }
 
 END_EXTERN_C

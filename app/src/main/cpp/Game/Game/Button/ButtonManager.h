@@ -33,8 +33,10 @@ public:
 	bool IsLock() const;
 
 	void Reset();
-	int GetDecide() const;
+	void SetControlPlayerId(int nPlayerId = -1);
+	int GetControlPlayerId() const;
 
+	int GetDecide() const;
 
 	void Update(GameMessage message, const void* param);
 
@@ -42,6 +44,7 @@ private:
 	bool		m_bLock;
 	int 		m_nSelectNo;
 	int 		m_nDecideNo;
+	int 		m_nControlPlayerId;
 	Entity*		m_pCursorEntity;
 	std::vector<ButtonBase*>	m_aButtons;
 };

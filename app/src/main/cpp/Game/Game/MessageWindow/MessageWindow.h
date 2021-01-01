@@ -36,6 +36,7 @@ public:
 
 public:
 	void SetVisible(bool bVisible);
+	void SetControlPlayerId(int nPlayerId = -1);
 
 	void SetTextScale(float fScale);
 	void SetMessage(const char* pLabel);
@@ -52,6 +53,7 @@ private:
 	bool 			m_bNextMessage;
 	int 			m_nNextMessageCnt;
 	int 			m_nCurrentUseLine;
+	int 			m_nControlPlayerId;
 	char 			m_cResPath[64];
 	float 			m_fTextScale;
 	LayoutComponent*	m_pLayoutComponent;
