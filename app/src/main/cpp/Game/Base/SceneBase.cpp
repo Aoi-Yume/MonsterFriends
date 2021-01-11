@@ -7,13 +7,16 @@
 #include <SceneManager.h>
 #include <LayoutComponent.h>
 #include <DelayInput.h>
+#include <TransferManager.h>
+#include <TransferBase.h>
 
 //------------------------------------------
 //------------------------------------------
 SceneBase::SceneBase(const char* pSceneName)
 : EntityBase()
 , m_nSceneState(eSceneState_ActiveWait)
-, m_pSceneName(pSceneName)
+, m_nSyncStep(eSyncStep_None)
+, m_SceneName(pSceneName)
 {
 }
 
@@ -34,7 +37,21 @@ int SceneBase::GetSceneState() const
 //------------------------------------------
 const char* SceneBase::GetSceneName() const
 {
-	return m_pSceneName;
+	return m_SceneName.c_str();
+}
+
+//------------------------------------------
+//------------------------------------------
+void SceneBase::SetSyncStep(int nStep)
+{
+	m_nSyncStep = nStep;
+}
+
+//------------------------------------------
+//------------------------------------------
+int SceneBase::GetSyncStep() const
+{
+	return m_nSyncStep;
 }
 
 //------------------------------------------
@@ -42,6 +59,13 @@ const char* SceneBase::GetSceneName() const
 bool SceneBase::IsActiveWait() const
 {
 	return GetSceneState() == eSceneState_ActiveWait;
+}
+
+//------------------------------------------
+//------------------------------------------
+bool SceneBase::IsSyncWait() const
+{
+	return GetSceneState() == eSceneState_SyncWait;
 }
 
 //------------------------------------------
@@ -69,16 +93,48 @@ bool SceneBase::IsDeactived() const
 //------------------------------------------
 void SceneBase::SceneSetup()
 {
-	m_nSceneState = eSceneState_Actived;
+	if(TransferManager::Get()->IsConnectSucess()){
+		m_nSyncStep = eSyncStep_SceneSync;
+		m_nSceneState = eSceneState_SyncWait;
+	}
+	else {
+		m_nSceneState = eSceneState_Actived;
+	}
 
-	// 継承先で実装
+	// 継承先でも実装
+}
+
+//------------------------------------------
+//------------------------------------------
+void SceneBase::SceneSync()
+{
+	// 継承先でも実装
+	auto pManager = TransferManager::Get();
+	if(m_nSyncStep == eSyncStep_SceneSync){
+		DEBUG_LOG("SyncWait\n");
+		pManager->StartTransfer(TransferManager::eTransferKind_SyncScene);
+		m_nSyncStep = eSyncStep_TouchInfo;
+	}
+	else if(m_nSyncStep == 1){
+		auto pTransfer = pManager->GetTransfer<TransferBase>(TransferManager::eTransferKind_SyncScene);
+		if(pTransfer->IsEnd()){
+			if(!pManager->IsStartTransfer(TransferManager::eTransferKind_TouchInfo)) {
+				pManager->StartTransfer(TransferManager::eTransferKind_TouchInfo);
+			}
+			DELAY_INPUT()->ResetDelayInput();
+			m_nSyncStep = eSyncStep_UserSync;
+		}
+	}
+	else if(m_nSyncStep == eSyncStep_UserSync){
+		m_nSyncStep = eSyncStep_End;
+	}
 }
 
 //------------------------------------------
 //------------------------------------------
 void SceneBase::SceneUpdate()
 {
-	// 継承先で実装
+	// 継承先でも実装
 
 	TouchInputInfo touchInfo = {};
 	const bool bFind = Engine::GetEngine()->FindDelayTouchInfo(touchInfo,eTouchEvent_DOWN);
@@ -101,12 +157,27 @@ void SceneBase::SceneFinalize()
 
 //------------------------------------------
 //------------------------------------------
+bool SceneBase::IsSceneSyncEnd() const
+{
+	return m_nSyncStep == eSyncStep_End;
+}
+
+//------------------------------------------
+//------------------------------------------
 void SceneBase::EntityUpdate(GameMessage message, const void* param)
 {
 	switch(message){
 		case eGameMessage_Setup:
 		{
 			SceneSetup();
+			break;
+		}
+		case eGameMessage_Sync:
+		{
+			SceneSync();
+			if(IsSceneSyncEnd()){
+				m_nSceneState = eSceneState_Actived;
+			}
 			break;
 		}
 		case eGameMessage_Update:

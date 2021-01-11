@@ -154,6 +154,26 @@ void LayoutComponent::SetResPath(const char *pResPath){
 
 //------------------------------------------
 //------------------------------------------
+void LayoutComponent::ChangeTexture(const char* pResPath)
+{
+	SetResPath(pResPath);
+	glBindTexture(GL_TEXTURE_2D, m_nTexId);
+
+	float fSizeW = 100.0f;
+	float fSizeH = 100.0f;
+	setupTexture(fSizeW, fSizeH);
+
+	// 設定しないとテクスチャが表示されないので注意
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+//------------------------------------------
+//------------------------------------------
 GameMessageResult LayoutComponent::Update(GameMessage message, const void* param)
 {
 	switch(message)
@@ -313,6 +333,7 @@ void LayoutComponent::setupTexture(float &fSizeW, float &fSizeH)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageSize[0], imageSize[1], 0, GL_RGBA, GL_UNSIGNED_BYTE, pBuffer);
 	fSizeW = (float)imageSize[0];
 	fSizeH = (float)imageSize[1];
+	GetEnv()->DeleteLocalRef(resPath);
 }
 
 //------------------------------------------

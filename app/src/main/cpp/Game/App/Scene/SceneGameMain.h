@@ -11,49 +11,101 @@
 #include "../Engine/Engine.h"
 #include "entity_define.h"
 #include "SceneBase.h"
+#include <State.h>
 
+class StateManager;
 class ComponentBase;
 class InformationPlate;
 class MessageWindow;
+class Shop;
 
+//==========================================
+//==========================================
+class StateGameMain : public StateBase
+{
+	enum {
+		eBtn_Adv,
+		eBtn_Work,
+		eBtn_Item,
+		eBtn_Max
+	};
+
+public:
+	void Begin(void* pUserPtr) override;
+	void Update(void* pUserPtr) override;
+	void End(void* pUserPtr) override;
+};
+
+//==========================================
+//==========================================
+class StateUseOrShopSelect : public StateBase
+{
+	enum {
+		eBtn_Use,
+		eBtn_Shop,
+	};
+public:
+	void Begin(void* pUserPtr) override;
+	void Update(void* pUserPtr) override;
+	void End(void* pUserPtr) override;
+};
+
+//==========================================
+//==========================================
+class StateShop : public StateBase
+{
+	void Begin(void* pUserPtr) override;
+	void Update(void* pUserPtr) override;
+	void End(void* pUserPtr) override;
+};
+
+//==========================================
+//==========================================
 class SceneGameMain : public SceneBase
 {
 	typedef SceneBase Super;
+	friend class StateGameMain;
+	friend class StateUseOrShopSelect;
+	friend class StateShop;
+
+public:
+	enum {
+		eBtnKind_Main,
+		eBtnKind_ItemOrShop,
+	};
+
+	enum {
+		eState_GameMain,
+		eState_SelectItemUseOrShop,
+		eState_Shop,
+		eState_Max
+	};
+
 public:
 	static SceneBase* CreateScene();
+
 public:
 	SceneGameMain();
 	virtual ~SceneGameMain();
 	
 protected:
 	virtual void SceneSetup() override ;
+	virtual void SceneSync() override;
 	virtual void SceneUpdate() override ;
 	virtual void SceneFinalize() override ;
+
 	void EntityUpdate(GameMessage message, const void* param) override;
 
 private:
-	enum {
-		eSTEP_NetworkInfoUpdate,
-		eSTEP_NetworkInfoUpdateWait,
-		eSTEP_ControlPlayer,
-		eSTEP_MAX
-	};
-
-	enum {
-		eBtn_Adv,
-		eBtn_SpendTime,
-		eBtn_Work,
-		eBtn_Max
-	};
-
-	int 		m_nStep;
 
 	Entity*		m_pBgImage;
 	Entity*		m_pChara;		// TODO キャラクラスに変更
+	Shop*		m_pShop;
 
-	ButtonManager*	m_pBtnManager;
 	InformationPlate* m_pInformationPlate;
 	MessageWindow* m_pMessageWindow;
+	StateManager*	m_pStateManager;
+	std::vector<ButtonManager*>	m_aBtnManager;
 };
 
 #endif

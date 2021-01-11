@@ -31,22 +31,105 @@ const char* AppParam::GetCharaName() const
 	return m_CharaInfo.cCharaName;
 }
 
-void AppParam::AddKizunaPoint(int nAdd)
+const char* AppParam::GetCharaName(int nPlayerId) const
 {
-	m_CharaInfo.nKizunaPoint = std::min(m_CharaInfo.nKizunaPoint + nAdd, 9999);
+	const int nNo = TransferManager::Get()->GetConnectNoFromPlayerId(nPlayerId);
+	if(nNo == -1){
+		return GetCharaName();
+	}
+	return TransferManager::Get()->GetConnect(nNo).Name.c_str();
+}
 
-	// 通信用情報も更新
+void AppParam::AddKizunaPoint(int nPlayerId, int nAdd)
+{
+	// 接続完了している時は通信用情報を更新
 	auto pManager = TransferManager::Get();
 	if(pManager->IsConnectSucess()){
-		const int nPlayerId = pManager->GetPlayerIdFromNetId(pManager->GetSelfConnect().Id.c_str());
-		if(nPlayerId >= 0){
-			m_NetworkGameInfo.ChharaInfo[nPlayerId].nKizunaPoint = m_CharaInfo.nKizunaPoint;
+		auto& nKizuna = m_NetworkGameInfo.ChharaInfo[nPlayerId].nKizunaPoint;
+		nKizuna = std::min(nKizuna + nAdd, 9999);
+
+		// プレイヤーIDが自身のIDなら自分用も更新
+		const int nNetPlayerId = pManager->GetPlayerIdFromNetId(pManager->GetSelfConnect().Id.c_str());
+		if(nNetPlayerId == nPlayerId){
+			m_CharaInfo.nKizunaPoint = nKizuna;
 		}
 	}
-};
-int AppParam::GetKizunaPoint() const
+	// 接続できていない時はプレイヤーIDが０の時だけ更新
+	else if(nPlayerId == 0){
+		auto& nKizuna = m_CharaInfo.nKizunaPoint;
+		nKizuna = std::min(nKizuna + nAdd, 9999);
+		m_NetworkGameInfo.ChharaInfo[nPlayerId].nKizunaPoint = nKizuna;
+	}
+}
+void AppParam::SubKizunaPoint(int nPlayerId, int nSub)
 {
-	return m_CharaInfo.nKizunaPoint;
+	// 接続完了している時は通信用情報を更新
+	auto pManager = TransferManager::Get();
+	if(pManager->IsConnectSucess()){
+		auto& nKizuna = m_NetworkGameInfo.ChharaInfo[nPlayerId].nKizunaPoint;
+		nKizuna = std::max(nKizuna - nSub, 0);
+
+		// プレイヤーIDが自身のIDなら自分用も更新
+		const int nNetPlayerId = pManager->GetPlayerIdFromNetId(pManager->GetSelfConnect().Id.c_str());
+		if(nNetPlayerId == nPlayerId){
+			m_CharaInfo.nKizunaPoint = nKizuna;
+		}
+	}
+		// 接続できていない時はプレイヤーIDが０の時だけ更新
+	else if(nPlayerId == 0){
+		auto& nKizuna = m_CharaInfo.nKizunaPoint;
+		nKizuna = std::max(nKizuna - nSub, 0);
+		m_NetworkGameInfo.ChharaInfo[nPlayerId].nKizunaPoint = nKizuna;
+	}
+}
+int AppParam::GetKizunaPoint(int nPlayerId) const
+{
+	return m_NetworkGameInfo.ChharaInfo[nPlayerId].nKizunaPoint;
+}
+
+void AppParam::AddItem(int nPlayerId, int nItemNo, int nNum)
+{
+	assert(nItemNo >= 0 && nItemNo < eItemKind_Max);
+
+	// 接続完了している時は通信用情報を更新
+	auto pManager = TransferManager::Get();
+	if(pManager->IsConnectSucess()) {
+		auto& uItemNum = m_NetworkGameInfo.ChharaInfo[nPlayerId].uItemNum[nItemNo];
+		uItemNum = std::min((int)uItemNum + nNum, UINT8_MAX);
+
+		// プレイヤーIDが自身のIDなら自分用も更新
+		const int nNetPlayerId = pManager->GetPlayerIdFromNetId(pManager->GetSelfConnect().Id.c_str());
+		if(nNetPlayerId == nPlayerId){
+			m_CharaInfo.uItemNum[nItemNo] = uItemNum;
+		}
+	}
+	// 接続できていない時はプレイヤーIDが０の時だけ更新
+	else if(nPlayerId == 0){
+		auto& uItemNum = m_CharaInfo.uItemNum[nItemNo];
+		uItemNum = std::min((int)uItemNum + nNum, UINT8_MAX);
+	}
+}
+void AppParam::SubItem(int nPlayerId, int nItemNo, int nNum)
+{
+	assert(nItemNo >= 0 && nItemNo < eItemKind_Max);
+
+	// 接続完了している時は通信用情報を更新
+	auto pManager = TransferManager::Get();
+	if(pManager->IsConnectSucess()) {
+		auto& uItemNum = m_NetworkGameInfo.ChharaInfo[nPlayerId].uItemNum[nItemNo];
+		uItemNum = std::max((int)uItemNum + nNum, 0);
+
+		// プレイヤーIDが自身のIDなら自分用も更新
+		const int nNetPlayerId = pManager->GetPlayerIdFromNetId(pManager->GetSelfConnect().Id.c_str());
+		if(nNetPlayerId == nPlayerId){
+			m_CharaInfo.uItemNum[nItemNo] = uItemNum;
+		}
+	}
+	// 接続できていない時はプレイヤーIDが０の時だけ更新
+	else if(nPlayerId == 0){
+		auto& uItemNum = m_CharaInfo.uItemNum[nItemNo];
+		uItemNum = std::max((int)uItemNum + nNum, 0);
+	}
 }
 
 AppParam::GameNetworkInfo& AppParam::GetNetworkInfo()

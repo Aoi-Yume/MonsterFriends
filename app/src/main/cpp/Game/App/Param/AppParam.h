@@ -13,26 +13,37 @@ class AppParam : public Singleton<AppParam>
 {
 	USE_SINGLETON(AppParam)
 public:
+	enum {
+		eItemKind_Max = 10
+	};
+
 	struct GameNetworkInfo {
 		int8_t  nCurrentPlayerId;
 		int8_t  nCurrentTurn;
 		struct CharaInfo {
-			int nKizunaPoint;
+			int 	nKizunaPoint;
+			uint8_t uItemNum[eItemKind_Max];
 		};
 		CharaInfo	ChharaInfo[NET_CONNECT_MAX];
 	};
 
 	struct CharacterInfo {
 		char cCharaName[32];
-		int nKizunaPoint;
+		int 	nKizunaPoint;
+		uint8_t uItemNum[eItemKind_Max];
 	};
 
 public:
 	void SetCharaName(const char* pName);
 	const char* GetCharaName() const;
+	const char* GetCharaName(int nPlayerId) const;
 
-	void AddKizunaPoint(int nAdd);
-	int GetKizunaPoint() const;
+	void AddKizunaPoint(int nPlayerId, int nAdd);
+	void SubKizunaPoint(int nPlayerId, int nSub);
+	int GetKizunaPoint(int nPlayerId) const;
+
+	void AddItem(int nPlayerId, int nItemNo, int nNum);
+	void SubItem(int nPlayerId, int nItemNo, int nNum);
 
 	GameNetworkInfo& GetNetworkInfo();
 	void DumpNetworkInfo();

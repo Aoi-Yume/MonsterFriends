@@ -9,6 +9,8 @@
 EntityBase::EntityBase()
 : m_pParentEntity(nullptr)
 , m_bLinkTransform(false)
+, m_nMessageCnt(0)
+, m_prevMessage(eGameMessage_Max)
 {
 	DEBUG_LOG("Call EntityBase Constructor");
 	for(int i = 0; i < eComponentKind_Max; ++i){
@@ -30,6 +32,10 @@ EntityBase::~EntityBase()
 
 void EntityBase::Update(GameMessage message, const void* param)
 {
+	if(message != m_prevMessage){
+		m_nMessageCnt = 0;
+	}
+
 	EntityUpdate(message, param);
 	ComponentUpdate(message, param);
 
@@ -39,6 +45,8 @@ void EntityBase::Update(GameMessage message, const void* param)
 			m_svpChild.at(i)->Update(message, param);
 		}
 	}
+
+	m_nMessageCnt++;
 }
 
 ComponentBase* EntityBase::GetComponent(ComponentKind nKind)
@@ -89,6 +97,11 @@ EntityBase* EntityBase::GetParent()
 bool EntityBase::GetLinkTransform() const
 {
 	return m_bLinkTransform;
+}
+
+int EntityBase::GetMessageCnt() const
+{
+	return m_nMessageCnt;
 }
 
 void EntityBase::EntityUpdate(GameMessage message, const void* param)

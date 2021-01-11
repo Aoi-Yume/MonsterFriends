@@ -138,39 +138,7 @@ void SceneAdv::SceneFinalize()
 //------------------------------------------
 void SceneAdv::EntityUpdate(GameMessage message, const void* param)
 {
-	switch(message){
-		case eGameMessage_Setup:
-		{
-			SceneSetup();
-			break;
-		}
-		case eGameMessage_Update:
-		{
-			SceneUpdate();
-			break;
-		}
-		case eGameMessage_PostUpdate:
-		{
-			break;
-		}
-		case eGameMessage_ChangeCamera:
-		{
-			break;
-		}
-		case eGameMessage_Draw:
-		{
-			break;
-		}
-		case eGameMessage_Pause:
-		{
-			break;
-		}
-		case eGameMessage_Destroy:
-		{
-			SceneFinalize();
-			break;
-		}
-	}
+	SceneBase::EntityUpdate(message, param);
 
 	if(message != eGameMessage_Setup) {
 		m_pBgImage->Update(message, param);
@@ -274,7 +242,7 @@ void SceneAdv::updateBattleStep()
 	else if(m_nSubStep == 4){
 		// TODO キズナ値調整
 		m_pMessageWindow->SetDirectMessage("キズナが10増えた！");
-		AppParam::Get()->AddKizunaPoint(10);
+		AppParam::Get()->AddKizunaPoint(AppParam::Get()->GetNetworkInfo().nCurrentPlayerId, 10);
 //		Engine::GetEngine()->ResetTouchEvent();
 		m_nSubStep = 5;
 	}

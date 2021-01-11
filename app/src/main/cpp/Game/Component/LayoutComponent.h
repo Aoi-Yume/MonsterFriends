@@ -21,6 +21,7 @@ public:
 	virtual ~LayoutComponent();
 
 	void SetResPath(const char* pResPath);
+	void ChangeTexture(const char* pResPath);
 	
 	virtual GameMessageResult Update(GameMessage message, const void* param) override;
 

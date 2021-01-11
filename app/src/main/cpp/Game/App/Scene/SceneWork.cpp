@@ -102,7 +102,8 @@ void SceneWork::SceneUpdate() {
 		if(m_pMessageWindow->IsNextMessage()) {
 			// TODO キズナ値調整
 			m_pMessageWindow->SetDirectMessage("キズナが10増えた！");
-			AppParam::Get()->AddKizunaPoint(10);
+			const int nPlayerId = AppParam::Get()->GetNetworkInfo().nCurrentPlayerId;
+			AppParam::Get()->AddKizunaPoint(nPlayerId,10);
 			m_nNextStep = 2;
 		}
 	}

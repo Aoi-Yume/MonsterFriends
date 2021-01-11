@@ -32,6 +32,7 @@ private:
 		uint8_t  	uKind;
 		bool bHost;
 		char SelfId[16];
+		unsigned int uRandomSeed;
 		struct IDInfo {
 			char OpponentId[16];
 		};

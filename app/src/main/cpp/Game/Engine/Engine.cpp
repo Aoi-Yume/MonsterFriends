@@ -6,6 +6,7 @@
 #include "Engine.h"
 #include <TransferManager.h>
 #include <DelayInput.h>
+#include <Random.h>
 
 static Engine* s_AoYumeEngine = nullptr;
 
@@ -31,6 +32,7 @@ void Engine::Create()
 	if( !s_AoYumeEngine ){
 		s_AoYumeEngine = new Engine();
 	}
+	Random::Initialize();
 	DELAY_INPUT()->Initialize(10);
 	DELAY_INPUT()->StartDelayInput();
 	s_AoYumeEngine->AddRef();

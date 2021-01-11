@@ -10,6 +10,7 @@ cmake_minimum_required(VERSION 3.4.1)
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
 
+include_directories(	src/main/cpp/Game/Algorithm)
 include_directories(	src/main/cpp/Game/Input)
 include_directories(	src/main/cpp/Game/Net)
 include_directories(	src/main/cpp/Game/Engine )
@@ -33,7 +34,9 @@ add_library(    math-lib SHARED
 				src/main/cpp/Math/math_Matrix.cpp  )
 
 add_library(	algorithm-lib SHARED
-				src/main/cpp/Game/Base/Singleton.cpp)
+				src/main/cpp/Game/Algorithm/Singleton.cpp
+				src/main/cpp/Game/Algorithm/Random.cpp
+				src/main/cpp/Game/Algorithm/State.cpp)
 
 add_library(    input-lib SHARED
 				src/main/cpp/Game/Input/DelayInput.cpp)
@@ -43,6 +46,7 @@ add_library(	net-lib SHARED
 				src/main/cpp/Game/Net/TransferManager.cpp
 				src/main/cpp/Game/Net/TransferConnect.cpp
 				src/main/cpp/Game/Net/TransferPlayerId.cpp
+				src/main/cpp/Game/Net/TransferSyncScene.cpp
 				src/main/cpp/Game/Net/TransferGameInfo.cpp
 				src/main/cpp/Game/Net/TransferTouchInfo.cpp)
 
@@ -78,12 +82,14 @@ add_library(	game-lib SHARED
 				src/main/cpp/Game/Game/MessageWindow/MessageWindow.cpp)
 
 add_library(	app_param-lib SHARED
-				src/main/cpp/Game/App/Param/AppParam.cpp)
+				src/main/cpp/Game/App/Param/AppParam.cpp
+				src/main/cpp/Game/App/Param/AppItemList.cpp)
 
 add_library(	app_entity-lib SHARED
 				src/main/cpp/Game/App/Entity/Character.cpp
 				src/main/cpp/Game/App/Entity/InformationPlate.cpp
-				src/main/cpp/Game/App/Entity/Dice.cpp)
+				src/main/cpp/Game/App/Entity/Dice.cpp
+				src/main/cpp/Game/App/Entity/Shop.cpp)
 
 add_library(	app_scene-lib SHARED
 				src/main/cpp/Game/App/Scene/SceneTitle.cpp

@@ -8,6 +8,7 @@
 #include "LayoutComponent.h"
 #include "CollisionComponent.h"
 #include "Dice.h"
+#include <Random.h>
 
 Dice::Dice()
 : GameEntity()
@@ -102,10 +103,7 @@ void Dice::shuffleDicePattern()
 {
 	const int nPrevDiceNo = m_uDiceRoulette[eDICE_MAX - 1];
 	while(true) {
-		for (int i = 0; i < eDICE_MAX; ++i) {
-			const int idx = rand() % (eDICE_MAX - i) + i;
-			std::swap(m_uDiceRoulette[i], m_uDiceRoulette[idx]);
-		}
+		Random::SyncShuffle(m_uDiceRoulette, eDICE_MAX);
 		if(nPrevDiceNo != m_uDiceRoulette[0]){ break; }
 	}
 }

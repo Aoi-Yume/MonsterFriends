@@ -41,6 +41,9 @@ void TransferPlayerId::initialize()
 			pManager->SetConnectPlayerId(dataInfo.cNetId, dataInfo.nPlayerId);
 		}
 	}
+	for(int i = 0; i < NET_CONNECT_MAX; ++i){
+		m_bReceive[i] = false;
+	}
 }
 
 bool TransferPlayerId::updateTransfer()

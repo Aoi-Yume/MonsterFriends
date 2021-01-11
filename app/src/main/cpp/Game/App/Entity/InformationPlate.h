@@ -23,6 +23,7 @@ public:
 	void GameEntityUpdate(const void* param) override;
 	void EntityUpdate(GameMessage message, const void* param) override;
 
+	void UpdatePlate();
 private:
 };
 

@@ -7,7 +7,7 @@
 #include "TransferManager.h"
 
 TransferGameInfo::TransferGameInfo()
-: TransferBase(TransferManager::eTransferKind_GameInfo, 500 * 1000 * 1000)
+: TransferBase(TransferManager::eTransferKind_GameInfo, 50 * 1000 * 1000)
 , m_bReceive()
 , m_Data()
 , m_nSize(0)

@@ -17,6 +17,7 @@ enum ComponentKind {
 
 enum GameMessage {
     eGameMessage_Setup,
+    eGameMessage_Sync,
     eGameMessage_Update,
 	eGameMessage_HitCollision,
     eGameMessage_PostUpdate,

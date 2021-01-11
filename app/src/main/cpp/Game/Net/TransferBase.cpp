@@ -42,6 +42,9 @@ void TransferBase::startTransfer()
 	if(m_thread.joinable()){
 		m_thread.join();
 	}
+	m_uReqest = 0;
+	m_nSendCnt = 0;
+	m_nReceiveCnt = 0;
 	m_thread = std::thread(&TransferBase::onThread, this);
 }
 void TransferBase::stopTransfer()

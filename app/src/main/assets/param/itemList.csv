@@ -1,0 +1,4 @@
+﻿#, アイテム名, 画像ファイル名, ショップコスト, 説明
+, ごみ, image/shop_item_trash.png, 10, きれいな「ごみ」にゃ
+, ごみ２, image/shop_item_trash.png, 20, きれいな「ごみ２」にゃ
+, ごみ３, image/shop_item_trash.png, 30, きれいな「ごみ３」にゃ

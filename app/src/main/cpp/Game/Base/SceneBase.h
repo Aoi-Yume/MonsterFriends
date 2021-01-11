@@ -18,11 +18,21 @@ public:
 	enum SceneState{
 		eSceneState_None,
 		eSceneState_ActiveWait,
+		eSceneState_SyncWait,
 		eSceneState_Actived,
 		eSceneState_DeactiveWait,
 		eSceneState_Deactived,
 		eSceneState_Max
 	};
+
+	enum SyncStep{
+		eSyncStep_None = -1,
+		eSyncStep_SceneSync,
+		eSyncStep_TouchInfo,
+		eSyncStep_UserSync,
+		eSyncStep_End = 100
+	};
+
 public:
 	SceneBase(const char* pSceneName);
 	virtual ~SceneBase();
@@ -30,20 +40,29 @@ public:
 public:
 	int GetSceneState() const;
 	const char* GetSceneName() const;
+
+	void SetSyncStep(int nStep);
+	int GetSyncStep() const;
 	
 	bool IsActiveWait() const;
+	bool IsSyncWait() const;
 	bool IsActived() const;
 	bool IsDeactiveWait() const;
 	bool IsDeactived() const;
-	
+
+	bool IsSceneSyncEnd() const;
+
 protected:
 	virtual void SceneSetup();
+	virtual void SceneSync();
 	virtual void SceneUpdate();
 	virtual void SceneFinalize();
+
 	void EntityUpdate(GameMessage message, const void* param) override;
 private:
 	int				m_nSceneState;
-	const char*		m_pSceneName;
+	int 			m_nSyncStep;
+	std::string		m_SceneName;
 };
 
 #endif

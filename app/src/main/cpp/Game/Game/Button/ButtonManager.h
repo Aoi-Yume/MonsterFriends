@@ -32,6 +32,8 @@ public:
 	void Unlock();
 	bool IsLock() const;
 
+	void SetVisible(bool bVisible);
+
 	void Reset();
 	void SetControlPlayerId(int nPlayerId = -1);
 	int GetControlPlayerId() const;

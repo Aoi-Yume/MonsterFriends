@@ -18,21 +18,115 @@
 #include <../Net/TransferGameInfo.h>
 #include <../Net/TransferTouchInfo.h>
 #include <AppParam.h>
+#include <Shop.h>
 
 SceneBase* SceneGameMain::CreateScene()
 {
 	return new SceneGameMain();
 }
 
-//------------------------------------------
-//------------------------------------------
+//==========================================
+//==========================================
+void StateGameMain::Begin(void* pUserPtr)
+{
+	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
+	auto pBtn = p->m_aBtnManager[SceneGameMain::eBtnKind_Main];
+	pBtn->SetControlPlayerId(AppParam::Get()->GetNetworkInfo().nCurrentPlayerId);
+	pBtn->Unlock();
+	pBtn->SetVisible(true);
+	p->m_pInformationPlate->UpdatePlate();	// プレイヤーIDが更新されていなかったので名前が更新されていないため
+	DEBUG_LOG("GameMain Begin\n");
+}
+void StateGameMain::Update(void* pUserPtr)
+{
+	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
+	auto pBtn = p->m_aBtnManager[SceneGameMain::eBtnKind_Main];
+
+	switch (pBtn->GetDecide()){
+		case eBtn_Adv: {
+			SCENE_MANAGER()->ChangeScene(SceneAdv::CreateScene());
+			break;
+		}
+		case eBtn_Work: {
+			SCENE_MANAGER()->ChangeScene(SceneWork::CreateScene());
+			break;
+		}
+		case eBtn_Item: {
+			ChangeState(SceneGameMain::eState_SelectItemUseOrShop);
+			break;
+		}
+		default:{ break; }
+	}
+}
+void StateGameMain::End(void *pUserPtr)
+{
+	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
+	auto pBtn = p->m_aBtnManager[SceneGameMain::eBtnKind_Main];
+	pBtn->Lock();
+	pBtn->SetVisible(false);
+}
+
+//==========================================
+//==========================================
+void StateUseOrShopSelect::Begin(void *pUserPtr)
+{
+	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
+	auto pBtn = p->m_aBtnManager[SceneGameMain::eBtnKind_ItemOrShop];
+	pBtn->SetControlPlayerId(AppParam::Get()->GetNetworkInfo().nCurrentPlayerId);
+	pBtn->Unlock();
+	pBtn->SetVisible(true);
+}
+void StateUseOrShopSelect::Update(void* pUserPtr)
+{
+	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
+	auto pBtn = p->m_aBtnManager[SceneGameMain::eBtnKind_ItemOrShop];
+
+	switch (pBtn->GetDecide()){
+		case eBtn_Use: {
+			break;
+		}
+		case eBtn_Shop: {
+			ChangeState(SceneGameMain::eState_Shop);
+			break;
+		}
+		default:{ break; }
+	}
+}
+void StateUseOrShopSelect::End(void *pUserPtr)
+{
+	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
+	auto pBtn = p->m_aBtnManager[SceneGameMain::eBtnKind_ItemOrShop];
+	pBtn->Lock();
+	pBtn->SetVisible(false);
+}
+
+//==========================================
+//==========================================
+void StateShop::Begin(void *pUserPtr)
+{
+	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
+	p->m_pShop->Open();
+}
+void StateShop::Update(void *pUserPtr)
+{
+
+}
+void StateShop::End(void *pUserPtr)
+{
+	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
+	p->m_pShop->Close();
+}
+
+//==========================================
+//==========================================
 SceneGameMain::SceneGameMain()
 : SceneBase("GameMain")
 , m_pBgImage(nullptr)
 , m_pChara(nullptr)
-, m_pBtnManager(nullptr)
+, m_pShop(nullptr)
 , m_pInformationPlate(nullptr)
 , m_pMessageWindow(nullptr)
+, m_aBtnManager()
 {
 	DEBUG_LOG("Scene Game Main Constructor");
 }
@@ -43,9 +137,12 @@ SceneGameMain::~SceneGameMain()
 {
 	delete m_pBgImage;
 	delete m_pChara;
-	delete m_pBtnManager;
+	delete m_pShop;
 	delete m_pInformationPlate;
 	delete m_pMessageWindow;
+	for(auto& it : m_aBtnManager) {
+		delete it;
+	}
 }
 
 //------------------------------------------
@@ -74,16 +171,9 @@ void SceneGameMain::SceneSetup() {
 		m_pInformationPlate->Update(eGameMessage_Setup, nullptr);
 	}
 	{
-		m_pBtnManager = new ButtonManager();
-		const std::pair<const char *, VEC3> btnList[] = {
-				{"image/button_Adv.png",       VEC3(-250.0f, -400.0f, 0)},
-				{"image/button_SpendTime.png", VEC3(0.0f, -400.0f, 0)},
-				{"image/button_Work.png",      VEC3(250.0f, -400.0f, 0)},
-		};
-		for (int i = 0; i < sizeof(btnList) / sizeof(btnList[0]); ++i) {
-			auto pBtn = m_pBtnManager->CreateButton(btnList[i].first);
-			pBtn->SetPosition(btnList[i].second);
-		}
+		m_pShop = new Shop();
+		m_pShop->SetInformationPlate(m_pInformationPlate);
+		m_pShop->Update(eGameMessage_Setup, nullptr);
 	}
 	{
 		m_pMessageWindow = new MessageWindow("image/message_window.png");
@@ -92,15 +182,84 @@ void SceneGameMain::SceneSetup() {
 		m_pMessageWindow->SetDirectMessage("てすと\nててててすと");
 		m_pMessageWindow->SetVisible(false);
 	}
-	m_nStep = eSTEP_ControlPlayer;
+	{
+		m_pStateManager = new StateManager(eState_Max);
+		m_pStateManager->SetUserPtr(this);
+		m_pStateManager->CreateState<StateGameMain>();
+		m_pStateManager->CreateState<StateUseOrShopSelect>();
+		m_pStateManager->CreateState<StateShop>();
+	}
+	{
+		// メインボタン
+		{
+			auto pBtnManager = new ButtonManager();
+			const std::pair<const char *, VEC3> btnList[] = {
+					{"image/button_Adv.png",  VEC3(-250.0f, -400.0f, 0)},
+					{"image/button_Work.png", VEC3(0.0f, -400.0f, 0)},
+					{"image/button_item.png", VEC3(250.0f, -400.0f, 0)},
+			};
+			for (int i = 0; i < sizeof(btnList) / sizeof(btnList[0]); ++i) {
+				auto pBtn = pBtnManager->CreateButton(btnList[i].first);
+				pBtn->SetPosition(btnList[i].second);
+			}
+			pBtnManager->SetVisible(false);
+			pBtnManager->Lock();
+			m_aBtnManager.emplace_back(pBtnManager);
+		}
+		// アイテム使用 or ショップボタン
+		{
+			auto pBtnManager = new ButtonManager();
+			const std::pair<const char *, VEC3> btnList[] = {
+					{"image/button_use.png",  VEC3(-250.0f, -400.0f, 0)},
+					{"image/button_shop.png", VEC3(250.0f, -400.0f, 0)},
+			};
+			for (int i = 0; i < sizeof(btnList) / sizeof(btnList[0]); ++i) {
+				auto pBtn = pBtnManager->CreateButton(btnList[i].first);
+				pBtn->SetPosition(btnList[i].second);
+			}
+			pBtnManager->SetVisible(false);
+			pBtnManager->Lock();
+			m_aBtnManager.emplace_back(pBtnManager);
+		}
+	}
 	auto pManager = TransferManager::Get();
 	if(pManager->IsConnectSucess()) {
 		if(!pManager->IsStartTransfer(TransferManager::eTransferKind_TouchInfo)) {
 			pManager->StartTransfer(TransferManager::eTransferKind_TouchInfo);
 		}
-		m_nStep = eSTEP_NetworkInfoUpdate;
 	}
+
 	DEBUG_LOG("Setup End");
+}
+
+//------------------------------------------
+//------------------------------------------
+void SceneGameMain::SceneSync()
+{
+	SceneBase::SceneSync();
+
+	auto pManager = TransferManager::Get();
+	if(GetSyncStep() == eSyncStep_UserSync) {
+		// ゲーム情報の送受信設定
+		auto pInfo = pManager->GetTransfer<TransferGameInfo>(
+				TransferManager::eTransferKind_GameInfo);
+		pInfo->SetGameInfoData(&AppParam::Get()->GetNetworkInfo(),
+							   sizeof(AppParam::GameNetworkInfo));
+		pInfo->SetReceiveCallBack([](void *pData) {
+			auto &pParam = AppParam::Get()->GetNetworkInfo();
+			pParam = *reinterpret_cast<AppParam::GameNetworkInfo *>(pData);
+		});
+		pInfo->SetDumpCallBack([]() { AppParam::Get()->DumpNetworkInfo(); });
+		pManager->StartTransfer(TransferManager::eTransferKind_GameInfo);
+		SetSyncStep(eSyncStep_UserSync + 1);
+	}
+	else if(GetSyncStep() == eSyncStep_UserSync + 1){
+		// ゲーム情報送受信待ち
+		auto pTransfer = pManager->GetTransfer<TransferBase>(TransferManager::eTransferKind_GameInfo);
+		if(pTransfer->IsEnd()){
+			SetSyncStep(eSyncStep_End);
+		}
+	}
 }
 
 //------------------------------------------
@@ -109,47 +268,7 @@ void SceneGameMain::SceneUpdate()
 {
 	Super::SceneUpdate();
 	//DEBUG_LOG("Launcher Call Update");
-
-	auto pManager = TransferManager::Get();
-	if(m_nStep == eSTEP_NetworkInfoUpdate){
-		// ゲーム情報の送受信設定
-		auto pInfo = pManager->GetTransfer<TransferGameInfo>(TransferManager::eTransferKind_GameInfo);
-		pInfo->SetGameInfoData(&AppParam::Get()->GetNetworkInfo(), sizeof(AppParam::GameNetworkInfo));
-		pInfo->SetReceiveCallBack([](void* pData){
-			auto& pParam = AppParam::Get()->GetNetworkInfo();
-			pParam = *reinterpret_cast<AppParam::GameNetworkInfo*>(pData);
-		});
-		pInfo->SetDumpCallBack([](){ AppParam::Get()->DumpNetworkInfo(); });
-		pManager->StartTransfer(TransferManager::eTransferKind_GameInfo);
-		m_nStep = eSTEP_NetworkInfoUpdateWait;
-	}
-	else if(m_nStep == eSTEP_NetworkInfoUpdateWait){
-		// ゲーム情報送受信待ち
-		auto pTransfer = pManager->GetTransfer<TransferBase>(TransferManager::eTransferKind_GameInfo);
-		if(pTransfer->IsEnd()){
-			DELAY_INPUT()->ResetDelayInput();
-			pTransfer->Dump();
-			m_pBtnManager->SetControlPlayerId(AppParam::Get()->GetNetworkInfo().nCurrentPlayerId);
-			m_nStep = eSTEP_ControlPlayer;
-		}
-	}
-	else if(m_nStep == eSTEP_ControlPlayer) {
-		switch (m_pBtnManager->GetDecide()){
-			case eBtn_Adv: {
-				SCENE_MANAGER()->ChangeScene(SceneAdv::CreateScene());
-				break;
-			}
-			case eBtn_SpendTime: {
-				SCENE_MANAGER()->ChangeScene(SceneSpendTime::CreateScene());
-				break;
-			}
-			case eBtn_Work: {
-				SCENE_MANAGER()->ChangeScene(SceneWork::CreateScene());
-				break;
-			}
-			default:{ break; }
-		}
-	}
+	m_pStateManager->Update();
 
 	//auto pTouchInput = Engine::GetEngine()->GetTouchInputInfoPtr(0);
 	//DEBUG_LOG_A("TouchEvent[%d], X[%.2f], Y[%.2f]\n", pTouchInput->nTouchEvent, pTouchInput->fTouchX, pTouchInput->fTouchY);
@@ -167,45 +286,16 @@ void SceneGameMain::SceneFinalize()
 //------------------------------------------
 void SceneGameMain::EntityUpdate(GameMessage message, const void* param)
 {
-	switch(message){
-		case eGameMessage_Setup:
-		{
-			SceneSetup();
-			break;
-		}
-		case eGameMessage_Update:
-		{
-			SceneUpdate();
-			break;
-		}
-		case eGameMessage_PostUpdate:
-		{
-			break;
-		}
-		case eGameMessage_ChangeCamera:
-		{
-			break;
-		}
-		case eGameMessage_Draw:
-		{
-			break;
-		}
-		case eGameMessage_Pause:
-		{
-			break;
-		}
-		case eGameMessage_Destroy:
-		{
-			SceneFinalize();
-			break;
-		}
-	}
+	SceneBase::EntityUpdate(message, param);
 
 	if(message != eGameMessage_Setup) {
 		m_pBgImage->Update(message, param);
 		m_pChara->Update(message, param);
+		m_pShop->Update(message, param);
 		m_pInformationPlate->Update(message, param);
-		m_pBtnManager->Update(message, param);
 		m_pMessageWindow->Update(message, param);
+		for(auto& it : m_aBtnManager) {
+			it->Update(message, param);
+		}
 	}
 }

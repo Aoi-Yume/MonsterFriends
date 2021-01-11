@@ -19,8 +19,9 @@ public:
 	enum TransferKind : uint8_t {
 		eTransferKind_Connect,
 		eTransferKind_PlayerId,
-		eTransferKind_GameInfo,
+		eTransferKind_SyncScene,
 		eTransferKind_TouchInfo,
+		eTransferKind_GameInfo,
 		eTransferKind_Max
 	};
 
@@ -79,8 +80,9 @@ public:
 	void BroadCast(jbyte* pData, int nSize);
 	void ReceiveData(const char* id, jbyte* pData, int nSize);
 
-	bool IsSeldConnectId(const char* id) const;
+	bool IsSelfConnectId(const char* id) const;
 	int GetConnectNoFromNetId(const char* id) const;
+	int GetConnectNoFromPlayerId(int nPlayerId) const;
 	int GetPlayerIdFromNetId(const char* id) const;
 
 private:

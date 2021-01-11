@@ -33,6 +33,8 @@ public:
 	EntityBase* GetParent();
 
 	bool GetLinkTransform() const;
+
+	int GetMessageCnt() const;
 protected:
 	virtual void EntityUpdate(GameMessage message, const void* param);
 	void ComponentUpdate(GameMessage message, const void* param);
@@ -43,6 +45,10 @@ protected:
 	std::vector<EntityBase*>	m_svpChild;
 
 	bool 		m_bLinkTransform;
+
+	int 		m_nMessageCnt;
+	GameMessage	m_prevMessage;
+
 };
 
 #endif

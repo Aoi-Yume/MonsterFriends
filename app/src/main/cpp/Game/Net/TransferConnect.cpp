@@ -5,6 +5,7 @@
 
 #include "TransferConnect.h"
 #include "TransferManager.h"
+#include <Random.h>
 
 TransferConnect::TransferConnect()
 : TransferBase(TransferManager::eTransferKind_Connect, 500 * 1000 * 1000)
@@ -20,6 +21,7 @@ void TransferConnect::initialize()
 {
 	m_Data.uKind = TransferManager::eTransferKind_Connect;
 	m_Data.bHost = TransferManager::Get()->IsHost();
+	m_Data.uRandomSeed = Random::GetSyncSeed();
 }
 
 bool TransferConnect::updateTransfer()
@@ -60,6 +62,9 @@ void TransferConnect::updateReceive(const char* Id, void* pData)
 		TransferManager::ConnectInfo info(m_Data.SelfId, "");
 		pManager->SetSelfConnect(info);
 		RequestEnd();
+	}
+	if(pReceiveData->bHost){
+		Random::SetSyncSeed(pReceiveData->uRandomSeed);
 	}
 	pManager->SetConnectHost(Id, pReceiveData->bHost);
 }

@@ -7,8 +7,9 @@
 #include "TransferBase.h"
 #include "TransferConnect.h"
 #include "TransferPlayerId.h"
-#include "TransferGameInfo.h"
+#include "TransferSyncScene.h"
 #include "TransferTouchInfo.h"
+#include "TransferGameInfo.h"
 USE_SINGLETON_VARIABLE(TransferManager);
 
 TransferManager::TransferManager()
@@ -51,8 +52,9 @@ void TransferManager::Initialize(bool bHost)
 	m_aTransfer.resize(eTransferKind_Max);
 	SetTransfer(eTransferKind_Connect, new TransferConnect);
 	SetTransfer(eTransferKind_PlayerId, new TransferPlayerId);
-	SetTransfer(eTransferKind_GameInfo, new TransferGameInfo);
+	SetTransfer(eTransferKind_SyncScene, new TransferSyncScene);
 	SetTransfer(eTransferKind_TouchInfo, new TransferTouchInfo);
+	SetTransfer(eTransferKind_GameInfo, new TransferGameInfo);
 }
 
 void TransferManager::SetConnectSuccess(bool bConnect)
@@ -130,7 +132,7 @@ int TransferManager::GetConnectNum() const
 
 void TransferManager::SetConnectHost(const char* id, bool bHost)
 {
-	if(IsSeldConnectId(id)) {
+	if(IsSelfConnectId(id)) {
 		m_SelfInfo.bHost = bHost;
 	}
 	else {
@@ -143,7 +145,7 @@ void TransferManager::SetConnectHost(const char* id, bool bHost)
 
 void TransferManager::SetConnectPlayerId(const char* id, int nPlayerId)
 {
-	if(IsSeldConnectId(id)){
+	if(IsSelfConnectId(id)){
 		m_SelfInfo.nPlayerId = nPlayerId;
 	}
 	else{
@@ -174,7 +176,7 @@ void TransferManager::ReceiveData(const char *id, jbyte* pData, int nSize)
 	}
 }
 
-bool TransferManager::IsSeldConnectId(const char* id) const
+bool TransferManager::IsSelfConnectId(const char* id) const
 {
 	return (std::strcmp(m_SelfInfo.Id.c_str(), id) == 0);
 }
@@ -191,9 +193,21 @@ int TransferManager::GetConnectNoFromNetId(const char* id) const
 	return -1;
 }
 
+int TransferManager::GetConnectNoFromPlayerId(int nPlayerId) const
+{
+	int i = 0;
+	for(const auto& info : m_aConnectInfo) {
+		if(info.nPlayerId == nPlayerId){
+			return i;
+		}
+		i++;
+	}
+	return -1;
+}
+
 int TransferManager::GetPlayerIdFromNetId(const char* id) const
 {
-	if(IsSeldConnectId(id)){
+	if(IsSelfConnectId(id)){
 		return m_SelfInfo.nPlayerId;
 	}
 	else {

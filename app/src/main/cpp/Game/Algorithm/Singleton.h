@@ -6,9 +6,6 @@
 #ifndef AOIYUME_SINGLETON_H
 #define AOIYUME_SINGLETON_H
 
-#include "../Engine/Engine.h"
-
-
 template <class T>
 class Singleton
 {

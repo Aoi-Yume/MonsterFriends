@@ -7,7 +7,8 @@
 #include <Entity.h>
 #include <SceneLauncher.h>
 #include "../Engine/Engine.h"
-#include "../App/Param/AppParam.h"
+#include <AppParam.h>
+#include <AppItemList.h>
 #include <SceneManager.h>
 #include <DelayInput.h>
 
@@ -36,6 +37,8 @@ Java_com_aoiyume_Game_GameMainRender_SurfaceCreate(
 	}
 	{
 		AppParam::Initialize();
+		AppItemList::Initialize();
+		AppItemList::Get()->Load();
 	}
 	// TODO Engine に解放コールバックを設定する
 }

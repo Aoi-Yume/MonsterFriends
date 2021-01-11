@@ -8,6 +8,7 @@
 
 #include <deque>
 #include <Singleton.h>
+#include <engine_define.h>
 
 struct TouchInputInfo{
 	int		nPreTouchEvent;

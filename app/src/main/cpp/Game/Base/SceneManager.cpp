@@ -188,6 +188,9 @@ void SceneManager::updateManager()
 			if((*it)->IsActiveWait()){
 				(*it)->Update(eGameMessage_Setup, nullptr);
 			}
+			else if((*it)->IsSyncWait()){
+				(*it)->Update(eGameMessage_Sync, nullptr);
+			}
 			else if((*it)->IsActived()){
 				(*it)->Update(eGameMessage_Update, nullptr);
 			}

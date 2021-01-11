@@ -95,6 +95,15 @@ bool ButtonManager::IsLock() const
 
 //-----------------------------------------
 //-----------------------------------------
+void ButtonManager::SetVisible(bool bVisible)
+{
+	for(auto& it : m_aButtons){
+		it->SetVisible(bVisible);
+	}
+}
+
+//-----------------------------------------
+//-----------------------------------------
 void ButtonManager::Reset()
 {
 	m_nSelectNo = -1;
