@@ -15,8 +15,10 @@
 
 class StateManager;
 class ComponentBase;
+class Character;
 class InformationPlate;
 class MessageWindow;
+class Adv;
 class Shop;
 
 //==========================================
@@ -30,6 +32,16 @@ class StateGameMain : public StateBase
 		eBtn_Max
 	};
 
+public:
+	void Begin(void* pUserPtr) override;
+	void Update(void* pUserPtr) override;
+	void End(void* pUserPtr) override;
+};
+
+//==========================================
+//==========================================
+class StateAdv : public StateBase
+{
 public:
 	void Begin(void* pUserPtr) override;
 	void Update(void* pUserPtr) override;
@@ -66,6 +78,7 @@ class SceneGameMain : public SceneBase
 	typedef SceneBase Super;
 	friend class StateGameMain;
 	friend class StateUseOrShopSelect;
+	friend class StateAdv;
 	friend class StateShop;
 
 public:
@@ -76,6 +89,7 @@ public:
 
 	enum {
 		eState_GameMain,
+		eState_Adv,
 		eState_SelectItemUseOrShop,
 		eState_Shop,
 		eState_Max
@@ -99,7 +113,8 @@ protected:
 private:
 
 	Entity*		m_pBgImage;
-	Entity*		m_pChara;		// TODO キャラクラスに変更
+	Character*	m_pChara;
+	Adv*		m_pAdv;
 	Shop*		m_pShop;
 
 	InformationPlate* m_pInformationPlate;

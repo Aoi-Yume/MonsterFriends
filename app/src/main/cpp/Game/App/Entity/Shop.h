@@ -25,6 +25,7 @@ public:
 
 	void Open();
 	void Close();
+	bool IsEnd() const;
 	void SetInformationPlate(InformationPlate* pPlate);
 	void SetVisible(bool bVisible);
 
@@ -41,10 +42,14 @@ private:
 		eStep_BuyCheck,
 		eSteo_BuyAfterMessageWait,
 		eStep_Reset,
+		eStep_BackMessage,
+		eStep_BackMessage_Wait,
+		eStep_End,
 	};
 	enum {
 		eBtnManager_Item,
 		eBtnManager_BuyOrCancel,
+		eBtnManager_Back,
 	};
 	enum {
 		eBtn_Item_01 = 0,
@@ -54,6 +59,8 @@ private:
 
 		eBtn_Buy = 0,
 		eBtn_BuyCancel,
+
+		eBtn_Back = 0,
 	};
 
 	int 				m_nStep;

@@ -3,41 +3,43 @@
 //
 
 
-#ifndef AOIYUME_SCENE_GAME_ADV_H
-#define AOIYUME_SCENE_GAME_ADV_H
+#ifndef AOIYUME_ADV_H
+#define AOIYUME_ADV_H
 
-#include <Entity.h>
-#include <Button/ButtonManager.h>
 #include "../Engine/Engine.h"
 #include "entity_define.h"
-#include "SceneBase.h"
+#include "GameEntity.h"
 
 class ComponentBase;
 class Character;
 class InformationPlate;
 class MessageWindow;
 class Dice;
+class ButtonManager;
 
-class SceneAdv : public SceneBase
+class Adv : public GameEntity
 {
-	typedef SceneBase Super;
-public:
-	static SceneBase* CreateScene();
+	typedef GameEntity Super;
 
 public:
 	enum {
 		eSTEP_APPEAR_ENEMY,
 		eSTEP_BATTLE,
+		eSTEP_END,
 	};
 
 public:
-	SceneAdv();
-	virtual ~SceneAdv();
+	Adv();
+	virtual ~Adv();
 
-protected:
-	virtual void SceneSetup() override ;
-	virtual void SceneUpdate() override ;
-	virtual void SceneFinalize() override ;
+	void Open();
+	void Close();
+	bool IsEnd() const;
+	void SetCharacter(Character* pChara);
+	void SetMessageWindow(MessageWindow* pMessageWindow);
+
+	void GameEntitySetup(const void* param) override;
+	void GameEntityUpdate(const void* param) override;
 	void EntityUpdate(GameMessage message, const void* param) override;
 
 private:
@@ -48,11 +50,7 @@ private:
 	struct CharaInfo{
 		Character* 	pChara = nullptr;
 		Dice*		pDice = nullptr;
-
-		~CharaInfo(){
-			delete pChara;
-			delete pDice;
-		}
+		VEC3		prePos = {};
 	};
 
 	int 		m_nStep;
@@ -62,12 +60,10 @@ private:
 	int 		m_nSubStep;
 	int 		m_nSubStepCnt;
 
-	Entity*		m_pBgImage;
 	CharaInfo	m_Chara;
 	CharaInfo	m_Enemy;
 
 	ButtonManager*	m_pBtnManager;
-	InformationPlate* m_pInformationPlate;
 	MessageWindow* m_pMessageWindow;
 };
 

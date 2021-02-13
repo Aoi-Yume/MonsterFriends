@@ -5,114 +5,160 @@
 
 #include <LayoutComponent.h>
 #include <TransformComponent.h>
-#include "SceneAdv.h"
+#include "Adv.h"
 #include "Button/SimpleButton.h"
-#include "SceneGameMain.h"
 #include <Character.h>
 #include <InformationPlate.h>
 #include <MessageWindow/MessageWindow.h>
 #include <Dice.h>
 #include <SceneManager.h>
 #include <AppParam.h>
+#include <Button/ButtonManager.h>
 
-SceneBase* SceneAdv::CreateScene()
+//------------------------------------------
+//------------------------------------------
+Adv::Adv()
+	: GameEntity()
+	, m_nStep(eSTEP_END)
+	, m_nNextStep(eSTEP_END)
+	, m_nStepCnt(0)
+	, m_nSubStep(0)
+	, m_nSubStepCnt(0)
+	, m_Chara()
+	, m_Enemy()
+	, m_pBtnManager(nullptr)
+	, m_pMessageWindow(nullptr)
 {
-	return new SceneAdv();
+	DEBUG_LOG("Adv Constructor");
 }
 
 //------------------------------------------
 //------------------------------------------
-SceneAdv::SceneAdv()
-: SceneBase("Adv")
-, m_nStep(0)
-, m_nNextStep(0)
-, m_nStepCnt(0)
-, m_nSubStep(0)
-, m_nSubStepCnt(0)
-, m_pBgImage(nullptr)
-, m_Chara()
-, m_Enemy()
-, m_pBtnManager(nullptr)
-, m_pInformationPlate(nullptr)
-, m_pMessageWindow(nullptr)
+Adv::~Adv()
 {
-	DEBUG_LOG("Scene Adv Constructor");
-}
-
-//------------------------------------------
-//------------------------------------------
-SceneAdv::~SceneAdv()
-{
-	delete m_pBgImage;
+	// m_pCharaのpCharaは外部参照
+	delete m_Chara.pDice;
+	delete m_Enemy.pChara;
+	delete m_Enemy.pDice;
 	delete m_pBtnManager;
-	delete m_pInformationPlate;
-	delete m_pMessageWindow;
 }
 
 //------------------------------------------
 //------------------------------------------
-void SceneAdv::SceneSetup() {
-	Super::SceneSetup();
-	DEBUG_LOG("Adv Call Setup");
+void Adv::Open()
+{
 	{
-		m_pBgImage = new Entity();
-		Entity::CreateLayoutComponent(m_pBgImage, "image/monfri_bg.png");
-		auto pLayoutComponent = (LayoutComponent *) m_pBgImage->GetComponent(eComponentKind_Layout);
-		pLayoutComponent->SetOrtho(true);
-		m_pBgImage->Update(eGameMessage_Setup, nullptr);
+		m_Chara.pChara->SetPosition(-350.0f, -150.0f, 0);
+		m_Chara.pDice->InVisible();
+		m_Chara.prePos = m_Chara.pChara->GetPosition();
+		m_Chara.pDice->SetPosition(VEC3(-350.0f, 90.0f, 0));
 	}
 	{
-		m_Chara.pChara = new Character(Character::eCHARA_01);
-		m_Chara.pChara->Update(eGameMessage_Setup, nullptr);
-		m_Chara.pChara->SetPosition(-350.0f, -150.0f, 0);
+		m_Enemy.pChara->SetPosition(350.0f, -150.0f, 0);
+		m_Enemy.pChara->SetScale(VEC3(-1.0f, 1.0f, 1.0f));
+		m_Enemy.pChara->SetVisible(true);
+		m_Enemy.pDice->InVisible();
+		m_Enemy.pDice->SetPosition(VEC3(350.0f, 90.0f, 0));
+	}
+	{
+		auto pBtn = m_pBtnManager->GetButton(0);
+		pBtn->Disable();
+		pBtn->SetVisible(false);
+		pBtn->SetPosition(VEC3(0, -400.0f, 0));
+		m_pBtnManager->SetControlPlayerId(AppParam::Get()->GetNetworkInfo().nCurrentPlayerId);
+		m_pBtnManager->Reset();
+		m_pBtnManager->Unlock();
+	}
+	{
+		m_pMessageWindow->SetTextScale(1.5f);
+		m_pMessageWindow->SetDirectMessage("敵のスライムが現れた！");
+		m_pMessageWindow->SetVisible(true);
+		m_pMessageWindow->SetControlPlayerId(AppParam::Get()->GetNetworkInfo().nCurrentPlayerId);
+	}
+	m_nStep = eSTEP_APPEAR_ENEMY;
+	m_nNextStep = eSTEP_APPEAR_ENEMY;
+	m_nStepCnt = 0;
+	m_nSubStep = 0;
+	m_nSubStepCnt = 0;
+}
+
+//------------------------------------------
+//------------------------------------------
+void Adv::Close()
+{
+	m_Chara.pChara->SetPosition(m_Chara.prePos);
+	m_Chara.pDice->InVisible();
+	m_Enemy.pChara->SetVisible(false);
+	m_Enemy.pDice->InVisible();
+	m_pBtnManager->SetVisible(false);
+	m_pBtnManager->Reset();
+	m_pBtnManager->Lock();
+	m_pMessageWindow->SetTextScale(1.0f);
+	m_pMessageWindow->SetVisible(false);
+}
+
+//------------------------------------------
+//------------------------------------------
+bool Adv::IsEnd() const
+{
+	return m_nStep == eSTEP_END;
+}
+
+//------------------------------------------
+//------------------------------------------
+void Adv::SetCharacter(Character* pChara)
+{
+	m_Chara.pChara = pChara;
+}
+
+//------------------------------------------
+//------------------------------------------
+void Adv::SetMessageWindow(MessageWindow* pMessageWindow)
+{
+	m_pMessageWindow = pMessageWindow;
+}
+
+//------------------------------------------
+//------------------------------------------
+void Adv::GameEntitySetup(const void* param) {
+	Super::GameEntitySetup(param);
+	DEBUG_LOG("Adv Call Setup");
+
+	{
 		m_Chara.pDice = new Dice();
 		m_Chara.pDice->Update(eGameMessage_Setup, nullptr);
 		m_Chara.pDice->InVisible();
-		m_Chara.pDice->SetPosition(VEC3(-350.0f, 90.0f, 0));
 	}
 	{
 		// TODO 敵をランダム設定
 		m_Enemy.pChara = new Character(Character::eCHARA_01);
 		m_Enemy.pChara->Update(eGameMessage_Setup, nullptr);
-		m_Enemy.pChara->SetPosition(350.0f, -150.0f, 0);
-		m_Enemy.pChara->SetScale(VEC3(-1.0f, 1.0f, 1.0f));
+		m_Enemy.pChara->SetVisible(false);
+
 		m_Enemy.pDice = new Dice();
 		m_Enemy.pDice->Update(eGameMessage_Setup, nullptr);
 		m_Enemy.pDice->InVisible();
-		m_Enemy.pDice->SetPosition(VEC3(350.0f, 90.0f, 0));
 	}
 	{
 		m_pBtnManager = new ButtonManager();
-		auto pBtn = m_pBtnManager->CreateButton("image/button_dice.png");
-		pBtn->Disable();
-		pBtn->SetVisible(false);
-		pBtn->SetPosition(VEC3(0, -400.0f, 0));
-		m_pBtnManager->SetControlPlayerId(AppParam::Get()->GetNetworkInfo().nCurrentPlayerId);
-	}
-	{
-		m_pInformationPlate = new InformationPlate();
-		m_pInformationPlate->Update(eGameMessage_Setup, nullptr);
-	}
-	{
-		m_pMessageWindow = new MessageWindow("image/message_window.png");
-		m_pMessageWindow->Update(eGameMessage_Setup, nullptr);
-		m_pMessageWindow->SetTextScale(1.5f);
-		m_pMessageWindow->SetDirectMessage("敵のスライムが現れた！");
-		m_pMessageWindow->SetVisible(true);
-		m_pMessageWindow->SetControlPlayerId(AppParam::Get()->GetNetworkInfo().nCurrentPlayerId);
+		m_pBtnManager->CreateButton("image/button_dice.png");
+		m_pBtnManager->SetVisible(false);
+		m_pBtnManager->Lock();
 	}
 	DEBUG_LOG("Setup End");
 }
 
 //------------------------------------------
 //------------------------------------------
-void SceneAdv::SceneUpdate() {
-	Super::SceneUpdate();
+void Adv::GameEntityUpdate(const void* param)
+{
+	Super::GameEntityUpdate(param);
 	//DEBUG_LOG("Launcher Call Update");
 
 	switch(m_nStep){
 		case eSTEP_APPEAR_ENEMY:{ updateAppearEnemyStep(); break; }
 		case eSTEP_BATTLE:{ updateBattleStep(); break; }
+		case eSTEP_END:{ /*何もしない*/ break; }
 		default:{ break; }
 	}
 
@@ -128,31 +174,19 @@ void SceneAdv::SceneUpdate() {
 
 //------------------------------------------
 //------------------------------------------
-void SceneAdv::SceneFinalize()
+void Adv::EntityUpdate(GameMessage message, const void* param)
 {
-	Super::SceneFinalize();
-	DEBUG_LOG("Title Call Finalize");
-}
-
-//------------------------------------------
-//------------------------------------------
-void SceneAdv::EntityUpdate(GameMessage message, const void* param)
-{
-	SceneBase::EntityUpdate(message, param);
+	Super::EntityUpdate(message, param);
 
 	if(message != eGameMessage_Setup) {
-		m_pBgImage->Update(message, param);
-		m_Chara.pChara->Update(message, param);
 		m_Enemy.pChara->Update(message, param);
 		m_Chara.pDice->Update(message, param);
 		m_Enemy.pDice->Update(message, param);
 		m_pBtnManager->Update(message, param);
-		m_pInformationPlate->Update(message, param);
-		m_pMessageWindow->Update(message, param);
 	}
 }
 
-void SceneAdv::updateAppearEnemyStep()
+void Adv::updateAppearEnemyStep()
 {
 	const int nPrevSubStep = m_nSubStep;
 	if(m_nSubStep == 0){
@@ -181,7 +215,7 @@ void SceneAdv::updateAppearEnemyStep()
 	}
 }
 
-void SceneAdv::updateBattleStep()
+void Adv::updateBattleStep()
 {
 	const int nPrevSubStep = m_nSubStep;
 	if(m_nSubStep == 0){
@@ -248,7 +282,7 @@ void SceneAdv::updateBattleStep()
 	}
 	else if(m_nSubStep == 5){
 		if(m_pMessageWindow->IsNextMessage()) {
-			SCENE_MANAGER()->ChangeScene(SceneGameMain::CreateScene());
+			m_nNextStep = eSTEP_END;
 		}
 	}
 

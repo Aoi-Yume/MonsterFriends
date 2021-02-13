@@ -89,13 +89,13 @@ add_library(	app_entity-lib SHARED
 				src/main/cpp/Game/App/Entity/Character.cpp
 				src/main/cpp/Game/App/Entity/InformationPlate.cpp
 				src/main/cpp/Game/App/Entity/Dice.cpp
-				src/main/cpp/Game/App/Entity/Shop.cpp)
+				src/main/cpp/Game/App/Entity/Shop.cpp
+				src/main/cpp/Game/App/Entity/Adv.cpp)
 
 add_library(	app_scene-lib SHARED
 				src/main/cpp/Game/App/Scene/SceneTitle.cpp
 				src/main/cpp/Game/App/Scene/SceneGameMain.cpp
-				src/main/cpp/Game/App/Scene/SceneAdv.cpp
-				src/main/cpp/Game/App/Scene/SceneSpendTime.cpp
+        src/main/cpp/Game/App/Scene/SceneSpendTime.cpp
 				src/main/cpp/Game/App/Scene/SceneWork.cpp
 				src/main/cpp/Game/App/Scene/SceneShop.cpp)
 

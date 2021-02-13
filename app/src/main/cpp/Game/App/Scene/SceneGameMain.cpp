@@ -5,20 +5,22 @@
 
 #include <LayoutComponent.h>
 #include "SceneGameMain.h"
-#include "SceneAdv.h"
 #include "SceneSpendTime.h"
 #include "SceneWork.h"
 #include <EntityManager.h>
 #include <Button/ButtonManager.h>
 #include <Button/SimpleButton.h>
 #include <SceneManager.h>
+#include <Character.h>
 #include <InformationPlate.h>
 #include <MessageWindow/MessageWindow.h>
 #include <../Net/TransferManager.h>
 #include <../Net/TransferGameInfo.h>
 #include <../Net/TransferTouchInfo.h>
 #include <AppParam.h>
+#include <Adv.h>
 #include <Shop.h>
+#include <CameraComponent.h>
 
 SceneBase* SceneGameMain::CreateScene()
 {
@@ -34,7 +36,8 @@ void StateGameMain::Begin(void* pUserPtr)
 	pBtn->SetControlPlayerId(AppParam::Get()->GetNetworkInfo().nCurrentPlayerId);
 	pBtn->Unlock();
 	pBtn->SetVisible(true);
-	p->m_pInformationPlate->UpdatePlate();	// プレイヤーIDが更新されていなかったので名前が更新されていないため
+	// プレイヤーIDが更新されていなかった。名前が更新するため呼び出す
+	p->m_pInformationPlate->UpdatePlate();
 	DEBUG_LOG("GameMain Begin\n");
 }
 void StateGameMain::Update(void* pUserPtr)
@@ -44,7 +47,8 @@ void StateGameMain::Update(void* pUserPtr)
 
 	switch (pBtn->GetDecide()){
 		case eBtn_Adv: {
-			SCENE_MANAGER()->ChangeScene(SceneAdv::CreateScene());
+			//SCENE_MANAGER()->ChangeScene(SceneAdv::CreateScene());
+			ChangeState(SceneGameMain::eState_Adv);
 			break;
 		}
 		case eBtn_Work: {
@@ -63,7 +67,29 @@ void StateGameMain::End(void *pUserPtr)
 	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
 	auto pBtn = p->m_aBtnManager[SceneGameMain::eBtnKind_Main];
 	pBtn->Lock();
+	pBtn->Reset();
 	pBtn->SetVisible(false);
+}
+
+//==========================================
+//==========================================
+void StateAdv::Begin(void *pUserPtr)
+{
+	DEBUG_LOG("StateAdv");
+	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
+	p->m_pAdv->Open();
+}
+void StateAdv::Update(void *pUserPtr)
+{
+	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
+	if(p->m_pAdv->IsEnd()) {
+		ChangeState(SceneGameMain::eState_GameMain);
+	}
+}
+void StateAdv::End(void *pUserPtr)
+{
+	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
+	p->m_pAdv->Close();
 }
 
 //==========================================
@@ -97,6 +123,7 @@ void StateUseOrShopSelect::End(void *pUserPtr)
 	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
 	auto pBtn = p->m_aBtnManager[SceneGameMain::eBtnKind_ItemOrShop];
 	pBtn->Lock();
+	pBtn->Reset();
 	pBtn->SetVisible(false);
 }
 
@@ -109,7 +136,10 @@ void StateShop::Begin(void *pUserPtr)
 }
 void StateShop::Update(void *pUserPtr)
 {
-
+	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
+	if(p->m_pShop->IsEnd()) {
+		ChangeState(SceneGameMain::eState_GameMain);
+	}
 }
 void StateShop::End(void *pUserPtr)
 {
@@ -137,6 +167,7 @@ SceneGameMain::~SceneGameMain()
 {
 	delete m_pBgImage;
 	delete m_pChara;
+	delete m_pAdv;
 	delete m_pShop;
 	delete m_pInformationPlate;
 	delete m_pMessageWindow;
@@ -158,22 +189,13 @@ void SceneGameMain::SceneSetup() {
 		m_pBgImage->Update(eGameMessage_Setup, nullptr);
 	}
 	{
-		m_pChara = new Entity();
-		const char* pResName = "image/chara_01.png";
-		Entity::CreateLayoutComponent(m_pChara, "image/chara_01.png");
-		auto pLayoutComponent = (LayoutComponent *) m_pChara->GetComponent(eComponentKind_Layout);
-		pLayoutComponent->SetOrtho(true);
+		m_pChara = new Character(Character::CHARA_ID::eCHARA_01);
 		m_pChara->Update(eGameMessage_Setup, nullptr);
 		m_pChara->SetPosition(0, -150.0f, 0);
 	}
 	{
 		m_pInformationPlate = new InformationPlate();
 		m_pInformationPlate->Update(eGameMessage_Setup, nullptr);
-	}
-	{
-		m_pShop = new Shop();
-		m_pShop->SetInformationPlate(m_pInformationPlate);
-		m_pShop->Update(eGameMessage_Setup, nullptr);
 	}
 	{
 		m_pMessageWindow = new MessageWindow("image/message_window.png");
@@ -183,9 +205,21 @@ void SceneGameMain::SceneSetup() {
 		m_pMessageWindow->SetVisible(false);
 	}
 	{
+		m_pAdv = new Adv();
+		m_pAdv->SetCharacter(m_pChara);
+		m_pAdv->SetMessageWindow(m_pMessageWindow);
+		m_pAdv->Update(eGameMessage_Setup, nullptr);
+	}
+	{
+		m_pShop = new Shop();
+		m_pShop->SetInformationPlate(m_pInformationPlate);
+		m_pShop->Update(eGameMessage_Setup, nullptr);
+	}
+	{
 		m_pStateManager = new StateManager(eState_Max);
 		m_pStateManager->SetUserPtr(this);
 		m_pStateManager->CreateState<StateGameMain>();
+		m_pStateManager->CreateState<StateAdv>();
 		m_pStateManager->CreateState<StateUseOrShopSelect>();
 		m_pStateManager->CreateState<StateShop>();
 	}
@@ -291,6 +325,7 @@ void SceneGameMain::EntityUpdate(GameMessage message, const void* param)
 	if(message != eGameMessage_Setup) {
 		m_pBgImage->Update(message, param);
 		m_pChara->Update(message, param);
+		m_pAdv->Update(message, param);
 		m_pShop->Update(message, param);
 		m_pInformationPlate->Update(message, param);
 		m_pMessageWindow->Update(message, param);

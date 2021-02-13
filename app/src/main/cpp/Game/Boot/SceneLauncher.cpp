@@ -13,7 +13,6 @@
 #include <TransformComponent.h>
 #include "SceneLauncher.h"
 #include "../App/Scene/SceneTitle.h"
-#include "../App/Scene/SceneAdv.h"
 #include "../App/Scene/SceneSpendTime.h"
 #include "../App/Scene/SceneWork.h"
 #include "../App/Scene/SceneShop.h"
@@ -57,7 +56,6 @@ void SceneLauncher::SceneSetup()
 		const char* pSceneName[] = {
 				"Title",
 				"Main",
-				"Adv",
 				"SpendTime",
 				"Work",
 				"Shop",
@@ -94,7 +92,6 @@ void SceneLauncher::SceneUpdate()
 	switch (m_pSimpleBtnMgr->GetDecide()){
 		case eButton_Title:{ SCENE_MANAGER()->AddNextCallScene(SceneTitle::CreateScene()); break; }
 		case eButton_GameMain:{ SCENE_MANAGER()->AddNextCallScene(SceneGameMain::CreateScene()); break;}
-		case eButton_Adv:{ SCENE_MANAGER()->AddNextCallScene(SceneAdv::CreateScene()); break; }
 		case eButton_SpendTime:{ SCENE_MANAGER()->AddNextCallScene(SceneSpendTime::CreateScene()); break; }
 		case eButton_Work:{ SCENE_MANAGER()->AddNextCallScene(SceneWork::CreateScene()); break; }
 		case eButton_Shop:{ SCENE_MANAGER()->AddNextCallScene(SceneShop::CreateScene()); break; }

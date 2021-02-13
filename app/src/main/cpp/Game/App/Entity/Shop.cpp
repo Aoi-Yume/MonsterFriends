@@ -17,7 +17,7 @@
 
 Shop::Shop()
 	: GameEntity()
-	, m_nStep(0)
+	, m_nStep(eStep_End)
 	, m_nItemNo()
 	, m_pMessageWindow(nullptr)
 	, m_pInformationPlate(nullptr)
@@ -42,6 +42,8 @@ void Shop::Open()
 	SetVisible(true);
 	m_aButtonManager[eBtnManager_Item]->Unlock();
 	m_aButtonManager[eBtnManager_Item]->SetVisible(true);
+	m_aButtonManager[eBtnManager_Back]->Unlock();
+	m_aButtonManager[eBtnManager_Back]->SetVisible(true);
 	m_nStep = eStep_SelectItemWait;
 }
 
@@ -52,6 +54,12 @@ void Shop::Close()
 		it->Lock();
 		it->SetVisible(false);
 	}
+	m_pMessageWindow->SetVisible(false);
+}
+
+bool Shop::IsEnd() const
+{
+	return m_nStep == eStep_End;
 }
 
 void Shop::SetInformationPlate(InformationPlate *pPlate)
@@ -126,6 +134,21 @@ void Shop::GameEntitySetup(const void* param) {
 			pBtnManager->SetControlPlayerId(nCurrentPlayerId);
 			m_aButtonManager.emplace_back(pBtnManager);
 		}
+		// 戻るボタン
+		{
+			auto pBtnManager = new ButtonManager();
+			const std::pair<const char *, VEC3> btnList[] = {
+					{"image/button_back.png", VEC3(700.0f, 300.0f, 0)},
+			};
+			for (int i = 0; i < sizeof(btnList) / sizeof(btnList[0]); ++i) {
+				auto pBtn = pBtnManager->CreateButton(btnList[i].first);
+				pBtn->SetPosition(btnList[i].second);
+			}
+			pBtnManager->SetVisible(false);
+			pBtnManager->Lock();
+			pBtnManager->SetControlPlayerId(nCurrentPlayerId);
+			m_aButtonManager.emplace_back(pBtnManager);
+		}
 	}
 	{
 		m_pMessageWindow = new MessageWindow("image/message_window.png");
@@ -144,6 +167,8 @@ void Shop::GameEntityUpdate(const void* param)
 	const int nDecide = m_aButtonManager[eBtnManager_Item]->GetDecide();
 	if(m_nStep == eStep_SelectItemWait){
 		if(nDecide >= eBtn_Item_01 && nDecide <= eBtn_Item_03){
+			m_aButtonManager[eBtnManager_Back]->SetVisible(false);
+			m_aButtonManager[eBtnManager_Back]->Lock();
 			m_nStep = eStep_ShowDetail;
 		}
 	}
@@ -204,8 +229,29 @@ void Shop::GameEntityUpdate(const void* param)
 		m_aButtonManager[eBtnManager_BuyOrCancel]->Lock();
 		m_aButtonManager[eBtnManager_Item]->Reset();
 		m_aButtonManager[eBtnManager_Item]->Unlock();
+		m_aButtonManager[eBtnManager_Back]->Reset();
+		m_aButtonManager[eBtnManager_Back]->Unlock();
+		m_aButtonManager[eBtnManager_Back]->SetVisible(true);
 		m_pMessageWindow->SetVisible(false);
 		m_nStep = eStep_SelectItemWait;
+	}
+	else if(m_nStep == eStep_BackMessage){
+		m_pMessageWindow->SetDirectMessage("バイバイにゃ");
+		m_pMessageWindow->SetVisible(true);
+		m_nStep = eStep_BackMessage_Wait;
+	}
+	else if(m_nStep == eStep_BackMessage_Wait){
+		if(m_pMessageWindow->IsNextMessage()){
+			m_nStep = eStep_End;
+		}
+	}
+
+	if(m_aButtonManager[eBtnManager_Back]->GetDecide() == eBtn_Back){
+		for(auto& it : m_aButtonManager){
+			it->Reset();
+			it->Lock();
+		}
+		m_nStep = eStep_BackMessage;
 	}
 }
 
