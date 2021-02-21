@@ -44,6 +44,7 @@ public:
 
 	void AddItem(int nPlayerId, int nItemNo, int nNum);
 	void SubItem(int nPlayerId, int nItemNo, int nNum);
+	int GetItemNum(int nPlayerId, int nItemNo) const;
 
 	GameNetworkInfo& GetNetworkInfo();
 	void DumpNetworkInfo();

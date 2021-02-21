@@ -20,7 +20,8 @@
 #include <AppParam.h>
 #include <Adv.h>
 #include <Shop.h>
-#include <CameraComponent.h>
+#include <UseItem.h>
+#include <Random.h>
 
 SceneBase* SceneGameMain::CreateScene()
 {
@@ -52,7 +53,7 @@ void StateGameMain::Update(void* pUserPtr)
 			break;
 		}
 		case eBtn_Work: {
-			SCENE_MANAGER()->ChangeScene(SceneWork::CreateScene());
+			ChangeState(SceneGameMain::eState_NextPlayer);
 			break;
 		}
 		case eBtn_Item: {
@@ -89,6 +90,9 @@ void StateAdv::Update(void *pUserPtr)
 void StateAdv::End(void *pUserPtr)
 {
 	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
+	auto pBtn = p->m_aBtnManager[SceneGameMain::eBtnKind_Main]->GetButton(0);
+	pBtn->Disable();
+	pBtn->SetGray(true);
 	p->m_pAdv->Close();
 }
 
@@ -109,6 +113,7 @@ void StateUseOrShopSelect::Update(void* pUserPtr)
 
 	switch (pBtn->GetDecide()){
 		case eBtn_Use: {
+			ChangeState(SceneGameMain::eState_UseItem);
 			break;
 		}
 		case eBtn_Shop: {
@@ -149,8 +154,40 @@ void StateShop::End(void *pUserPtr)
 
 //==========================================
 //==========================================
+void StateUseItem::Begin(void *pUserPtr)
+{
+	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
+	p->m_pUseItem->Open();
+}
+void StateUseItem::Update(void *pUserPtr)
+{
+	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
+	if(p->m_pUseItem->IsEnd()) {
+		ChangeState(SceneGameMain::eState_GameMain);
+	}
+}
+void StateUseItem::End(void *pUserPtr)
+{
+	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
+	p->m_pUseItem->Close();
+}
+
+//==========================================
+//==========================================
+void StateNextPlayer::Begin(void *pUserPtr)
+{
+	const int nNum = TransferManager::Get()->GetConnectNum() + 1;
+	auto& networkInfo = AppParam::Get()->GetNetworkInfo();
+	networkInfo.nCurrentPlayerId = (networkInfo.nCurrentPlayerId + 1) % nNum;
+	networkInfo.nCurrentTurn++;
+	SCENE_MANAGER()->ChangeScene(SceneGameMain::CreateScene());
+}
+
+//==========================================
+//==========================================
 SceneGameMain::SceneGameMain()
 : SceneBase("GameMain")
+, m_pCounter(nullptr)
 , m_pBgImage(nullptr)
 , m_pChara(nullptr)
 , m_pShop(nullptr)
@@ -165,10 +202,12 @@ SceneGameMain::SceneGameMain()
 //------------------------------------------
 SceneGameMain::~SceneGameMain()
 {
+	delete m_pCounter;
 	delete m_pBgImage;
 	delete m_pChara;
 	delete m_pAdv;
 	delete m_pShop;
+	delete m_pUseItem;
 	delete m_pInformationPlate;
 	delete m_pMessageWindow;
 	for(auto& it : m_aBtnManager) {
@@ -181,6 +220,16 @@ SceneGameMain::~SceneGameMain()
 void SceneGameMain::SceneSetup() {
 	Super::SceneSetup();
 	DEBUG_LOG("GameMain Call Setup");
+	{
+		m_pCounter = new Entity();
+		Entity::CreateTextImageComponent(m_pCounter, "", 32);
+		auto p = (TextImageComponent*)m_pCounter->GetComponent(eComponentKind_Layout);
+		p->SetOrtho(true);
+		m_pCounter->Update(eGameMessage_Setup, nullptr);
+		float x = -Engine::GetEngine()->GetScreenInfo().m_nScreenX * 0.5 + 100;
+		float y = Engine::GetEngine()->GetScreenInfo().m_nScreenY * 0.5f - 100;
+		m_pCounter->SetPosition(x, y, 0);
+	}
 	{
 		m_pBgImage = new Entity();
 		Entity::CreateLayoutComponent(m_pBgImage, "image/monfri_bg.png");
@@ -216,12 +265,19 @@ void SceneGameMain::SceneSetup() {
 		m_pShop->Update(eGameMessage_Setup, nullptr);
 	}
 	{
+		m_pUseItem = new UseItem();
+		m_pUseItem->SetInformationPlate(m_pInformationPlate);
+		m_pUseItem->Update(eGameMessage_Setup, nullptr);
+	}
+	{
 		m_pStateManager = new StateManager(eState_Max);
 		m_pStateManager->SetUserPtr(this);
 		m_pStateManager->CreateState<StateGameMain>();
 		m_pStateManager->CreateState<StateAdv>();
 		m_pStateManager->CreateState<StateUseOrShopSelect>();
 		m_pStateManager->CreateState<StateShop>();
+		m_pStateManager->CreateState<StateUseItem>();
+		m_pStateManager->CreateState<StateNextPlayer>();
 	}
 	{
 		// メインボタン
@@ -291,6 +347,7 @@ void SceneGameMain::SceneSync()
 		// ゲーム情報送受信待ち
 		auto pTransfer = pManager->GetTransfer<TransferBase>(TransferManager::eTransferKind_GameInfo);
 		if(pTransfer->IsEnd()){
+			pTransfer->Dump();
 			SetSyncStep(eSyncStep_End);
 		}
 	}
@@ -304,6 +361,10 @@ void SceneGameMain::SceneUpdate()
 	//DEBUG_LOG("Launcher Call Update");
 	m_pStateManager->Update();
 
+	auto p = (TextImageComponent*)m_pCounter->GetComponent(eComponentKind_Layout);
+	char str[128];
+	std::snprintf(str, sizeof(str), "%d", DELAY_INPUT()->GetCurrentFrame());
+	p->SetText(str);
 	//auto pTouchInput = Engine::GetEngine()->GetTouchInputInfoPtr(0);
 	//DEBUG_LOG_A("TouchEvent[%d], X[%.2f], Y[%.2f]\n", pTouchInput->nTouchEvent, pTouchInput->fTouchX, pTouchInput->fTouchY);
 }
@@ -327,8 +388,10 @@ void SceneGameMain::EntityUpdate(GameMessage message, const void* param)
 		m_pChara->Update(message, param);
 		m_pAdv->Update(message, param);
 		m_pShop->Update(message, param);
+		m_pUseItem->Update(message, param);
 		m_pInformationPlate->Update(message, param);
 		m_pMessageWindow->Update(message, param);
+		m_pCounter->Update(message, param);
 		for(auto& it : m_aBtnManager) {
 			it->Update(message, param);
 		}

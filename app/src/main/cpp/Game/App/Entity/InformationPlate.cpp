@@ -25,7 +25,7 @@ void InformationPlate::GameEntitySetup(const void* param) {
 	Super::GameEntitySetup(param);
 	const int nCurrentPlayerId = AppParam::Get()->GetNetworkInfo().nCurrentPlayerId;
 	{
-		Entity::CreateLayoutComponent(this, "image/information_plate.png");
+		Entity::CreateLayoutComponent(this, "image/point_plate.png");
 		auto pComponent = (LayoutComponent *) GetComponent(eComponentKind_Layout);
 		pComponent->SetOrtho(true);
 	}
@@ -49,27 +49,18 @@ void InformationPlate::GameEntitySetup(const void* param) {
 		Entity *pEntity = new Entity();
 		Entity::CreateTextImageComponent(pEntity, "", 32);
 		auto pText = (TextImageComponent *) pEntity->GetComponent(eComponentKind_Layout);
-		pText->SetText("キズナ");
-		pEntity->SetPosition(-100.0f, 0.0f, 0);
-		pText->SetOrtho(true);
-		AddChild(pEntity);
-	}
-	{
-		Entity *pEntity = new Entity();
-		Entity::CreateTextImageComponent(pEntity, "", 32);
-		auto pText = (TextImageComponent *) pEntity->GetComponent(eComponentKind_Layout);
 		char pointStr[64];
 		std::snprintf(pointStr, sizeof(pointStr), "%d", AppParam::Get()->GetKizunaPoint(nCurrentPlayerId));
 		pointStr[sizeof(pointStr) - 1] = '\0';
 		pText->SetText(pointStr);
 		const int nLength = strlen(pointStr);
 		// TODO 内部的にセンタリングや左揃え指定出来るようにする(現状多少ずれる)
-		pEntity->SetPosition(200.0f - ((float)nLength * 0.5f) * 16.0f, 0.0f, 0);
+		pEntity->SetPosition(100.0f - ((float)nLength * 0.5f) * 16.0f, 2.0f, 0);
 		pText->SetOrtho(true);
 		AddChild(pEntity);
 	}
 	const float fPosX = (float)-Engine::GetEngine()->GetScreenInfo().m_nScreenX * 0.35f;
-	const float fPosY = (float)-Engine::GetEngine()->GetScreenInfo().m_nScreenX * 0.21f;
+	const float fPosY = (float)Engine::GetEngine()->GetScreenInfo().m_nScreenY * 0.45f;
 	SetPosition(fPosX, fPosY, 0);
 }
 
@@ -87,7 +78,7 @@ void InformationPlate::UpdatePlate()
 {
 	const int nCurrentPlayerId = AppParam::Get()->GetNetworkInfo().nCurrentPlayerId;
 	{
-		Entity* pChild = reinterpret_cast<Entity*>(GetChild(0));
+		Entity* pChild = reinterpret_cast<Entity*>(GetChild(eChild_Name));
 		auto pText = (TextImageComponent *) pChild->GetComponent(eComponentKind_Layout);
 		const char* pName = nullptr;
 		if(TransferManager::Get()->IsConnectSucess()) {
@@ -99,7 +90,7 @@ void InformationPlate::UpdatePlate()
 		pText->SetText(pName);
 	}
 	{
-		Entity* pChild = reinterpret_cast<Entity*>(GetChild(2));
+		Entity* pChild = reinterpret_cast<Entity*>(GetChild(eChild_Point));
 		auto pText = (TextImageComponent *) pChild->GetComponent(eComponentKind_Layout);
 		char pointStr[64];
 		std::snprintf(pointStr, sizeof(pointStr), "%d", AppParam::Get()->GetKizunaPoint(nCurrentPlayerId));
@@ -107,6 +98,6 @@ void InformationPlate::UpdatePlate()
 		pText->SetText(pointStr);
 		const int nLength = strlen(pointStr);
 		// TODO 内部的にセンタリングや左揃え指定出来るようにする(現状多少ずれる)
-		pChild->SetPosition(200.0f - ((float)nLength * 0.5f) * 16.0f, 0.0f, 0);
+		pChild->SetPosition(100.0f - ((float)nLength * 0.5f) * 16.0f, 2.0f, 0);
 	}
 }

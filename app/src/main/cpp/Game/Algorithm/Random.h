@@ -30,6 +30,7 @@ public:
 
 	static unsigned int GetSeed();
 	static unsigned int GetSyncSeed();
+	static int GetCallSyncRandNum();
 
 	template<typename T>
 	static void Shuffle(T& rArray, int nNum)

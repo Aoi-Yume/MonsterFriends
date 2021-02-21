@@ -31,6 +31,9 @@ public:
 	void Select() override;
 	void UnSelect() override;
 
+protected:
+	void ChangeColor() override ;
+
 private:
 	LayoutComponent*	m_pLayoutComponent;
 };

@@ -1,5 +1,5 @@
 ﻿//
-// Created by 葵ユメ on 2021/01/10.
+// Created by 葵ユメ on 2021/02/21.
 //
 
 
@@ -9,29 +9,25 @@
 #include "TransformComponent.h"
 #include "LayoutComponent.h"
 #include "CollisionComponent.h"
-#include "Shop.h"
+#include "UseItem.h"
 #include <Button/ButtonManager.h>
 #include <Button/SimpleButton.h>
 #include <MessageWindow/MessageWindow.h>
 #include <InformationPlate.h>
 #include <ItemListUI.h>
 
-Shop::Shop()
+UseItem::UseItem()
 	: GameEntity()
-	, m_nStep(eStep_End)
-	, m_nItemNo()
+	, m_nStep(0)
 	, m_pMessageWindow(nullptr)
 	, m_pInformationPlate(nullptr)
 	, m_pItemListUI(nullptr)
 	, m_aButtonManager()
 {
-	DEBUG_LOG("Create Shop");
-	m_nItemNo[0] = 0;
-	m_nItemNo[1] = 1;
-	m_nItemNo[2] = 2;
+	DEBUG_LOG("Create UseItem");
 }
 
-Shop::~Shop()
+UseItem::~UseItem()
 {
 	for(auto& it : m_aButtonManager) {
 		delete it;
@@ -40,20 +36,18 @@ Shop::~Shop()
 	delete m_pMessageWindow;
 }
 
-void Shop::Open()
+void UseItem::Open()
 {
 	SetVisible(true);
+	updateItemList();
+	m_pItemListUI->Open();
 	m_aButtonManager[eBtnManager_Back]->Unlock();
 	m_aButtonManager[eBtnManager_Back]->SetVisible(true);
-	m_pItemListUI->ClearItemNo();
-	m_pItemListUI->AddItemNo(m_nItemNo[0]);
-	m_pItemListUI->AddItemNo(m_nItemNo[1]);
-	m_pItemListUI->AddItemNo(m_nItemNo[2]);
-	m_pItemListUI->Open();
+	m_aButtonManager[eBtnManager_Back]->Reset();
 	m_nStep = eStep_SelectItemWait;
 }
 
-void Shop::Close()
+void UseItem::Close()
 {
 	SetVisible(false);
 	for(auto& it : m_aButtonManager) {
@@ -64,28 +58,12 @@ void Shop::Close()
 	m_pMessageWindow->SetVisible(false);
 }
 
-bool Shop::IsEnd() const
+bool UseItem::IsEnd() const
 {
 	return m_nStep == eStep_End;
 }
 
-void Shop::SetInformationPlate(InformationPlate *pPlate)
-{
-	m_pInformationPlate = pPlate;
-}
-
-void Shop::SetVisible(bool bVisible)
-{
-	const int nChildSize = GetChildSize();
-	for(int i = 0; i < nChildSize; ++i){
-		auto pComponent = GetChild(i)->GetComponent(eComponentKind_Layout);
-		if(pComponent){
-			reinterpret_cast<LayoutComponent*>(pComponent)->SetVisible(bVisible);
-		}
-	}
-}
-
-void Shop::GameEntitySetup(const void* param) {
+void UseItem::GameEntitySetup(const void* param) {
 	Super::GameEntitySetup(param);
 
 	const int nCurrentPlayerId = AppParam::Get()->GetNetworkInfo().nCurrentPlayerId;
@@ -94,21 +72,11 @@ void Shop::GameEntitySetup(const void* param) {
 		AddChild(m_pItemListUI);
 	}
 	{
-		Entity* pEntity = new Entity();
-		Entity::CreateLayoutComponent(pEntity, "image/clerk.png");
-		auto pComponent = (LayoutComponent *) pEntity->GetComponent(eComponentKind_Layout);
-		pComponent->SetOrtho(true);
-		const float x = Engine::GetEngine()->GetScreenInfo().m_nScreenX * 0.5f - 100.0f;
-		const float y = Engine::GetEngine()->GetScreenInfo().m_nScreenY * 0.5f - 80.0f;
-		pEntity->SetPosition(x, -y, 0);
-		AddChild(pEntity);
-	}
-	{
-		// 「かう」or「かわない」ボタン
+		// 「つかう」or「やめる」ボタン
 		{
 			auto pBtnManager = new ButtonManager();
 			const std::pair<const char *, VEC3> btnList[] = {
-					{"image/button_buy.png", VEC3(-250.0f, -400.0f, 0)},
+					{"image/button_use.png", VEC3(-250.0f, -400.0f, 0)},
 					{"image/button_buyCancel.png", VEC3(250.0f, -400.0f, 0)},
 			};
 			for (int i = 0; i < sizeof(btnList) / sizeof(btnList[0]); ++i) {
@@ -147,7 +115,7 @@ void Shop::GameEntitySetup(const void* param) {
 	SetVisible(false);
 }
 
-void Shop::GameEntityUpdate(const void* param)
+void UseItem::GameEntityUpdate(const void* param)
 {
 	Super::GameEntityUpdate(param);
 	const int nSelectItemNo = m_pItemListUI->GetSelectItemNo();
@@ -176,7 +144,7 @@ void Shop::GameEntityUpdate(const void* param)
 	else if(m_nStep == eStep_ShowExplain){
 		const auto& itemInfo = AppItemList::Get()->GetItemInfo(nSelectItemNo);
 		char str[128] = {};
-		snprintf(str, sizeof(str), "%sにゃ\n「%dキズナ」にゃ", itemInfo.explain.c_str(), itemInfo.nCost);
+		snprintf(str, sizeof(str), "%s", itemInfo.explain.c_str());
 		str[sizeof(str) - 1] = '\0';
 		m_pMessageWindow->SetDirectMessage(str);
 		m_nStep = eStep_MessageWait2;
@@ -184,65 +152,54 @@ void Shop::GameEntityUpdate(const void* param)
 	else if(m_nStep == eStep_MessageWait2){
 		if(m_pMessageWindow->IsNextMessage()){
 			m_pMessageWindow->SetVisible(false);
-			m_aButtonManager[eBtnManager_BuyOrCancel]->SetVisible(true);
-			m_aButtonManager[eBtnManager_BuyOrCancel]->Unlock();
-			m_nStep = eStep_BuyOrCancel;
+			m_aButtonManager[eBtnManager_UseOrCancel]->SetVisible(true);
+			m_aButtonManager[eBtnManager_UseOrCancel]->Unlock();
+			m_nStep = eStep_UseOrCancel;
 		}
 	}
-	else if(m_nStep == eStep_BuyOrCancel){
-		const int nDecide2 = m_aButtonManager[eBtnManager_BuyOrCancel]->GetDecide();
-		if(nDecide2 == eBtn_Buy){
-			m_aButtonManager[eBtnManager_BuyOrCancel]->SetVisible(false);
-			m_nStep = eStep_BuyCheck;
+	else if(m_nStep == eStep_UseOrCancel){
+		const int nDecide2 = m_aButtonManager[eBtnManager_UseOrCancel]->GetDecide();
+		if(nDecide2 == eBtn_Use){
+			m_aButtonManager[eBtnManager_UseOrCancel]->SetVisible(false);
+			m_nStep = eStep_Use;
 		}
-		else if (nDecide2 == eBtn_BuyCancel){
+		else if (nDecide2 == eBtn_UseCancel){
 			m_nStep = eStep_Reset;
 		}
 	}
-	else if(m_nStep == eStep_BuyCheck){
-		const int nPlayerId = AppParam::Get()->GetNetworkInfo().nCurrentPlayerId;
-		const int nPlayerKizuna = AppParam::Get()->GetKizunaPoint(nPlayerId);
-		const auto& itemInfo = AppItemList::Get()->GetItemInfo(nSelectItemNo);
-		if(nPlayerKizuna >= itemInfo.nCost){
-			AppParam::Get()->SubKizunaPoint(nPlayerId, itemInfo.nCost);
-			AppParam::Get()->AddItem(nPlayerId, nSelectItemNo, 1);
-			m_pMessageWindow->SetDirectMessage("まいどありにゃ");
-		}
-		else{
-			m_pMessageWindow->SetDirectMessage("キズナが足りないにゃ");
-		}
-		m_pMessageWindow->SetVisible(true);
-		m_nStep = eStep_BuyAfterMessageWait;
+	else if(m_nStep == eStep_Use){
+		const int nPlayer = AppParam::Get()->GetNetworkInfo().nCurrentPlayerId;
+		AppParam::Get()->SubItem(nPlayer, nSelectItemNo, 1);
+		m_nStep = eStep_UseWait;
 	}
-	else if(m_nStep == eStep_BuyAfterMessageWait){
+	else if(m_nStep == eStep_UseWait){
+#if 0
 		if(m_pMessageWindow->IsNextMessage()){
 			m_nStep = eStep_Reset;
 		}
+#endif
+		m_nStep = eStep_Reset;
 	}
 	else if(m_nStep == eStep_Reset){
 		if(m_pInformationPlate){
 			m_pInformationPlate->UpdatePlate();
 		}
-		m_aButtonManager[eBtnManager_BuyOrCancel]->SetVisible(false);
-		m_aButtonManager[eBtnManager_BuyOrCancel]->Reset();
-		m_aButtonManager[eBtnManager_BuyOrCancel]->Lock();
-		m_pItemListUI->Reset();
-		m_pItemListUI->UnLock();
+		m_aButtonManager[eBtnManager_UseOrCancel]->SetVisible(false);
+		m_aButtonManager[eBtnManager_UseOrCancel]->Reset();
+		m_aButtonManager[eBtnManager_UseOrCancel]->Lock();
+		// UIを更新するため一度閉じて開きなおす
+		{
+			m_pItemListUI->Close();
+			updateItemList();
+			m_pItemListUI->Open();
+			m_pItemListUI->Reset();
+			m_pItemListUI->UnLock();
+		}
 		m_aButtonManager[eBtnManager_Back]->Reset();
 		m_aButtonManager[eBtnManager_Back]->Unlock();
 		m_aButtonManager[eBtnManager_Back]->SetVisible(true);
 		m_pMessageWindow->SetVisible(false);
 		m_nStep = eStep_SelectItemWait;
-	}
-	else if(m_nStep == eStep_BackMessage){
-		m_pMessageWindow->SetDirectMessage("バイバイにゃ");
-		m_pMessageWindow->SetVisible(true);
-		m_nStep = eStep_BackMessage_Wait;
-	}
-	else if(m_nStep == eStep_BackMessage_Wait){
-		if(m_pMessageWindow->IsNextMessage()){
-			m_nStep = eStep_End;
-		}
 	}
 
 	if(m_aButtonManager[eBtnManager_Back]->GetDecide() == eBtn_Back){
@@ -250,15 +207,42 @@ void Shop::GameEntityUpdate(const void* param)
 			it->Reset();
 			it->Lock();
 		}
-		m_nStep = eStep_BackMessage;
+		m_nStep = eStep_End;
 	}
 }
 
-void Shop::EntityUpdate(GameMessage message, const void* param)
+void UseItem::EntityUpdate(GameMessage message, const void* param)
 {
 	Super::EntityUpdate(message, param);
 	for(auto& it : m_aButtonManager) {
 		it->Update(message, param);
 	}
 	m_pMessageWindow->Update(message, param);
+}
+
+void UseItem::SetInformationPlate(InformationPlate *pPlate)
+{
+	m_pInformationPlate = pPlate;
+}
+
+void UseItem::SetVisible(bool bVisible)
+{
+	const int nChildSize = GetChildSize();
+	for(int i = 0; i < nChildSize; ++i){
+		auto pComponent = GetChild(i)->GetComponent(eComponentKind_Layout);
+		if(pComponent){
+			reinterpret_cast<LayoutComponent*>(pComponent)->SetVisible(bVisible);
+		}
+	}
+}
+
+void UseItem::updateItemList()
+{
+	m_pItemListUI->ClearItemNo();
+	const int nPlayer = AppParam::Get()->GetNetworkInfo().nCurrentPlayerId;
+	for(int i = 0; i < AppParam::eItemKind_Max; ++i){
+		if(AppParam::Get()->GetItemNum(nPlayer, i) > 0){
+			m_pItemListUI->AddItemNo(i);
+		}
+	}
 }

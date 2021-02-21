@@ -68,7 +68,8 @@ void DelayInput::AddTouchInfo(const TouchInputInfo& info, int nPlayer)
 }
 void DelayInput::AddDelayTouchInfo(const DelayTouchInfo& info, int nPlayer)
 {
-	m_aTouchInputInfo[nPlayer].emplace_back(info.uFrame, info.info);
+	uint32_t  uFrane = std::max(info.uFrame, m_uCurrentFrame + 3);
+	m_aTouchInputInfo[nPlayer].emplace_back(uFrane, info.info);
 	std::sort(m_aTouchInputInfo[nPlayer].begin(), m_aTouchInputInfo[nPlayer].end(),
 			[](const DelayTouchInfo& a, const DelayTouchInfo& b){ return a.uFrame < b.uFrame; });
 }

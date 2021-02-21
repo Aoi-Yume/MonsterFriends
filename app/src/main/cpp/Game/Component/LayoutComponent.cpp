@@ -106,22 +106,20 @@ static const char* s_vtx2DShaderSrc =
 static const char* s_fragShaderSrc =
 		"precision mediump float; \n"
   		"uniform sampler2D uni_sampler; \n"
-		"uniform float uni_Alpha; \n"
+		"uniform vec4 uni_simpleColor; \n"
 		"varying vec2 vary_uv; \n"
 		"void main() { \n"
 		"gl_FragColor = texture2D(uni_sampler, vec2(vary_uv.x, 1.0f - vary_uv.y)); \n"
-		"gl_FragColor.w *= uni_Alpha; \n"
+		"gl_FragColor *= uni_simpleColor; \n"
 		"if(gl_FragColor.w <= 0.1f) { discard; } \n"
 		"}";
 
 static const char* s_fragColorShaderSrc =
 		"precision mediump float; \n"
   		"uniform vec4 uni_simpleColor; \n"
-		"uniform float uni_Alpha; \n"
 		"varying vec2 vary_uv; \n"
 		"void main() { \n"
 		"gl_FragColor = uni_simpleColor; \n"
-		"gl_FragColor.w *= uni_Alpha; \n"
 		"if(gl_FragColor.w <= 0.1f) { discard; } \n"
 		"}";
 #endif
@@ -265,7 +263,8 @@ void LayoutComponent::setup()
 	m_nViewProjLocation = glGetUniformLocation(getShaderProgram(), "uni_viewProj");
 	m_nViewportInvLocation = glGetUniformLocation(getShaderProgram(), "uni_viewportInv");
 	m_nSamplerLocation = glGetUniformLocation(getShaderProgram(), "uni_sampler");
-	m_nAlphaLocation = glGetUniformLocation(getShaderProgram(), "uni_Alpha");
+	m_nColorLocation = glGetUniformLocation(getShaderProgram(), "uni_simpleColor");
+
 #endif
 
 	m_bCreated = true;
@@ -314,7 +313,11 @@ void LayoutComponent::setupUniformShaderParam()
 	const float* pCamMtx = (IsOrtho()) ? pCamera->Get2D().Get() : pCamera->GetViewProjection().Get();
 	glUniformMatrix4fv(m_nViewProjLocation, 1, GL_FALSE, pCamMtx);
 
-	glUniform1f(m_nAlphaLocation, GetAlpha());
+#if OPENGL_VERTION >= 3
+	glUniform4fv(SHADER_UNIFORM_COLOR, 1, (const GLfloat*)&GetColor());
+#else
+	glUniform4fv(m_nColorLocation, 1, (const GLfloat*)&GetColor());
+#endif
 }
 
 //------------------------------------------
@@ -566,7 +569,7 @@ void TextImageComponent::setupTexture(float &fSizeW, float &fSizeH)
 	jobject imageBufferObj = GetEnv()->CallStaticObjectMethod(classID, methodID_1, text, m_nFontSize);
 	void* pBuffer = GetEnv()->GetDirectBufferAddress(imageBufferObj);
 	uint size = (uint)GetEnv()->GetDirectBufferCapacity(imageBufferObj);
-	unsigned char* pColorData = reinterpret_cast<unsigned char*>(pBuffer);
+	auto* pColorData = reinterpret_cast<unsigned char*>(pBuffer);
 	// インデックス計算ラムダ式
 	auto getIndex = [&imageSize](uint i, uint j)->uint{
 		return (i * (uint)imageSize[1] + j) * 4U;
@@ -629,7 +632,6 @@ DebugSquareImageComponent::DebugSquareImageComponent(EntityBase* pEntityBase)
 : Super(pEntityBase)
 , m_fSizeW(100.0f)
 , m_fSizeH(100.0f)
-, m_Color(0.0f, 0.0f, 0.0f, 1.0f)
 {
 
 }
@@ -650,13 +652,6 @@ void DebugSquareImageComponent::SetSize(float fSizeW, float fSizeH)
 
 //------------------------------------------
 //------------------------------------------
-void DebugSquareImageComponent::SetColor(const VEC4& color)
-{
-	m_Color = color;
-}
-
-//------------------------------------------
-//------------------------------------------
 void DebugSquareImageComponent::setupShader()
 {
 	SetUseTex(false);
@@ -668,11 +663,6 @@ void DebugSquareImageComponent::setupShader()
 void DebugSquareImageComponent::setupUniformShaderParam()
 {
 	Super::setupUniformShaderParam();
-#if OPENGL_VERTION >= 3
-	glUniform4fv(SHADER_UNIFORM_COLOR, 1, (const GLfloat*)&m_Color);
-#else
-	glUniform4fv(glGetUniformLocation(getShaderProgram(), "uni_simpleColor"), 1, (const GLfloat*)&m_Color);
-#endif
 }
 
 //------------------------------------------

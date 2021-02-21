@@ -22,7 +22,8 @@ Dice::Dice()
 	for(int i = 0; i < eDICE_MAX; ++i){
 		m_uDiceRoulette[i] = i + 1;
 	}
-	shuffleDicePattern();
+	Random::SyncShuffle(m_uDiceRoulette, eDICE_MAX);
+	ResetStopDice();
 }
 
 Dice::~Dice()
@@ -58,10 +59,6 @@ void Dice::GameEntityUpdate(const void* param)
 		}
 		m_nCurrentDiceNo = m_uDiceRoulette[m_nCurrentDiceIdx];
 		m_nCurrentDiceIdx = (m_nCurrentDiceIdx + 1) % eDICE_MAX;
-		// 1週したらパターン変更
-		if(m_nCurrentDiceIdx == 0){
-			shuffleDicePattern();
-		}
 	}
 }
 
@@ -92,18 +89,18 @@ void Dice::StartDice()
 void Dice::StopDice()
 {
 	m_bDiceStart = false;
+	for(int i = 0; i < eDICE_MAX; ++i){
+		SetVisible(i, (i + 1) == m_nStopDiceNo);
+	}
+	m_nCurrentDiceNo = m_nStopDiceNo;
+}
+
+void Dice::ResetStopDice()
+{
+	m_nStopDiceNo = Random::GetSyncInt(1, eDICE_MAX);
 }
 
 uint8_t Dice::GetDice() const
 {
 	return m_nCurrentDiceNo;
-}
-
-void Dice::shuffleDicePattern()
-{
-	const int nPrevDiceNo = m_uDiceRoulette[eDICE_MAX - 1];
-	while(true) {
-		Random::SyncShuffle(m_uDiceRoulette, eDICE_MAX);
-		if(nPrevDiceNo != m_uDiceRoulette[0]){ break; }
-	}
 }

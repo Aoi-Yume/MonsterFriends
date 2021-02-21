@@ -10,7 +10,7 @@ DrawComponent::DrawComponent(ComponentKind nKind, EntityBase* pEntityBase)
 , m_bOrtho(false)
 , m_bUseTex(false)
 , m_bVisible(true)
-, m_fAlpha(1.0f)
+, m_Color(1, 1, 1, 1)
 , m_nVtxShader(0)
 , m_nFragShader(0)
 , m_nShaderProgram(0)
@@ -65,14 +65,14 @@ bool DrawComponent::IsVisible() const
 	return m_bVisible;
 }
 
-void DrawComponent::SetAlpha(float fAlpha)
+void DrawComponent::SetColor(const VEC4& color)
 {
-	m_fAlpha = fAlpha;
+	m_Color = color;
 }
 
-float DrawComponent::GetAlpha() const
+const VEC4& DrawComponent::GetColor() const
 {
-	return m_fAlpha;
+	return m_Color;
 }
 
 GLuint DrawComponent::loadShader(GLenum type, const GLchar* pShaderCode)

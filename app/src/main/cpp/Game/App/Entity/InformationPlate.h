@@ -14,6 +14,10 @@ class InformationPlate : public GameEntity
 {
 	typedef GameEntity Super;
 public:
+	enum {
+		eChild_Name,
+		eChild_Point,
+	};
 
 public:
 	InformationPlate();

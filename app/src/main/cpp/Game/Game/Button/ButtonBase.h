@@ -42,11 +42,15 @@ public:
 	bool IsUnSelect() const;
 	bool IsSelected() const;
 
+	void SetGray(bool bGray);
+	bool IsGray() const;
+
 protected:
 	virtual void ChangeColor();
 
 private:
 	bool 	m_bEnable;
+	bool 	m_bGray;
 	int		m_nState;
 
 	Collision2DRectComponent*		m_pColl2DRectComponent;

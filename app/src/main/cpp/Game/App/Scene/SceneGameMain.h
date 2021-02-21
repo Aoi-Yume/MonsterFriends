@@ -20,6 +20,7 @@ class InformationPlate;
 class MessageWindow;
 class Adv;
 class Shop;
+class UseItem;
 
 //==========================================
 //==========================================
@@ -73,6 +74,22 @@ class StateShop : public StateBase
 
 //==========================================
 //==========================================
+class StateUseItem : public StateBase
+{
+	void Begin(void* pUserPtr) override;
+	void Update(void* pUserPtr) override;
+	void End(void* pUserPtr) override;
+};
+
+//==========================================
+//==========================================
+class StateNextPlayer : public StateBase
+{
+	void Begin(void* pUserPtr) override;
+};
+
+//==========================================
+//==========================================
 class SceneGameMain : public SceneBase
 {
 	typedef SceneBase Super;
@@ -80,6 +97,8 @@ class SceneGameMain : public SceneBase
 	friend class StateUseOrShopSelect;
 	friend class StateAdv;
 	friend class StateShop;
+	friend class StateUseItem;
+	friend class StateNextPlayer;
 
 public:
 	enum {
@@ -92,6 +111,8 @@ public:
 		eState_Adv,
 		eState_SelectItemUseOrShop,
 		eState_Shop,
+		eState_UseItem,
+		eState_NextPlayer,
 		eState_Max
 	};
 
@@ -111,11 +132,12 @@ protected:
 	void EntityUpdate(GameMessage message, const void* param) override;
 
 private:
-
+	Entity*		m_pCounter;
 	Entity*		m_pBgImage;
 	Character*	m_pChara;
 	Adv*		m_pAdv;
 	Shop*		m_pShop;
+	UseItem*	m_pUseItem;
 
 	InformationPlate* m_pInformationPlate;
 	MessageWindow* m_pMessageWindow;

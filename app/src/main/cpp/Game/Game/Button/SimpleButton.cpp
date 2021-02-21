@@ -38,3 +38,13 @@ void SimpleButton::UnSelect()
 {
 	Super::UnSelect();
 }
+
+void SimpleButton::ChangeColor()
+{
+	if(IsGray()){
+		m_pLayoutComponent->SetColor(VEC4(0.5f, 0.5f, 0.5f, 1.0f));
+	}
+	else{
+		m_pLayoutComponent->SetColor(VEC4(1.0f, 1.0f, 1.0f, 1.0f));
+	}
+}

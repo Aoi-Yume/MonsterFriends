@@ -9,6 +9,7 @@
 #include <GLES2/gl2.h>
 #include "../Engine/Engine.h"
 #include "ComponentBase.h"
+#include "../../Math/math_Vector.h"
 
 
 class DrawComponent : public ComponentBase
@@ -28,8 +29,8 @@ public:
 	void SetVisible(bool bVisible);
 	bool IsVisible() const;
 
-	void SetAlpha(float fAlpha);
-	float GetAlpha() const;
+	void SetColor(const VEC4& color);
+	const VEC4& GetColor() const;
 
 protected:
 	GLuint loadShader(GLenum type, const char* pShaderCode);
@@ -48,7 +49,7 @@ private:
 	bool 		m_bUseTex;
 	bool 		m_bVisible;
 
-	float 		m_fAlpha;
+	VEC4		m_Color;
 
 	GLuint		m_nVtxShader;
 	GLuint		m_nFragShader;

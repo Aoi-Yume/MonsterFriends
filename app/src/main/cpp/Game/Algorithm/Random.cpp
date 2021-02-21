@@ -10,6 +10,7 @@ static unsigned int 		s_SyncSeed;
 static std::random_device	s_RndDevice;
 static std::mt19937			s_AppRandom;
 static std::mt19937			s_SyncRandom;
+static int m_CallSyncRand;
 
 void Random::Initialize()
 {
@@ -49,18 +50,21 @@ float Random::GetFloat(float fMin, float fMax)
 
 int Random::GetSyncInt()
 {
+	m_CallSyncRand++;
 	return s_SyncRandom();
 }
 
 int Random::GetSyncInt(int nMin, int nMax)
 {
 	auto temp = std::uniform_int_distribution<>(nMin, nMax);
+	m_CallSyncRand++;
 	return temp(s_SyncRandom);
 }
 
 float Random::GetSyncFloat(float fMin, float fMax)
 {
 	auto temp = std::uniform_real_distribution<>(fMin, fMax);
+	m_CallSyncRand++;
 	return temp(s_SyncRandom);
 }
 
@@ -72,4 +76,9 @@ unsigned int Random::GetSeed()
 unsigned int Random::GetSyncSeed()
 {
 	return s_SyncSeed;
+}
+
+int Random::GetCallSyncRandNum()
+{
+	return m_CallSyncRand;
 }

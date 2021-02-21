@@ -117,7 +117,7 @@ void AppParam::SubItem(int nPlayerId, int nItemNo, int nNum)
 	auto pManager = TransferManager::Get();
 	if(pManager->IsConnectSucess()) {
 		auto& uItemNum = m_NetworkGameInfo.ChharaInfo[nPlayerId].uItemNum[nItemNo];
-		uItemNum = std::max((int)uItemNum + nNum, 0);
+		uItemNum = std::max((int)uItemNum - nNum, 0);
 
 		// プレイヤーIDが自身のIDなら自分用も更新
 		const int nNetPlayerId = pManager->GetPlayerIdFromNetId(pManager->GetSelfConnect().Id.c_str());
@@ -128,8 +128,21 @@ void AppParam::SubItem(int nPlayerId, int nItemNo, int nNum)
 	// 接続できていない時はプレイヤーIDが０の時だけ更新
 	else if(nPlayerId == 0){
 		auto& uItemNum = m_CharaInfo.uItemNum[nItemNo];
-		uItemNum = std::max((int)uItemNum + nNum, 0);
+		uItemNum = std::max((int)uItemNum - nNum, 0);
 	}
+}
+
+int AppParam::GetItemNum(int nPlayerId, int nItemNo) const
+{
+	assert(nItemNo >= 0 && nItemNo < eItemKind_Max);
+
+	// 接続完了している時は通信用情報から取得
+	auto pManager = TransferManager::Get();
+	if(pManager->IsConnectSucess()) {
+		return m_NetworkGameInfo.ChharaInfo[nPlayerId].uItemNum[nItemNo];
+	}
+	// 接続できていない時は自身の情報から取得
+	return m_CharaInfo.uItemNum[nItemNo];
 }
 
 AppParam::GameNetworkInfo& AppParam::GetNetworkInfo()

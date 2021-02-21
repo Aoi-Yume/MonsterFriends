@@ -11,6 +11,7 @@
 ButtonBase::ButtonBase()
 : Entity()
 , m_bEnable(true)
+, m_bGray(false)
 , m_nState(eState_UnSelect)
 , m_pColl2DRectComponent(nullptr)
 {
@@ -67,6 +68,17 @@ bool ButtonBase::IsSelect() const
 bool ButtonBase::IsSelected() const
 {
 	return m_nState == eState_Selected;
+}
+
+void ButtonBase::SetGray(bool bGray)
+{
+	m_bGray = bGray;
+	ChangeColor();
+}
+
+bool ButtonBase::IsGray() const
+{
+	return m_bGray;
 }
 
 bool ButtonBase::IsUnSelect() const

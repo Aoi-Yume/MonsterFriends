@@ -267,6 +267,8 @@ void Adv::updateBattleStep()
 			if(m_Chara.pDice->GetDice() == m_Enemy.pDice->GetDice()) {
 				m_nSubStep = 0;
 				m_pMessageWindow->SetVisible(false);
+				m_Chara.pDice->ResetStopDice();
+				m_Enemy.pDice->ResetStopDice();
 			}
 			else {
 				m_nSubStep = 4;

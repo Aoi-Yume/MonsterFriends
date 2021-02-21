@@ -13,6 +13,7 @@
 class ButtonManager;
 class MessageWindow;
 class InformationPlate;
+class ItemListUI;
 
 class Shop : public GameEntity
 {
@@ -38,16 +39,17 @@ private:
 		eStep_SelectItemWait,
 		eStep_ShowDetail,
 		eStep_MessageWait,
+		eStep_ShowExplain,
+		eStep_MessageWait2,
 		eStep_BuyOrCancel,
 		eStep_BuyCheck,
-		eSteo_BuyAfterMessageWait,
+		eStep_BuyAfterMessageWait,
 		eStep_Reset,
 		eStep_BackMessage,
 		eStep_BackMessage_Wait,
 		eStep_End,
 	};
 	enum {
-		eBtnManager_Item,
 		eBtnManager_BuyOrCancel,
 		eBtnManager_Back,
 	};
@@ -67,6 +69,7 @@ private:
 	int 				m_nItemNo[eBtn_Item_Max];
 	MessageWindow* 		m_pMessageWindow;
 	InformationPlate*	m_pInformationPlate;
+	ItemListUI*			m_pItemListUI;
 	std::vector<ButtonManager*>		m_aButtonManager;
 };
 

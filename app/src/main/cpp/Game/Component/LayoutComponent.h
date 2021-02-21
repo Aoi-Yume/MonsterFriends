@@ -45,7 +45,7 @@ protected:
 	GLint 		m_nTransformLocation;
 	GLint 		m_nViewportInvLocation;
 	GLint 		m_nViewProjLocation;
-	GLint 		m_nAlphaLocation;
+	GLint 		m_nColorLocation;
 
 private:
 	bool		m_bCreated;
@@ -101,7 +101,6 @@ public:
 	virtual ~DebugSquareImageComponent();
 
 	void SetSize(float fSizeW, float fSizeH);
-	void SetColor(const VEC4& color);
 protected:
 	void setupShader() override;
 	void setupUniformShaderParam() override;
@@ -110,6 +109,5 @@ protected:
 private:
 	float 		m_fSizeW;
 	float 		m_fSizeH;
-	VEC4		m_Color;
 };
 #endif
