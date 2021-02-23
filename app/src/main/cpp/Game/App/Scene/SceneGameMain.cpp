@@ -18,6 +18,7 @@
 #include <../Net/TransferGameInfo.h>
 #include <../Net/TransferTouchInfo.h>
 #include <AppParam.h>
+#include <AppSkillList.h>
 #include <Adv.h>
 #include <Shop.h>
 #include <UseItem.h>
@@ -39,7 +40,7 @@ void StateGameMain::Begin(void* pUserPtr)
 	pBtn->SetVisible(true);
 	// プレイヤーIDが更新されていなかった。名前が更新するため呼び出す
 	p->m_pInformationPlate->UpdatePlate();
-	DEBUG_LOG("GameMain Begin\n");
+	DEBUG_LOG("State GameMain Begin\n");
 }
 void StateGameMain::Update(void* pUserPtr)
 {
@@ -318,6 +319,7 @@ void SceneGameMain::SceneSetup() {
 			pManager->StartTransfer(TransferManager::eTransferKind_TouchInfo);
 		}
 	}
+	SKILL_LIST()->InitializeSkillTransfer();
 
 	DEBUG_LOG("Setup End");
 }

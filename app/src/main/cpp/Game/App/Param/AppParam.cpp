@@ -11,8 +11,13 @@ AppParam::AppParam()
 : Singleton<AppParam>()
 , m_CharaInfo()
 , m_NetworkGameInfo()
+, m_NetworkSkillInfo()
 {
 	DEBUG_LOG("Create AppParam");
+	m_CharaInfo.nKizunaPoint = 100;
+	for(int i = 0; i < NET_CONNECT_MAX; ++i){
+		m_NetworkGameInfo.ChharaInfo[i].nKizunaPoint = 100;
+	}
 }
 
 AppParam::~AppParam()
@@ -157,4 +162,18 @@ void AppParam::DumpNetworkInfo()
 	for(int i = 0; i < NET_CONNECT_MAX; ++i){
 		DEBUG_LOG_A("Player[%d]:Kizuna[%d]\n", i + 1, m_NetworkGameInfo.ChharaInfo[i].nKizunaPoint);
 	}
+}
+
+AppParam::SkillNetworkInfo& AppParam::GetSkillInfo()
+{
+	return m_NetworkSkillInfo;
+}
+
+void AppParam::DumpNetworkSkillInfo()
+{
+	DEBUG_LOG_A("SkillNo[%d]\n", m_NetworkSkillInfo.SkillNo);
+	DEBUG_LOG_A("SendPlayerId[%d]\n", m_NetworkSkillInfo.SendPlayer);
+	DEBUG_LOG_A("TargetPlayer[%d]\n", m_NetworkSkillInfo.TargetPlayer);
+	DEBUG_LOG_A("Duration[%d]\n", m_NetworkSkillInfo.Duration);
+	DEBUG_LOG_A("Param[%d]\n", m_NetworkSkillInfo.Param);
 }

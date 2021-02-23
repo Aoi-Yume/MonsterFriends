@@ -89,7 +89,7 @@ bool Entity::IsVisible()
 
 bool Entity::CreateTextImageComponent(Entity* pEntity, const char* pText, int nFontSize)
 {
-	DEBUG_LOG("Create Text Image Component");
+//	DEBUG_LOG("Create Text Image Component");
 	CreateTransformComponent(pEntity);
 	if( pEntity->m_pComponent[eComponentKind_Layout] ){ return false; }
 	TextImageComponent* pComponent = new TextImageComponent(pEntity);
@@ -102,7 +102,7 @@ bool Entity::CreateTextImageComponent(Entity* pEntity, const char* pText, int nF
 
 bool Entity::CreateLayoutComponent(Entity* pEntity, const char* pResPath)
 {
-    DEBUG_LOG("Create Layout Component");
+//    DEBUG_LOG("Create Layout Component");
     CreateTransformComponent(pEntity);
 
 	if( pEntity->m_pComponent[eComponentKind_Layout] ){ return false; }
@@ -116,10 +116,10 @@ bool Entity::CreateLayoutComponent(Entity* pEntity, const char* pResPath)
 
 bool Entity::CreateTransformComponent(Entity* pEntity)
 {
-	DEBUG_LOG("Create Transform Component");
+//	DEBUG_LOG("Create Transform Component");
 	if(  pEntity->m_pComponent[eComponentKind_Transform] )
 	{
-		DEBUG_LOG("Create Transform Component Filed");
+//		DEBUG_LOG("Create Transform Component Filed");
 		return false;
 	}
 	pEntity->m_pComponent[eComponentKind_Transform] = new TransformComponent(pEntity);
@@ -128,10 +128,10 @@ bool Entity::CreateTransformComponent(Entity* pEntity)
 
 bool Entity::CreateCollision2DRectComponent(Entity *pEntity)
 {
-	DEBUG_LOG("Create Collision2DRect Component");
+//	DEBUG_LOG("Create Collision2DRect Component");
 	if(  pEntity->m_pComponent[eComponentKind_Collision] )
 	{
-		DEBUG_LOG("Create Collision2DRect Component Filed");
+//		DEBUG_LOG("Create Collision2DRect Component Filed");
 		return false;
 	}
 	pEntity->m_pComponent[eComponentKind_Collision] = new Collision2DRectComponent(pEntity);
@@ -140,10 +140,10 @@ bool Entity::CreateCollision2DRectComponent(Entity *pEntity)
 
 bool Entity::CreateCameraComponent(Entity *pEntity)
 {
-    DEBUG_LOG("Create Camera Component");
+//    DEBUG_LOG("Create Camera Component");
     if( pEntity->m_pComponent[eComponentKind_Camera] )
     {
-        DEBUG_LOG("Create Camera Component Filed");
+ //       DEBUG_LOG("Create Camera Component Filed");
         return false;
     }
     pEntity->m_pComponent[eComponentKind_Camera] = new CameraComponent(pEntity);
@@ -152,7 +152,7 @@ bool Entity::CreateCameraComponent(Entity *pEntity)
 
 bool Entity::CreateDebugSquareImageComponent(Entity *pEntity)
 {
-	DEBUG_LOG("Create Debug Square Image Component");
+//	DEBUG_LOG("Create Debug Square Image Component");
 	!CreateTransformComponent(pEntity);
 	if( pEntity->m_pComponent[eComponentKind_Layout] ){ return false; }
 	DebugSquareImageComponent* pComponent = new DebugSquareImageComponent(pEntity);

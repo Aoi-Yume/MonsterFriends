@@ -9,6 +9,7 @@
 #include "../Engine/Engine.h"
 #include <AppParam.h>
 #include <AppItemList.h>
+#include <AppSkillList.h>
 #include <SceneManager.h>
 #include <DelayInput.h>
 
@@ -39,8 +40,18 @@ Java_com_aoiyume_Game_GameMainRender_SurfaceCreate(
 		AppParam::Initialize();
 		AppItemList::Initialize();
 		AppItemList::Get()->Load();
+		AppSkillList::Initialize();
+		AppSkillList::Get()->Load();
 	}
 	// TODO Engine に解放コールバックを設定する
+	auto DestroyCalback = [=](){
+		SceneManager::DestroySceneManager();
+		AppParam::Destroy();
+		AppItemList::Destroy();
+		AppSkillList::Destroy();
+		delete s_EntityMgr;
+	};
+	Engine::GetEngine()->SetDestrpyCallBack(DestroyCalback);
 }
 //--------------------------------------------------------
 JNIEXPORT void JNICALL

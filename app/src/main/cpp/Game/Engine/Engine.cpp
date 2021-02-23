@@ -16,6 +16,7 @@ Engine::Engine()
 : m_nRef(0)
 , m_AssetManagerObjRef(nullptr)
 , m_pAssetMaanger(nullptr)
+, m_DestroyCallBack()
 {
 }
 
@@ -23,30 +24,16 @@ Engine::Engine()
 //-----------------------------------------
 Engine::~Engine()
 {
+	if(m_DestroyCallBack){
+		m_DestroyCallBack();
+	}
 }
 
 //-----------------------------------------
 //-----------------------------------------
-void Engine::Create()
+void Engine::SetDestrpyCallBack(const std::function<void ()> &callBack)
 {
-	if( !s_AoYumeEngine ){
-		s_AoYumeEngine = new Engine();
-	}
-	Random::Initialize();
-	DELAY_INPUT()->Initialize(10);
-	DELAY_INPUT()->StartDelayInput();
-	s_AoYumeEngine->AddRef();
-}
-
-//-----------------------------------------
-//-----------------------------------------
-void Engine::Destroy()
-{
-	s_AoYumeEngine->SubRef();
-	if(s_AoYumeEngine->IsEmptyRef()){
-		delete s_AoYumeEngine;
-		s_AoYumeEngine = nullptr;
-	}
+	m_DestroyCallBack = callBack;
 }
 
 //-----------------------------------------
@@ -245,6 +232,30 @@ void Engine::SendData(const char* pId, jbyte* pData, int nSize)
 	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SYSTEM, "SendData");
 	jstring Id = GetEnv()->NewStringUTF(pId);
 	GetEnv()->CallStaticVoidMethod(classID, methodID_1, Id, byteData);
+}
+
+//-----------------------------------------
+//-----------------------------------------
+void Engine::Create()
+{
+	if( !s_AoYumeEngine ){
+		s_AoYumeEngine = new Engine();
+	}
+	Random::Initialize();
+	DELAY_INPUT()->Initialize(10);
+	DELAY_INPUT()->StartDelayInput();
+	s_AoYumeEngine->AddRef();
+}
+
+//-----------------------------------------
+//-----------------------------------------
+void Engine::Destroy()
+{
+	s_AoYumeEngine->SubRef();
+	if(s_AoYumeEngine->IsEmptyRef()){
+		delete s_AoYumeEngine;
+		s_AoYumeEngine = nullptr;
+	}
 }
 
 //-----------------------------------------

@@ -1,4 +1,4 @@
-﻿#, アイテム名, 画像ファイル名, ショップコスト, 説明
-, ごみ, image/shop_item_trash.png, 10, きれいな「ごみ」
-, ごみ２, image/shop_item_trash.png, 20, きれいな「ごみ２」
-, キズナドレイン, image/shop_item_trash.png, 30, 誰かからキズナを盗む
+﻿#, アイテム名, 画像ファイル名, ショップコスト, 説明, スキル名
+, ごみ, image/shop_item_trash.png, 10, きれいな「ごみ」, なし
+, ごみ２, image/shop_item_trash.png, 20, きれいな「ごみ２」, なし
+, キズナドレイン, image/shop_item_trash.png, 30, 誰かからキズナを盗む, キズナドレイン

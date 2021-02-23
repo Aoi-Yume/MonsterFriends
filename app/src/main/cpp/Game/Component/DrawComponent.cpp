@@ -15,24 +15,12 @@ DrawComponent::DrawComponent(ComponentKind nKind, EntityBase* pEntityBase)
 , m_nFragShader(0)
 , m_nShaderProgram(0)
 {
-	DEBUG_LOG("Call DrawComponent Constructor");
-	/*
-    jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_LAYOUT_COMPONENT);
-    jmethodID  methodID = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_LAYOUT_COMPONENT, "<init>");
-    jobject pObj = GetEnv()->AllocObject(classID);
-
-    m_pObj = GetEnv()->NewGlobalRef(pObj);
-    jfieldID  fieldID = ObjectLoader::GetObjectLoader()->GetFieledID(CLASS_NAME_LAYOUT_COMPONENT, "m_nInstance");
-    GetEnv()->SetLongField(m_pObj, fieldID, reinterpret_cast<long>(this));
-
-    GetEnv()->CallVoidMethod(m_pObj, methodID);
-	*/
+//	DEBUG_LOG("Call DrawComponent Constructor");
 }
 
 DrawComponent::~DrawComponent()
 {
-    DEBUG_LOG("Call DrawComponent Deconstructor");
-   // GetEnv()->DeleteGlobalRef(m_pObj);
+//    DEBUG_LOG("Call DrawComponent Deconstructor");
 }
 
 void DrawComponent::SetOrtho(bool bOrtho)

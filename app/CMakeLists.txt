@@ -36,7 +36,8 @@ add_library(    math-lib SHARED
 add_library(	algorithm-lib SHARED
 				src/main/cpp/Game/Algorithm/Singleton.cpp
 				src/main/cpp/Game/Algorithm/Random.cpp
-				src/main/cpp/Game/Algorithm/State.cpp)
+				src/main/cpp/Game/Algorithm/State.cpp
+				src/main/cpp/Game/Algorithm/Util.cpp)
 
 add_library(    input-lib SHARED
 				src/main/cpp/Game/Input/DelayInput.cpp)
@@ -48,7 +49,8 @@ add_library(	net-lib SHARED
 				src/main/cpp/Game/Net/TransferPlayerId.cpp
 				src/main/cpp/Game/Net/TransferSyncScene.cpp
 				src/main/cpp/Game/Net/TransferGameInfo.cpp
-				src/main/cpp/Game/Net/TransferTouchInfo.cpp)
+				src/main/cpp/Game/Net/TransferTouchInfo.cpp
+				src/main/cpp/Game/Net/TransferSkillInfo.cpp)
 
 add_library(	aoiyume_engine-lib SHARED
 				src/main/cpp/Game/Engine/engine-lib.cpp
@@ -83,7 +85,8 @@ add_library(	game-lib SHARED
 
 add_library(	app_param-lib SHARED
 				src/main/cpp/Game/App/Param/AppParam.cpp
-				src/main/cpp/Game/App/Param/AppItemList.cpp)
+				src/main/cpp/Game/App/Param/AppItemList.cpp
+				src/main/cpp/Game/App/Param/AppSkillList.cpp)
 
 add_library(	app_entity-lib SHARED
 				src/main/cpp/Game/App/Entity/Character.cpp

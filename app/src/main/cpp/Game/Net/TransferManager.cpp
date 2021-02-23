@@ -10,6 +10,8 @@
 #include "TransferSyncScene.h"
 #include "TransferTouchInfo.h"
 #include "TransferGameInfo.h"
+#include "TransferSkillInfo.h"
+
 USE_SINGLETON_VARIABLE(TransferManager);
 
 TransferManager::TransferManager()
@@ -55,6 +57,7 @@ void TransferManager::Initialize(bool bHost)
 	SetTransfer(eTransferKind_SyncScene, new TransferSyncScene);
 	SetTransfer(eTransferKind_TouchInfo, new TransferTouchInfo);
 	SetTransfer(eTransferKind_GameInfo, new TransferGameInfo);
+	SetTransfer(eTramsferKind_SkillInfo, new TransferSkillInfo);
 }
 
 void TransferManager::SetConnectSuccess(bool bConnect)
@@ -159,6 +162,12 @@ void TransferManager::SetConnectPlayerId(const char* id, int nPlayerId)
 void TransferManager::SendHost(jbyte* pData, int nSize)
 {
 	sendData(GetHostConnect().Id.c_str(), pData, nSize);
+}
+
+void TransferManager::SendPlayer(int nPlayerId, jbyte* pData, int nSize)
+{
+	const int nNo = GetConnectNoFromPlayerId(nPlayerId);
+	sendData(m_aConnectInfo[nNo].Id.c_str(), pData, nSize);
 }
 
 void TransferManager::BroadCast(jbyte *pData, int nSize)

@@ -23,14 +23,12 @@ public:
 		std::string fileName;
 		int nCost;
 		std::string explain;
+		std::string skillName;
 	};
 	
 public:
 	void Load();
 	const ItemInfo& GetItemInfo(int nIdx) const;
-
-private:
-	void splitCSVText(std::vector<std::string>& aSplitText, std::string text);
 
 private:
 	std::vector<ItemInfo>	m_aItemInfo;

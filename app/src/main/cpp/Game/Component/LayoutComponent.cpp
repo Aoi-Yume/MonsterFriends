@@ -130,7 +130,7 @@ LayoutComponent::LayoutComponent(EntityBase* pEntityBase)
 : Super(eComponentKind_Layout, pEntityBase)
 , m_bCreated(false)
 {
-	DEBUG_LOG("Call LayoutComponent Constructor");
+//	DEBUG_LOG("Call LayoutComponent Constructor");
 	memset(m_cResPath, 0, sizeof(m_cResPath));
 }
 
@@ -138,7 +138,7 @@ LayoutComponent::LayoutComponent(EntityBase* pEntityBase)
 //------------------------------------------
 LayoutComponent::~LayoutComponent()
 {
-    DEBUG_LOG("Call LayoutComponent Deconstructor");
+//    DEBUG_LOG("Call LayoutComponent Deconstructor");
 }
 
 //------------------------------------------

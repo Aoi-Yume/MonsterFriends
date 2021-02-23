@@ -33,6 +33,15 @@ public:
 		uint8_t uItemNum[eItemKind_Max];
 	};
 
+	struct SkillNetworkInfo {
+		bool Standby;
+		int	SkillNo;
+		int Duration;
+		int Param;
+		int SendPlayer;
+		int TargetPlayer;
+	};
+
 public:
 	void SetCharaName(const char* pName);
 	const char* GetCharaName() const;
@@ -49,9 +58,13 @@ public:
 	GameNetworkInfo& GetNetworkInfo();
 	void DumpNetworkInfo();
 
+	SkillNetworkInfo& GetSkillInfo();
+	void DumpNetworkSkillInfo();
+
 private:
 	CharacterInfo 		m_CharaInfo;
 	GameNetworkInfo		m_NetworkGameInfo;
+	SkillNetworkInfo	m_NetworkSkillInfo;
 };
 
 #endif

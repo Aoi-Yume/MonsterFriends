@@ -22,6 +22,7 @@ public:
 		eTransferKind_SyncScene,
 		eTransferKind_TouchInfo,
 		eTransferKind_GameInfo,
+		eTramsferKind_SkillInfo,
 		eTransferKind_Max
 	};
 
@@ -77,6 +78,7 @@ public:
 	void SetConnectPlayerId(const char* id, int nPlayerId);
 
 	void SendHost(jbyte* pData, int nSize);
+	void SendPlayer(int nPlayerId, jbyte* pData, int nSize);
 	void BroadCast(jbyte* pData, int nSize);
 	void ReceiveData(const char* id, jbyte* pData, int nSize);
 

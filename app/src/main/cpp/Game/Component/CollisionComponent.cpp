@@ -27,14 +27,14 @@ CollisionComponent::CollisionComponent(EntityBase* pEntityBase)
 , m_pTransform(nullptr)
 , m_pParam(nullptr)
 {
-    DEBUG_LOG("Call CollisionComponent Constructor");
+//    DEBUG_LOG("Call CollisionComponent Constructor");
 }
 
 //------------------------------------------
 //------------------------------------------
 CollisionComponent::~CollisionComponent()
 {
-    DEBUG_LOG("Call CollisionComponent Deconstructor");
+//	   DEBUG_LOG("Call CollisionComponent Deconstructor");
 }
 
 //------------------------------------------

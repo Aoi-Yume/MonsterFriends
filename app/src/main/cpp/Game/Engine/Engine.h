@@ -31,7 +31,9 @@ class Engine
 public:
 	Engine();
 	virtual ~Engine();
-	
+
+	void SetDestrpyCallBack(const std::function<void()>& callBack);
+
 	void AddRef();
 	void SubRef();
 	bool IsEmptyRef() const;
@@ -75,6 +77,8 @@ private:
 
 	jobject 		m_AssetManagerObjRef;
 	AAssetManager*	m_pAssetMaanger;
+
+	std::function<void()> m_DestroyCallBack;
 };
 
 #endif

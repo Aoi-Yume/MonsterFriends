@@ -14,12 +14,12 @@ TransformComponent::TransformComponent(EntityBase* pEntityBase)
 , m_transform()
 , m_worldTransform()
 {
-    DEBUG_LOG("Call TransformComponent Constructor");
+//    DEBUG_LOG("Call TransformComponent Constructor");
 }
 
 TransformComponent::~TransformComponent()
 {
-    DEBUG_LOG("Call TransformComponent Deconstructor");
+//    DEBUG_LOG("Call TransformComponent Deconstructor");
 }
 
 void TransformComponent::SetScale(const VEC3& scale)

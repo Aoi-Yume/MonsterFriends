@@ -6,6 +6,7 @@
 #include <CameraComponent.h>
 #include <AppParam.h>
 #include <AppItemList.h>
+#include <AppSkillList.h>
 #include "TransformComponent.h"
 #include "LayoutComponent.h"
 #include "CollisionComponent.h"
@@ -15,6 +16,9 @@
 #include <MessageWindow/MessageWindow.h>
 #include <InformationPlate.h>
 #include <ItemListUI.h>
+
+#include <TransferManager.h>
+#include <TransferSkillInfo.h>
 
 UseItem::UseItem()
 	: GameEntity()
@@ -170,15 +174,16 @@ void UseItem::GameEntityUpdate(const void* param)
 	else if(m_nStep == eStep_Use){
 		const int nPlayer = AppParam::Get()->GetNetworkInfo().nCurrentPlayerId;
 		AppParam::Get()->SubItem(nPlayer, nSelectItemNo, 1);
+		const char* pSkillName = AppItemList::Get()->GetItemInfo(nSelectItemNo).skillName.c_str();
+		const int nSkillNo = SKILL_LIST()->GetSkillNoFromSkillName(pSkillName);
+		SKILL_LIST()->BeginItemSkill(nPlayer, nSkillNo);
 		m_nStep = eStep_UseWait;
 	}
 	else if(m_nStep == eStep_UseWait){
-#if 0
-		if(m_pMessageWindow->IsNextMessage()){
+		if(SKILL_LIST()->IsEndItemSkill()){
+			TransferManager::Get()->GetTransfer<TransferSkillInfo>(TransferManager::eTramsferKind_SkillInfo)->Dump();
 			m_nStep = eStep_Reset;
 		}
-#endif
-		m_nStep = eStep_Reset;
 	}
 	else if(m_nStep == eStep_Reset){
 		if(m_pInformationPlate){
