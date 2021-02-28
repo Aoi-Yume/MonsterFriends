@@ -12,6 +12,7 @@
 #include <AppSkillList.h>
 #include <SceneManager.h>
 #include <DelayInput.h>
+#include <FadeCtrl.h>
 
 EXTERN_C
 
@@ -42,13 +43,15 @@ Java_com_aoiyume_Game_GameMainRender_SurfaceCreate(
 		AppItemList::Get()->Load();
 		AppSkillList::Initialize();
 		AppSkillList::Get()->Load();
+		FadeCtrl::Initialize();
 	}
-	// TODO Engine に解放コールバックを設定する
+	// Engine に解放コールバックを設定する
 	auto DestroyCalback = [=](){
 		SceneManager::DestroySceneManager();
 		AppParam::Destroy();
 		AppItemList::Destroy();
 		AppSkillList::Destroy();
+		FadeCtrl::Destroy();
 		delete s_EntityMgr;
 	};
 	Engine::GetEngine()->SetDestrpyCallBack(DestroyCalback);
@@ -74,9 +77,10 @@ Java_com_aoiyume_Game_GameMainRender_SurfaceDraw(
         JNIEnv *env, jobject jobj
 )
 {
-    //DEBUG_LOG("Call GameMain SurfaceDraw");
+   	Engine::GetEngine()->SetTimePoint(std::chrono::system_clock::now());
 
 	s_EntityMgr->Update(eGameMessage_Update, nullptr);
+	FADE()->Update(eGameMessage_Update, nullptr);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//glEnable(GL_DEPTH_TEST);
@@ -84,6 +88,7 @@ Java_com_aoiyume_Game_GameMainRender_SurfaceDraw(
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
 	s_EntityMgr->Update(eGameMessage_Draw, nullptr);
+	FADE()->Update(eGameMessage_Draw, nullptr);
 
 	//glDisable(GL_DEPTH_TEST);
 	DELAY_INPUT()->Update();

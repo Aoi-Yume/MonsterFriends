@@ -16,6 +16,8 @@ Engine::Engine()
 : m_nRef(0)
 , m_AssetManagerObjRef(nullptr)
 , m_pAssetMaanger(nullptr)
+, m_TimePoint()
+, m_DeltaTime()
 , m_DestroyCallBack()
 {
 }
@@ -94,6 +96,22 @@ bool Engine::FindDelayTouchInfo(TouchInputInfo& info, int nEvent, int nPlayerId)
 {
 	nPlayerId = fixNetPlayerId(nPlayerId);
 	return DELAY_INPUT()->FindDelayTouchInfo(info, nEvent, nPlayerId);
+}
+
+//-----------------------------------------
+//-----------------------------------------
+void Engine::SetTimePoint(const TIME_POINT & timePoint)
+{
+	auto sub = timePoint - m_TimePoint;
+	m_DeltaTime = std::chrono::duration_cast<DURATION>(sub);
+	m_TimePoint = timePoint;
+}
+
+//-----------------------------------------
+//-----------------------------------------
+float Engine::GetDeltaTime() const
+{
+	return m_DeltaTime.count() / 1000.0f;
 }
 
 //-----------------------------------------

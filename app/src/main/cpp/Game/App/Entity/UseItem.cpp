@@ -173,15 +173,33 @@ void UseItem::GameEntityUpdate(const void* param)
 	}
 	else if(m_nStep == eStep_Use){
 		const int nPlayer = AppParam::Get()->GetNetworkInfo().nCurrentPlayerId;
-		AppParam::Get()->SubItem(nPlayer, nSelectItemNo, 1);
+		const bool bUsePossible = AppItemList::Get()->IsUsePossible(nSelectItemNo, nPlayer);
+		if(bUsePossible) {
+			AppParam::Get()->SubItem(nPlayer, nSelectItemNo, 1);
+		}
 		const char* pSkillName = AppItemList::Get()->GetItemInfo(nSelectItemNo).skillName.c_str();
 		const int nSkillNo = SKILL_LIST()->GetSkillNoFromSkillName(pSkillName);
 		SKILL_LIST()->BeginItemSkill(nPlayer, nSkillNo);
-		m_nStep = eStep_UseWait;
+		m_nStep = (bUsePossible ? eStep_UseWait : eStep_UseImPossible);
 	}
 	else if(m_nStep == eStep_UseWait){
 		if(SKILL_LIST()->IsEndItemSkill()){
-			TransferManager::Get()->GetTransfer<TransferSkillInfo>(TransferManager::eTramsferKind_SkillInfo)->Dump();
+			const auto pManager = TransferManager::Get();
+			if(pManager->IsConnectSucess()) {
+				pManager->GetTransfer<TransferSkillInfo>(
+						TransferManager::eTransferKind_SkillInfo)->Dump();
+			}
+			m_nStep = eStep_Reset;
+		}
+	}
+	else if(m_nStep == eStep_UseImPossible){
+		m_pMessageWindow->SetDirectMessage("このアイテムは使えない！");
+		m_pMessageWindow->SetVisible(true);
+		m_nStep = eStep_UseImPossibleWait;
+	}
+	else if(m_nStep == eStep_UseImPossibleWait){
+		if(m_pMessageWindow->IsNextMessage()) {
+			m_pMessageWindow->SetVisible(false);
 			m_nStep = eStep_Reset;
 		}
 	}

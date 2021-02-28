@@ -54,7 +54,9 @@ void AppSkillList::Load()
 void AppSkillList::InitializeSkillTransfer()
 {
 	auto pManager = TransferManager::Get();
-	auto p = pManager->GetTransfer<TransferSkillInfo>(TransferManager::eTramsferKind_SkillInfo);
+	if(!pManager->IsConnectSucess()){ return; }
+
+	auto p = pManager->GetTransfer<TransferSkillInfo>(TransferManager::eTransferKind_SkillInfo);
 	p->SetReceiveCallBack([this](void* pData){
 		const auto data = (AppParam::SkillNetworkInfo*)(pData);
 		const auto skill = m_aSkillInfo[data->SkillNo];
@@ -121,7 +123,9 @@ void AppSkillList::BeginItemSkill(int nPlayer, int nSkillNo)
 bool AppSkillList::IsEndItemSkill() const
 {
 	const auto pManager = TransferManager::Get();
-	const auto p = pManager->GetTransfer<TransferSkillInfo>(TransferManager::eTramsferKind_SkillInfo);
+	if(!pManager->IsConnectSucess()){ return true; }
+
+	const auto p = pManager->GetTransfer<TransferSkillInfo>(TransferManager::eTransferKind_SkillInfo);
 	return p->IsEnd();
 }
 
@@ -136,6 +140,8 @@ void AppSkillList::UpdateSkill(const UpdateSkillInfo& info)
 void AppSkillList::sendNetSkillInfo(int nSkillNo, const UpdateSkillInfo& info)
 {
 	auto pManager = TransferManager::Get();
+	if(!pManager->IsConnectSucess()){ return; }
+
 	auto& netSkillInfo = AppParam::Get()->GetSkillInfo();
 	netSkillInfo.Standby = true;
 	netSkillInfo.SkillNo = nSkillNo;
@@ -144,7 +150,7 @@ void AppSkillList::sendNetSkillInfo(int nSkillNo, const UpdateSkillInfo& info)
 	netSkillInfo.TargetPlayer = info.nTargetPlayer;
 	netSkillInfo.Param = info.nParam;
 
-	auto p = pManager->GetTransfer<TransferSkillInfo>(TransferManager::eTramsferKind_SkillInfo);
+	auto p = pManager->GetTransfer<TransferSkillInfo>(TransferManager::eTransferKind_SkillInfo);
 	p->SetSkillInfoData(&netSkillInfo, sizeof(AppParam::SkillNetworkInfo), info.nSendPlayer);
-	pManager->StartTransfer(TransferManager::eTramsferKind_SkillInfo);
+	pManager->StartTransfer(TransferManager::eTransferKind_SkillInfo);
 }

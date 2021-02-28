@@ -66,7 +66,8 @@ private:
 	int						m_nNextState;
 	
 	int						m_nNextCallState;
-	
+	int 					m_nWait;
+
 	const char*			m_pReturnSceneName;
 	SceneBase*				m_pInitalizeScene;
 	SceneBase* 				m_pNextScene;

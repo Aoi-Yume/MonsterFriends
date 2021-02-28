@@ -57,7 +57,7 @@ void TransferManager::Initialize(bool bHost)
 	SetTransfer(eTransferKind_SyncScene, new TransferSyncScene);
 	SetTransfer(eTransferKind_TouchInfo, new TransferTouchInfo);
 	SetTransfer(eTransferKind_GameInfo, new TransferGameInfo);
-	SetTransfer(eTramsferKind_SkillInfo, new TransferSkillInfo);
+	SetTransfer(eTransferKind_SkillInfo, new TransferSkillInfo);
 }
 
 void TransferManager::SetConnectSuccess(bool bConnect)

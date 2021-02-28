@@ -64,6 +64,10 @@ EXTERN_CXX
 
 #include <string>
 
+using SYSTEM_CLOCK = std::chrono::system_clock;
+using DURATION = std::chrono::milliseconds;
+using TIME_POINT = std::chrono::time_point<SYSTEM_CLOCK>;
+
 END_EXTERN_CXX
 //---------- end extern "c++" ------------
 

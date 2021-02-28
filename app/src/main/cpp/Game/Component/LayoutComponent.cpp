@@ -128,7 +128,20 @@ static const char* s_fragColorShaderSrc =
 //------------------------------------------
 LayoutComponent::LayoutComponent(EntityBase* pEntityBase)
 : Super(eComponentKind_Layout, pEntityBase)
+, m_nTransformLocation(0)
+, m_nViewportInvLocation(0)
+, m_nViewProjLocation(0)
+, m_nColorLocation(0)
 , m_bCreated(false)
+, m_cResPath()
+, m_nVtxBuffer(0)
+, m_nIdxBuffer(0)
+, m_nTexId(0)
+, m_nVtxLocation(0)
+, m_nUvLocation(0)
+, m_nSamplerLocation(0)
+, m_aVtxBuffer()
+, m_aIndexBuffer()
 {
 //	DEBUG_LOG("Call LayoutComponent Constructor");
 	memset(m_cResPath, 0, sizeof(m_cResPath));
@@ -324,6 +337,8 @@ void LayoutComponent::setupUniformShaderParam()
 //------------------------------------------
 void LayoutComponent::setupTexture(float &fSizeW, float &fSizeH)
 {
+	DEBUG_LOG_A("Load Res:%s", m_cResPath);
+
 	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_UTILITY);
 	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_UTILITY, "LoadImage");
 	jmethodID  methodID_2 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_UTILITY, "GetImageSize");

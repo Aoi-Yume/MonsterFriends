@@ -24,6 +24,14 @@ class UseItem;
 
 //==========================================
 //==========================================
+class StateFadeIn : public StateBase
+{
+	void Begin(void* pUserPtr) override;
+	void Update(void* pUserPtr) override;
+};
+
+//==========================================
+//==========================================
 class StateGameMain : public StateBase
 {
 	enum {
@@ -32,8 +40,6 @@ class StateGameMain : public StateBase
 		eBtn_Item,
 		eBtn_Max
 	};
-
-public:
 	void Begin(void* pUserPtr) override;
 	void Update(void* pUserPtr) override;
 	void End(void* pUserPtr) override;
@@ -43,7 +49,6 @@ public:
 //==========================================
 class StateAdv : public StateBase
 {
-public:
 	void Begin(void* pUserPtr) override;
 	void Update(void* pUserPtr) override;
 	void End(void* pUserPtr) override;
@@ -57,7 +62,6 @@ class StateUseOrShopSelect : public StateBase
 		eBtn_Use,
 		eBtn_Shop,
 	};
-public:
 	void Begin(void* pUserPtr) override;
 	void Update(void* pUserPtr) override;
 	void End(void* pUserPtr) override;
@@ -86,6 +90,14 @@ class StateUseItem : public StateBase
 class StateNextPlayer : public StateBase
 {
 	void Begin(void* pUserPtr) override;
+	void Update(void* pUserPtr) override;
+};
+
+//==========================================
+//==========================================
+class StateClear : public StateBase
+{
+	void Begin(void* pUSerPtr) override;
 };
 
 //==========================================
@@ -93,12 +105,14 @@ class StateNextPlayer : public StateBase
 class SceneGameMain : public SceneBase
 {
 	typedef SceneBase Super;
+	friend class StateFadeIn;
 	friend class StateGameMain;
 	friend class StateUseOrShopSelect;
 	friend class StateAdv;
 	friend class StateShop;
 	friend class StateUseItem;
 	friend class StateNextPlayer;
+	friend class StateClear;
 
 public:
 	enum {
@@ -107,12 +121,14 @@ public:
 	};
 
 	enum {
+		eState_FadeIn,
 		eState_GameMain,
 		eState_Adv,
 		eState_SelectItemUseOrShop,
 		eState_Shop,
 		eState_UseItem,
 		eState_NextPlayer,
+		eState_Clear,
 		eState_Max
 	};
 

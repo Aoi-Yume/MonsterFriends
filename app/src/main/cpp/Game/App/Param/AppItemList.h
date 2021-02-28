@@ -20,6 +20,7 @@ public:
 
 	struct ItemInfo {
 		std::string name;
+		std::string useType;
 		std::string fileName;
 		int nCost;
 		std::string explain;
@@ -29,6 +30,8 @@ public:
 public:
 	void Load();
 	const ItemInfo& GetItemInfo(int nIdx) const;
+
+	bool IsUsePossible(int nIdx, int nPlayerId) const;
 
 private:
 	std::vector<ItemInfo>	m_aItemInfo;

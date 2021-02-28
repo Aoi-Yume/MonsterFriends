@@ -18,6 +18,7 @@ public:
 	};
 
 	struct GameNetworkInfo {
+		bool bClear;
 		int8_t  nCurrentPlayerId;
 		int8_t  nCurrentTurn;
 		struct CharaInfo {
@@ -54,6 +55,9 @@ public:
 	void AddItem(int nPlayerId, int nItemNo, int nNum);
 	void SubItem(int nPlayerId, int nItemNo, int nNum);
 	int GetItemNum(int nPlayerId, int nItemNo) const;
+
+	void SetClear(bool bClear);
+	bool IsClear() const;
 
 	GameNetworkInfo& GetNetworkInfo();
 	void DumpNetworkInfo();

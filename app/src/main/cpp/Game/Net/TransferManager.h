@@ -22,7 +22,7 @@ public:
 		eTransferKind_SyncScene,
 		eTransferKind_TouchInfo,
 		eTransferKind_GameInfo,
-		eTramsferKind_SkillInfo,
+		eTransferKind_SkillInfo,
 		eTransferKind_Max
 	};
 
@@ -61,6 +61,7 @@ public:
 	template<class T>
 	T* GetTransfer(int nKind) {
 		assert(nKind >= 0 && nKind < eTransferKind_Max);
+		assert(nKind < m_aTransfer.size());
 		return reinterpret_cast<T*>(m_aTransfer[nKind]);
 	}
 

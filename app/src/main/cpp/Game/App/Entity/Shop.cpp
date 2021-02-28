@@ -27,7 +27,7 @@ Shop::Shop()
 {
 	DEBUG_LOG("Create Shop");
 	m_nItemNo[0] = 0;
-	m_nItemNo[1] = 1;
+	m_nItemNo[1] = 3;
 	m_nItemNo[2] = 2;
 }
 
@@ -216,6 +216,29 @@ void Shop::GameEntityUpdate(const void* param)
 	}
 	else if(m_nStep == eStep_BuyAfterMessageWait){
 		if(m_pMessageWindow->IsNextMessage()){
+			m_nStep = eStep_ClearCheck;
+		}
+	}
+	else if(m_nStep == eStep_ClearCheck){
+		const int nPlayerId = AppParam::Get()->GetNetworkInfo().nCurrentPlayerId;
+		const auto& itemInfo = AppItemList::Get()->GetItemInfo(nSelectItemNo);
+		m_nStep = eStep_Reset;
+		if(itemInfo.name == "キズナクリスタル"){
+			if(AppParam::Get()->GetItemNum(nPlayerId, nSelectItemNo) >= 3){
+				AppParam::Get()->SetClear(true);
+				m_nStep = eStep_ClearMessage;
+			}
+		}
+	}
+	else if(m_nStep == eStep_ClearMessage){
+		m_pMessageWindow->SetDirectMessage(
+				"クリスタルが３つあるにゃ！すごいにゃ！\n"
+						"みんなで今回の結果をみるにゃ！");
+		m_pMessageWindow->SetVisible(true);
+		m_nStep = eStep_ClearMessageWait;
+	}
+	else if(m_nStep == eStep_ClearMessageWait){
+		if(m_pMessageWindow->IsNextMessage()){
 			m_nStep = eStep_Reset;
 		}
 	}
@@ -232,7 +255,7 @@ void Shop::GameEntityUpdate(const void* param)
 		m_aButtonManager[eBtnManager_Back]->Unlock();
 		m_aButtonManager[eBtnManager_Back]->SetVisible(true);
 		m_pMessageWindow->SetVisible(false);
-		m_nStep = eStep_SelectItemWait;
+		m_nStep = (AppParam::Get()->IsClear() ? eStep_End : eStep_SelectItemWait);
 	}
 	else if(m_nStep == eStep_BackMessage){
 		m_pMessageWindow->SetDirectMessage("バイバイにゃ");

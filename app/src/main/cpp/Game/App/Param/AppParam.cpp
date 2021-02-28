@@ -150,6 +150,14 @@ int AppParam::GetItemNum(int nPlayerId, int nItemNo) const
 	return m_CharaInfo.uItemNum[nItemNo];
 }
 
+void AppParam::SetClear(bool bClear) {
+	m_NetworkGameInfo.bClear = true;
+}
+
+bool AppParam::IsClear() const {
+	return m_NetworkGameInfo.bClear;
+}
+
 AppParam::GameNetworkInfo& AppParam::GetNetworkInfo()
 {
 	return m_NetworkGameInfo;

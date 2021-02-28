@@ -1,4 +1,5 @@
-﻿#, アイテム名, 画像ファイル名, ショップコスト, 説明, スキル名
-, ごみ, image/shop_item_trash.png, 10, きれいな「ごみ」, なし
-, ごみ２, image/shop_item_trash.png, 20, きれいな「ごみ２」, なし
-, キズナドレイン, image/shop_item_trash.png, 30, 誰かからキズナを盗む, キズナドレイン
+﻿#, アイテム名,使用タイプ, 画像ファイル名, ショップコスト, 説明, スキル名
+, ごみ, 不可, image/shop_item_trash.png, 10, きれいな「ごみ」, なし
+, ごみ２, 不可, image/shop_item_trash.png, 20, きれいな「ごみ２」, なし
+, キズナドレイン, 可能, image/shop_item_trash.png, 30, 誰かからキズナを盗む, キズナドレイン
+, キズナクリスタル, 不可, image/shop_cristal.png, 60, ３つ集めると勝利する, なし

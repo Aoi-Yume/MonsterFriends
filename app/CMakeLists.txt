@@ -76,6 +76,7 @@ add_library(	entity-lib	SHARED
 
 add_library(	game-lib SHARED
 				src/main/cpp/Game/Game/GameEntity.cpp
+				src/main/cpp/Game/Game/FadeCtrl.cpp
 				src/main/cpp/Game/Game/Button/ButtonBase.cpp
 				src/main/cpp/Game/Game/Button/DebugButton.cpp
 				src/main/cpp/Game/Game/Button/SimpleButton.cpp

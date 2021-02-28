@@ -4,6 +4,7 @@
 
 
 #include "Util.h"
+#include "../aoiyume_define.h"
 #include <sstream>
 
 namespace Util {
@@ -20,7 +21,10 @@ namespace Util {
 		}
 		if (text.find_last_of('\n') != std::string::npos) {
 			auto pos = text.find_last_of('\n');
-			text.erase(pos);
+			// 最後の行に改行が含まれていたら消す
+			if(text.length() - pos <= 1) {
+				text.erase(pos);
+			}
 		}
 		std::stringstream ss;
 		ss << text;

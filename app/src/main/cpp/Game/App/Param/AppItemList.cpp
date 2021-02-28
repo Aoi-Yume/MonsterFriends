@@ -28,22 +28,24 @@ void AppItemList::Load()
 	std::vector<std::string>	aSplitText;
 	Util::SplitCSVText(aSplitText, str);
 
-	const int nParamNum = 5;
+	const int nParamNum = 6;
 	m_aItemInfo.resize(aSplitText.size() / nParamNum);
+	assert(aSplitText.size() % nParamNum == 0);
 	for(int i = 0; i < aSplitText.size(); ++i){
 		const int nIdx = i / nParamNum;
 		const int nParamNo = i % nParamNum;
 		auto& info = m_aItemInfo[nIdx];
 		if(nParamNo == 0){ info.name = aSplitText[i]; }
-		else if(nParamNo == 1){ info.fileName = aSplitText[i]; }
-		else if(nParamNo == 2){ info.nCost = atoi(aSplitText[i].c_str()); }
-		else if(nParamNo == 3){ info.explain = aSplitText[i]; }
-		else if(nParamNo == 4){ info.skillName = aSplitText[i]; }
+		if(nParamNo == 1){ info.useType = aSplitText[i]; }
+		else if(nParamNo == 2){ info.fileName = aSplitText[i]; }
+		else if(nParamNo == 3){ info.nCost = atoi(aSplitText[i].c_str()); }
+		else if(nParamNo == 4){ info.explain = aSplitText[i]; }
+		else if(nParamNo == 5){ info.skillName = aSplitText[i]; }
 	}
 	for(int i = 0; i < m_aItemInfo.size(); ++i) {
 		auto& it = m_aItemInfo[i];
-		DEBUG_LOG_A("ItemNo[%d]：[%s][%s][%d][%s][%s]\n",
-				i + 1, it.name.c_str(), it.fileName.c_str(), it.nCost,
+		DEBUG_LOG_A("ItemNo[%d]：[%s][%s][%s][%d][%s][%s]\n",
+				i + 1, it.name.c_str(), it.useType.c_str(), it.fileName.c_str(), it.nCost,
 				it.explain.c_str(), it.skillName.c_str());
 	}
 }
@@ -51,4 +53,12 @@ void AppItemList::Load()
 const AppItemList::ItemInfo& AppItemList::GetItemInfo(int nIdx) const
 {
 	return m_aItemInfo[nIdx];
+}
+
+bool AppItemList::IsUsePossible(int nIdx, int nPlayerId) const
+{
+	const std::string& useType = m_aItemInfo[nIdx].useType;
+	if(useType == "可能"){ return true; }
+	if(useType == "不可"){ return false; }
+	return false;
 }

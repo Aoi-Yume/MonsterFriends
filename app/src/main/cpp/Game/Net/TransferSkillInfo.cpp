@@ -7,7 +7,7 @@
 #include "TransferManager.h"
 
 TransferSkillInfo::TransferSkillInfo()
-: TransferBase(TransferManager::eTramsferKind_SkillInfo, 50 * 1000 * 1000)
+: TransferBase(TransferManager::eTransferKind_SkillInfo, 50 * 1000 * 1000)
 , m_bReceive()
 , m_Data()
 , m_nSize(0)
@@ -23,7 +23,7 @@ TransferSkillInfo::~TransferSkillInfo()
 
 void TransferSkillInfo::initialize()
 {
-	m_Data.uKind = TransferManager::eTramsferKind_SkillInfo;
+	m_Data.uKind = TransferManager::eTransferKind_SkillInfo;
 	m_Data.bReqEnd = false;
 	for(int i = 0; i < NET_CONNECT_MAX; ++i){
 		m_bReceive[i] = false;

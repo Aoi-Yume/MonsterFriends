@@ -36,6 +36,7 @@ SceneManager::SceneManager(SceneBase* pInitalizeScene)
 , m_nState(eManagerState_None)
 , m_nNextState(eManagerState_None)
 , m_nNextCallState(eCallState_None)
+, m_nWait(0)
 , m_pReturnSceneName(nullptr)
 , m_pInitalizeScene(pInitalizeScene)
 , m_pNextScene(nullptr)
@@ -180,6 +181,11 @@ void SceneManager::setupManager()
 //------------------------------------------
 void SceneManager::updateManager()
 {
+	if(m_nWait > 0){
+		m_nWait--;
+		return;
+	}
+
 	switch(m_nState){
 		case eManagerState_Update:
 		{
@@ -187,6 +193,7 @@ void SceneManager::updateManager()
 			if(it == m_slScene.rend()){ break; }
 			if((*it)->IsActiveWait()){
 				(*it)->Update(eGameMessage_Setup, nullptr);
+				m_nWait = 3;	// ロード後はデルタタイムが安定しないので少しウェイト
 			}
 			else if((*it)->IsSyncWait()){
 				(*it)->Update(eGameMessage_Sync, nullptr);

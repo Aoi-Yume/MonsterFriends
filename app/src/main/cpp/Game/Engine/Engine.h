@@ -44,6 +44,9 @@ public:
 	void SetTouchInputInfo(int nEvent, float fTouchX, float fTouchY, int nPlayerId = -1);
 	bool FindDelayTouchInfo(TouchInputInfo& info, int nEvent, int nPlayerId = -1) const;
 
+	void SetTimePoint(const TIME_POINT& timePoint);
+	float GetDeltaTime() const;
+
 	void SetCameraComponent(void* pComponent);
 	void* GetCameraComponent() const;
 
@@ -77,6 +80,9 @@ private:
 
 	jobject 		m_AssetManagerObjRef;
 	AAssetManager*	m_pAssetMaanger;
+
+	TIME_POINT 		m_TimePoint;
+	DURATION 		m_DeltaTime;
 
 	std::function<void()> m_DestroyCallBack;
 };

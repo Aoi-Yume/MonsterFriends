@@ -28,6 +28,8 @@ public:
 		eStep_UseOrCancel,
 		eStep_Use,
 		eStep_UseWait,
+		eStep_UseImPossible,
+		eStep_UseImPossibleWait,
 		eStep_Reset,
 		eStep_End
 	};

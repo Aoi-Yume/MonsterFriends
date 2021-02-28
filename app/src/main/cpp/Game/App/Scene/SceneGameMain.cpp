@@ -10,6 +10,7 @@
 #include <EntityManager.h>
 #include <Button/ButtonManager.h>
 #include <Button/SimpleButton.h>
+#include <FadeCtrl.h>
 #include <SceneManager.h>
 #include <Character.h>
 #include <InformationPlate.h>
@@ -27,6 +28,22 @@
 SceneBase* SceneGameMain::CreateScene()
 {
 	return new SceneGameMain();
+}
+
+//==========================================
+//==========================================
+void StateFadeIn::Begin(void *pUserPtr)
+{
+	FADE()->In();
+}
+
+//==========================================
+//==========================================
+void StateFadeIn::Update(void* pUserPtr)
+{
+	if (FADE()->IsFadeInEnd()) {
+		ChangeState(SceneGameMain::eState_GameMain);
+	}
 }
 
 //==========================================
@@ -144,7 +161,12 @@ void StateShop::Update(void *pUserPtr)
 {
 	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
 	if(p->m_pShop->IsEnd()) {
-		ChangeState(SceneGameMain::eState_GameMain);
+		if(AppParam::Get()->IsClear()) {
+			ChangeState(SceneGameMain::eState_Clear);
+		}
+		else {
+			ChangeState(SceneGameMain::eState_GameMain);
+		}
 	}
 }
 void StateShop::End(void *pUserPtr)
@@ -181,7 +203,20 @@ void StateNextPlayer::Begin(void *pUserPtr)
 	auto& networkInfo = AppParam::Get()->GetNetworkInfo();
 	networkInfo.nCurrentPlayerId = (networkInfo.nCurrentPlayerId + 1) % nNum;
 	networkInfo.nCurrentTurn++;
-	SCENE_MANAGER()->ChangeScene(SceneGameMain::CreateScene());
+	FADE()->Out();
+}
+void StateNextPlayer::Update(void* pUserPtr)
+{
+	if(FADE()->IsFadeOutEnd()){
+		SCENE_MANAGER()->ChangeScene(SceneGameMain::CreateScene());
+	}
+}
+
+//==========================================
+//==========================================
+void StateClear::Begin(void* pUserPtr)
+{
+	DEBUG_LOG("Call Clear State");
 }
 
 //==========================================
@@ -273,12 +308,15 @@ void SceneGameMain::SceneSetup() {
 	{
 		m_pStateManager = new StateManager(eState_Max);
 		m_pStateManager->SetUserPtr(this);
+		m_pStateManager->CreateState<StateFadeIn>();
 		m_pStateManager->CreateState<StateGameMain>();
 		m_pStateManager->CreateState<StateAdv>();
 		m_pStateManager->CreateState<StateUseOrShopSelect>();
 		m_pStateManager->CreateState<StateShop>();
 		m_pStateManager->CreateState<StateUseItem>();
 		m_pStateManager->CreateState<StateNextPlayer>();
+		m_pStateManager->CreateState<StateClear>();
+		m_pStateManager->ChangeState(eState_FadeIn);
 	}
 	{
 		// メインボタン
