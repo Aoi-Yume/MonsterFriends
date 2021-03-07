@@ -30,6 +30,7 @@ public:
 public:
 	void Load();
 	const ItemInfo& GetItemInfo(int nIdx) const;
+	int GetItemNoFromName(const char* pName) const;
 
 	bool IsUsePossible(int nIdx, int nPlayerId) const;
 

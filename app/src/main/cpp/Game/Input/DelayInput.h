@@ -33,29 +33,29 @@ class DelayInput : public Singleton<DelayInput>
 
 public:
 	struct DelayTouchInfo {
-		uint32_t uFrame;
+		float fTime;
 		TouchInputInfo info;
 
 		DelayTouchInfo()
-				: uFrame(0U)
+				: fTime(0.0f)
 				, info()
 		{}
 
-		DelayTouchInfo(uint32_t uFrame, const TouchInputInfo& info)
-				: uFrame(uFrame)
+		DelayTouchInfo(float fTime, const TouchInputInfo& info)
+				: fTime(fTime)
 				, info(info)
 		{}
 	};
 
 public:
-	void Initialize(int nDelay);
-	void Update();
+	void Initialize(float fDelay);
+	void Update(float fDeltaTime);
 
 	void StartDelayInput();
 	void StopDelayInput();
 	void ResetDelayInput();
 
-	uint32_t GetCurrentFrame() const;
+	float GetCurrentTime() const;
 	void AddTouchInfo(const TouchInputInfo& info, int nPlayer = 0);
 	void AddDelayTouchInfo(const DelayTouchInfo& info, int nPlayer = 0);
 	void ClearTouchInfo(int nPlayer= 0);
@@ -70,8 +70,8 @@ private:
 	};
 
 	uint8_t  m_uState;
-	uint32_t m_nDelay;
-	uint32_t m_uCurrentFrame;
+	float m_fDelay;
+	float m_fCurrentTime;
 	std::deque<DelayTouchInfo>		m_aTouchInputInfo[NET_CONNECT_MAX];
 };
 

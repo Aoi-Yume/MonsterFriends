@@ -29,7 +29,9 @@ import androidx.fragment.app.Fragment;
 
 public class GameMainFragment extends Fragment {
     static boolean m_bShowKeyboard = false;
-    static EditText m_InputText = null;
+    static EditText m_InputText[] = null;
+    static int m_CurrentInpuTextNo = 0;
+    static final int m_InputTextMax = 2;
     static NearbyClient m_NearbyClient = null;
 
     static Runnable ShowSoftKeyborad = new Runnable() {
@@ -43,7 +45,7 @@ public class GameMainFragment extends Fragment {
             InputMethodManager imm = (InputMethodManager)MainActivity.GetContext().getSystemService(MainActivity.GetContext().INPUT_METHOD_SERVICE);
 
             if(imm != null) {
-                imm.showSoftInput(m_InputText, 0);
+                imm.showSoftInput(m_InputText[m_CurrentInpuTextNo], 0);
             }
         }
     };
@@ -61,39 +63,42 @@ public class GameMainFragment extends Fragment {
         //view.setFocusableInTouchMode(true);
         //view.requestFocus();
 
-        m_InputText = view.findViewById(R.id.inputText);
-        m_InputText.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        m_InputText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean b) {
-                if(b) {
-                    new Handler(Looper.getMainLooper()).post(ShowSoftKeyborad);
-                }
-                else {
-                    m_bShowKeyboard = false;
-                    InputMethodManager imm = (InputMethodManager)MainActivity.GetContext().getSystemService(MainActivity.GetContext().INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                }
-            }
-        });
-        m_InputText.setOnEditorActionListener(new TextView.OnEditorActionListener(){
-            @Override
-            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-                boolean bEntorUp = false;
-                if(actionId == EditorInfo.IME_ACTION_NONE) {
-                    if (keyEvent != null && keyEvent.getAction() == KeyEvent.ACTION_UP) {
-                        bEntorUp = true;
+        m_CurrentInpuTextNo = 0;
+        m_InputText = new EditText[m_InputTextMax];
+        m_InputText[0] = view.findViewById(R.id.inputText1);
+        m_InputText[1] = view.findViewById(R.id.inputText2);
+        for(int i = 0; i < m_InputTextMax; ++i) {
+            m_InputText[i].setImeOptions(EditorInfo.IME_ACTION_DONE);
+            m_InputText[i].setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View view, boolean b) {
+                    if (b) {
+                        new Handler(Looper.getMainLooper()).post(ShowSoftKeyborad);
+                    } else {
+                        InputMethodManager imm = (InputMethodManager) MainActivity.GetContext().getSystemService(MainActivity.GetContext().INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                     }
                 }
-                if(actionId == EditorInfo.IME_ACTION_DONE || bEntorUp) {
-                    m_bShowKeyboard = false;
-                    InputMethodManager imm = (InputMethodManager)MainActivity.GetContext().getSystemService(MainActivity.GetContext().INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
-                    return true;
+            });
+            m_InputText[i].setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                    boolean bEntorUp = false;
+                    if (actionId == EditorInfo.IME_ACTION_NONE) {
+                        if (keyEvent != null && keyEvent.getAction() == KeyEvent.ACTION_UP) {
+                            bEntorUp = true;
+                        }
+                    }
+                    if (actionId == EditorInfo.IME_ACTION_DONE || bEntorUp) {
+                        m_bShowKeyboard = false;
+                        InputMethodManager imm = (InputMethodManager) MainActivity.GetContext().getSystemService(MainActivity.GetContext().INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
+                        return true;
+                    }
+                    return false;
                 }
-                return false;
-            }
-        });
+            });
+        }
 
         m_NearbyClient = new NearbyClient();
         m_NearbyClient.Initialize();
@@ -114,10 +119,11 @@ public class GameMainFragment extends Fragment {
     {
         Log.d("Monster Friends", "call ShowSoftwareKeyboard\n");
         m_bShowKeyboard = true;
+        m_CurrentInpuTextNo = (m_CurrentInpuTextNo + 1) % m_InputTextMax;
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                m_InputText.requestFocus();
+                m_InputText[m_CurrentInpuTextNo].requestFocus();
             }
         });
     }
@@ -126,7 +132,7 @@ public class GameMainFragment extends Fragment {
     {
         return m_bShowKeyboard;
     }
-    public static String GetInputText() { return m_InputText.getText().toString(); }
+    public static String GetInputText() { return m_InputText[m_CurrentInpuTextNo].getText().toString(); }
 
     public static void StartNearbyAdvertising(String ConnectName)
     {
@@ -146,6 +152,7 @@ public class GameMainFragment extends Fragment {
     {
         m_NearbyClient.StopDiscovery();
     }
+    public static void DisconnectNearbyAllEndPoint(){ m_NearbyClient.DisconnectAllEndPoint(); }
     public static void SendData(String Id, byte[] data)
     {
         m_NearbyClient.SendData(Id, data);

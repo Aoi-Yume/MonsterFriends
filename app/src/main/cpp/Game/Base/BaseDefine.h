@@ -12,6 +12,7 @@ enum ComponentKind {
 	eComponentKind_Collision,
     eComponentKind_Camera,
     eComponentKind_Layout,
+    eComponentKind_Animation,
     eComponentKind_Max
 };
 

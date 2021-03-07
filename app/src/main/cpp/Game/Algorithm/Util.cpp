@@ -33,7 +33,7 @@ namespace Util {
 			ss >> splitText;
 			// BOMコードを除外
 			if (splitText.size() == 3) {
-				if (splitText[0] == 0xEF && splitText[1] == 0xBB && splitText[2] == 0xBF) {
+				if ((u_char)splitText[0] == 0xEF && (u_char)splitText[1] == 0xBB && (u_char)splitText[2] == 0xBF) {
 					continue;
 				}
 			}

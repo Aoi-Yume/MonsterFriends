@@ -5,6 +5,8 @@
 
 cmake_minimum_required(VERSION 3.4.1)
 
+add_compile_options(-Wno-undefined-var-template)
+
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds them for you.
@@ -68,7 +70,8 @@ add_library(	component-lib SHARED
 				src/main/cpp/Game/Component/CollisionComponent.cpp
 				src/main/cpp/Game/Component/CameraComponent.cpp
 				src/main/cpp/Game/Component/LayoutComponent.cpp
-				src/main/cpp/Game/Component/CollisionManager.cpp	)
+				src/main/cpp/Game/Component/CollisionManager.cpp
+				src/main/cpp/Game/Component/AnimationComponent.cpp )
 
 add_library(	entity-lib	SHARED
 				src/main/cpp/Game/Entity/Entity.cpp
@@ -101,9 +104,7 @@ add_library(	app_entity-lib SHARED
 add_library(	app_scene-lib SHARED
 				src/main/cpp/Game/App/Scene/SceneTitle.cpp
 				src/main/cpp/Game/App/Scene/SceneGameMain.cpp
-        src/main/cpp/Game/App/Scene/SceneSpendTime.cpp
-				src/main/cpp/Game/App/Scene/SceneWork.cpp
-				src/main/cpp/Game/App/Scene/SceneShop.cpp)
+				src/main/cpp/Game/App/Scene/SceneResult.cpp)
 
 add_library(	boot-lib SHARED
 				src/main/cpp/Game/Boot/gamemain-lib.cpp

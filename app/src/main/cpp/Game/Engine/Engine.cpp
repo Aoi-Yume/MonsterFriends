@@ -181,7 +181,7 @@ void Engine::ShowSoftwareKeyboard()
 
 //-----------------------------------------
 //-----------------------------------------
-bool Engine::IsShowSofrwareKeyboard() const
+bool Engine::IsShowSoftwareKeyboard() const
 {
 	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SYSTEM);
 	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SYSTEM, "IsShowSoftwareKeyboard");
@@ -241,6 +241,15 @@ void Engine::StopNearbyDiscovery()
 
 //-----------------------------------------
 //-----------------------------------------
+void Engine::DisconnectNearbyAllEndPoint()
+{
+	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SYSTEM);
+	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SYSTEM, "DisconnectNearbyAllEndPoint");
+	GetEnv()->CallStaticVoidMethod(classID, methodID_1);
+}
+
+//-----------------------------------------
+//-----------------------------------------
 void Engine::SendData(const char* pId, jbyte* pData, int nSize)
 {
 	jbyteArray byteData = GetEnv()->NewByteArray(nSize);
@@ -260,7 +269,7 @@ void Engine::Create()
 		s_AoYumeEngine = new Engine();
 	}
 	Random::Initialize();
-	DELAY_INPUT()->Initialize(10);
+	DELAY_INPUT()->Initialize(0.1f);
 	DELAY_INPUT()->StartDelayInput();
 	s_AoYumeEngine->AddRef();
 }

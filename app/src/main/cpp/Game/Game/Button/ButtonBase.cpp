@@ -6,6 +6,7 @@
 #include <LayoutComponent.h>
 #include <CollisionComponent.h>
 #include <TransformComponent.h>
+#include <AnimationComponent.h>
 #include "ButtonBase.h"
 
 ButtonBase::ButtonBase()
@@ -46,6 +47,15 @@ void ButtonBase::Disable()
 bool ButtonBase::IsEnable() const
 {
 	return m_bEnable;
+}
+
+void ButtonBase::SetVisible(bool bVisible)
+{
+	Entity::SetVisible(bVisible);
+	auto p = reinterpret_cast<AnimationComponent*>(GetComponent(eComponentKind_Animation));
+	if(p) {
+		p->Play((bVisible ? "Open" : "Close"));
+	}
 }
 
 void ButtonBase::Select()

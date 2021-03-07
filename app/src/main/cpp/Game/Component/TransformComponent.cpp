@@ -68,7 +68,7 @@ const MAT4* TransformComponent::GetLocalMatrix() const
 const MAT4* TransformComponent::GetWorldMatrix()
 {
 	MAT4 worldMtx = getParentMatrix();
-	m_worldTransform = m_transform * worldMtx ;
+	m_worldTransform = worldMtx * m_transform;
 
 	return &m_worldTransform;
 }
@@ -80,7 +80,7 @@ MAT4 TransformComponent::getParentMatrix()
 		auto pTransform = (TransformComponent*)pEntityBase->GetComponent(eComponentKind_Transform);
 		if(pTransform){
 			MAT4 mtx = *pTransform->GetLocalMatrix();
-			return mtx * pTransform->getParentMatrix();
+			return pTransform->getParentMatrix() * mtx ;
 		}
 	}
 	return MAT4();

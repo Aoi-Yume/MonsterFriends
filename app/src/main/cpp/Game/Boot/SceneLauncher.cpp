@@ -13,14 +13,8 @@
 #include <TransformComponent.h>
 #include "SceneLauncher.h"
 #include "../App/Scene/SceneTitle.h"
-#include "../App/Scene/SceneSpendTime.h"
-#include "../App/Scene/SceneWork.h"
-#include "../App/Scene/SceneShop.h"
-
-class SceneGameMain{
-public:
-	static SceneBase* CreateScene();
-};
+#include "../App/Scene/SceneGameMain.h"
+#include "../App/Scene/SceneResult.h"
 
 //------------------------------------------
 //------------------------------------------
@@ -56,9 +50,7 @@ void SceneLauncher::SceneSetup()
 		const char* pSceneName[] = {
 				"Title",
 				"Main",
-				"SpendTime",
-				"Work",
-				"Shop",
+				"Result",
 				NULL
 		};
 		m_pSimpleBtnMgr = new ButtonManager();
@@ -92,9 +84,7 @@ void SceneLauncher::SceneUpdate()
 	switch (m_pSimpleBtnMgr->GetDecide()){
 		case eButton_Title:{ SCENE_MANAGER()->AddNextCallScene(SceneTitle::CreateScene()); break; }
 		case eButton_GameMain:{ SCENE_MANAGER()->AddNextCallScene(SceneGameMain::CreateScene()); break;}
-		case eButton_SpendTime:{ SCENE_MANAGER()->AddNextCallScene(SceneSpendTime::CreateScene()); break; }
-		case eButton_Work:{ SCENE_MANAGER()->AddNextCallScene(SceneWork::CreateScene()); break; }
-		case eButton_Shop:{ SCENE_MANAGER()->AddNextCallScene(SceneShop::CreateScene()); break; }
+		case eButton_Result:{ SCENE_MANAGER()->AddNextCallScene(SceneResult::CreateScene()); break; }
 		default: { 	m_pSimpleBtnMgr->Reset(); break; }
 	}
 #endif

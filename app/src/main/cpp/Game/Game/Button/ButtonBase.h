@@ -38,6 +38,8 @@ public:
 	void Disable();
 	bool IsEnable() const;
 
+	void SetVisible(bool bVisible);
+
 	bool IsSelect() const;
 	bool IsUnSelect() const;
 	bool IsSelected() const;

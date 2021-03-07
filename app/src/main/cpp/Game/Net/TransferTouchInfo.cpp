@@ -8,7 +8,7 @@
 
 TransferTouchInfo::TransferTouchInfo()
 : TransferBase(TransferManager::eTransferKind_TouchInfo, 50 * 1000 * 1000)
-, m_lastSendFrame(0U)
+, m_lastSendTime(0.0f)
 , m_Data()
 , m_pReceiveCallBack()
 , m_pDumpCallBack()
@@ -22,7 +22,7 @@ TransferTouchInfo::~TransferTouchInfo()
 void TransferTouchInfo::initialize()
 {
 	m_Data.uKind = TransferManager::eTransferKind_TouchInfo;
-	m_lastSendFrame = 0U;
+	m_lastSendTime = 0.0f;
 }
 
 bool TransferTouchInfo::updateTransfer()
@@ -32,8 +32,8 @@ bool TransferTouchInfo::updateTransfer()
 	if(DELAY_INPUT()->IsInputEmpty(nPlayerId)){ return false; }
 
 	m_Data.info = DELAY_INPUT()->GetNextDelayTouchInfo(nPlayerId);
-	if(m_lastSendFrame == m_Data.info.uFrame){ return false; }
-	m_lastSendFrame = m_Data.info.uFrame;
+	if(m_lastSendTime >= m_Data.info.fTime){ return false; }
+	m_lastSendTime = m_Data.info.fTime;
 
 	pManager->BroadCast((jbyte *)&m_Data, sizeof(m_Data));
 	return true;

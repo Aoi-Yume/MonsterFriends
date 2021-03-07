@@ -44,7 +44,7 @@ void SimpleCursor::EntityUpdate(GameMessage message, const void *param) {
 		const int nPlayerId = m_pButtonManager->GetControlPlayerId();
 		TouchInputInfo info = {};
 		if(!pEngine->FindDelayTouchInfo(info, eTouchEvent_DOWN, nPlayerId)){
-			!pEngine->FindDelayTouchInfo(info, eTouchEvent_MOVE, nPlayerId);
+			pEngine->FindDelayTouchInfo(info, eTouchEvent_MOVE, nPlayerId);
 		}
 		const float fTouchX = info.fTouchX;
 		const float fTouchY = info.fTouchY;

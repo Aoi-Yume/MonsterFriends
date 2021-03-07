@@ -19,6 +19,8 @@ TransferConnect::~TransferConnect()
 
 void TransferConnect::initialize()
 {
+	memset(&m_Data, 0, sizeof(m_Data));
+	auto pManager = TransferManager::Get();
 	m_Data.uKind = TransferManager::eTransferKind_Connect;
 	m_Data.bHost = TransferManager::Get()->IsHost();
 	m_Data.uRandomSeed = Random::GetSyncSeed();

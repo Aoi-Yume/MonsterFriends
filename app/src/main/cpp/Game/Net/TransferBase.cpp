@@ -74,7 +74,10 @@ void TransferBase::onThread()
 	GetThreadEnv();
 	initialize();
 	while(true){
-		if((m_uReqest & eRequest_Stop) != 0U){ continue; }
+		if((m_uReqest & eRequest_Stop) != 0U){
+			if((m_uReqest & eRequest_End) != 0U){ break; }
+			continue;
+		}
 		if(updateTransfer()) {
 			m_nSendCnt++;
 		}

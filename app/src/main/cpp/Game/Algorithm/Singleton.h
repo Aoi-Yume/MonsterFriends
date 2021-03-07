@@ -16,7 +16,7 @@ protected:
 private:
 	Singleton(const Singleton&) = delete;
 	void operator=(const Singleton&) = delete;
-	
+
 	
 public:
 	static void Initialize(){
@@ -33,7 +33,7 @@ public:
 		}
 		return s_pSingleton;
 	}
-	
+
 private:
 	static T* s_pSingleton;
 };

@@ -27,25 +27,7 @@ TransferManager::TransferManager()
 TransferManager::~TransferManager()
 {
     DEBUG_LOG("Call TransferManager Deconstructor");
-	// 終了要求
-	for(auto& it : m_aTransfer){
-		it->RequestEnd();
-	}
-	// 終了待ち
-	do{
-		bool bAllEnd = true;
-		for(auto& it : m_aTransfer){
-			if(!it->IsEnd()){
-				bAllEnd = false;
-				break;
-			}
-		}
-		if(bAllEnd){ break; }
-	} while(true);
-	for(auto& it : m_aTransfer) {
-		delete it;
-		it = nullptr;
-	}
+	ResetConnect();
 }
 
 void TransferManager::Initialize(bool bHost)
@@ -69,6 +51,31 @@ bool TransferManager::IsConnectSucess() const
 	return m_bConnectSucess;
 }
 
+void TransferManager::ResetConnect()
+{
+	m_SelfInfo = {};
+	m_aConnectInfo.clear();
+	// 終了要求
+	for(auto& it : m_aTransfer){
+		it->RequestEnd();
+	}
+	// 終了待ち
+	do{
+		bool bAllEnd = true;
+		for(auto& it : m_aTransfer){
+			if(!it->IsEnd() && it->IsStart()){
+				bAllEnd = false;
+				break;
+			}
+		}
+		if(bAllEnd){ break; }
+	} while(true);
+	for(auto& it : m_aTransfer) {
+		delete it;
+		it = nullptr;
+	}
+}
+
 void TransferManager::SetTransfer(int nKind, TransferBase* pTransfer)
 {
 	assert(nKind >= 0 && nKind < eTransferKind_Max);
@@ -85,6 +92,13 @@ void TransferManager::StopTransfer(int nKind)
 {
 	assert(nKind >= 0 && nKind < eTransferKind_Max);
 	m_aTransfer[nKind]->stopTransfer();
+}
+
+void TransferManager::StopAllTransfer()
+{
+	for(int i = 0; i < eTransferKind_Max; ++i){
+		m_aTransfer[i]->stopTransfer();
+	}
 }
 
 bool TransferManager::IsStartTransfer(int nKind) const

@@ -130,6 +130,10 @@ public class NearbyClient {
                 new AdvertisingOptions.Builder().setStrategy(STRATEGY).build());
     }
 
+    public void DisconnectAllEndPoint(){
+        m_ConnectionsClient.stopAllEndpoints();
+    }
+
     public void StopAdvertising() {
         m_ConnectionsClient.stopAdvertising();
     }

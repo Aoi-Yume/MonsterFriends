@@ -12,6 +12,7 @@
 #include "../../Math/math_Vector.h"
 
 class ComponentBase;
+class AnimationComponent;
 
 class Entity : public EntityBase
 {
@@ -39,6 +40,7 @@ public:
 	static bool CreateTransformComponent(Entity* pEntity);
 	static bool CreateCollision2DRectComponent(Entity* pEntity);
     static bool CreateCameraComponent(Entity* pEntity);
+    static AnimationComponent* CreateAnimationComponent(Entity* pEntity);
 
 	static bool CreateDebugSquareImageComponent(Entity* pEntity);
 };

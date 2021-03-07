@@ -52,10 +52,12 @@ public:
 
 	void SetConnectSuccess(bool bConnect);
 	bool IsConnectSucess() const;
+	void ResetConnect();
 
 	void SetTransfer(int nKind, TransferBase* pTransfer);
 	void StartTransfer(int nKind);
 	void StopTransfer(int nKind);
+	void StopAllTransfer();
 	bool IsStartTransfer(int nKind) const;
 	
 	template<class T>

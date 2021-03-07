@@ -36,7 +36,7 @@ private:
 		DelayInput::DelayTouchInfo info;
 	};
 
-	uint32_t 	m_lastSendFrame;
+	float 	m_lastSendTime;
 	Data		m_Data;
 	std::function<void(void*, int)>	m_pReceiveCallBack;
 	std::function<void()>	m_pDumpCallBack;

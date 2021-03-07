@@ -21,7 +21,19 @@
         app:layout_constraintVertical_bias="1.0" />
 
     <EditText
-        android:id="@+id/inputText"
+        android:id="@+id/inputText1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:singleLine="true"
+        app:layout_constraintEnd_toEndOf="@+id/gameMainGLSurfaceView"
+        app:layout_constraintStart_toStartOf="@+id/gameMainGLSurfaceView"
+        app:layout_constraintTop_toBottomOf="@+id/gameMainGLSurfaceView" />
+
+    <EditText
+        android:id="@+id/inputText2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"

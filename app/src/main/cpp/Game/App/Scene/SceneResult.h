@@ -1,10 +1,10 @@
 ﻿//
-// Created by 葵ユメ on 2018/09/19.
+// Created by 葵ユメ on 2021/03/05.
 //
 
 
-#ifndef AOIYUME_SCENE_GAME_MAIN_H
-#define AOIYUME_SCENE_GAME_MAIN_H
+#ifndef AOIYUME_SCENE_RESULT_H
+#define AOIYUME_SCENE_RESULT_H
 
 #include <Entity.h>
 #include <Button/ButtonManager.h>
@@ -16,33 +16,19 @@
 class StateManager;
 class ComponentBase;
 class Character;
-class InformationPlate;
 class MessageWindow;
-class Adv;
-class Shop;
-class UseItem;
 
 //==========================================
 //==========================================
-class SceneGameMain : public SceneBase
+class SceneResult : public SceneBase
 {
 	typedef SceneBase Super;
 
 public:
 	enum {
-		eBtnKind_Main,
-		eBtnKind_ItemOrShop,
-	};
-
-	enum {
 		eState_FadeIn,
-		eState_GameMain,
-		eState_Adv,
-		eState_SelectItemUseOrShop,
-		eState_Shop,
-		eState_UseItem,
-		eState_NextPlayer,
-		eState_ClearFademOut,
+		eState_ResultMain,
+		eState_FadeOut,
 		eState_Max
 	};
 
@@ -50,8 +36,8 @@ public:
 	static SceneBase* CreateScene();
 
 public:
-	SceneGameMain();
-	virtual ~SceneGameMain();
+	SceneResult();
+	virtual ~SceneResult();
 	
 protected:
 	virtual void SceneSetup() override ;
@@ -62,15 +48,13 @@ protected:
 	void EntityUpdate(GameMessage message, const void* param) override;
 
 public:
-	Entity*		m_pCounter;
 	Entity*		m_pBgImage;
-	Character*	m_pChara;
-	Adv*		m_pAdv;
-	Shop*		m_pShop;
-	UseItem*	m_pUseItem;
+	struct CharaInfo {
+		int nCristalNum;
+		Character *pChara;
+	};
+	CharaInfo	m_CharaInfo[NET_CONNECT_MAX];
 
-	InformationPlate* m_pInformationPlate;
-	MessageWindow* m_pMessageWindow;
 	StateManager*	m_pStateManager;
 	std::vector<ButtonManager*>	m_aBtnManager;
 };

@@ -15,8 +15,10 @@ AppParam::AppParam()
 {
 	DEBUG_LOG("Create AppParam");
 	m_CharaInfo.nKizunaPoint = 100;
+	m_CharaInfo.uItemNum[3] = 2;
 	for(int i = 0; i < NET_CONNECT_MAX; ++i){
-		m_NetworkGameInfo.ChharaInfo[i].nKizunaPoint = 100;
+		m_NetworkGameInfo.CharaInfo[i].nKizunaPoint = 100;
+		m_NetworkGameInfo.CharaInfo[i].uItemNum[3] = 2;
 	}
 }
 
@@ -50,7 +52,7 @@ void AppParam::AddKizunaPoint(int nPlayerId, int nAdd)
 	// 接続完了している時は通信用情報を更新
 	auto pManager = TransferManager::Get();
 	if(pManager->IsConnectSucess()){
-		auto& nKizuna = m_NetworkGameInfo.ChharaInfo[nPlayerId].nKizunaPoint;
+		auto& nKizuna = m_NetworkGameInfo.CharaInfo[nPlayerId].nKizunaPoint;
 		nKizuna = std::min(nKizuna + nAdd, 9999);
 
 		// プレイヤーIDが自身のIDなら自分用も更新
@@ -63,7 +65,7 @@ void AppParam::AddKizunaPoint(int nPlayerId, int nAdd)
 	else if(nPlayerId == 0){
 		auto& nKizuna = m_CharaInfo.nKizunaPoint;
 		nKizuna = std::min(nKizuna + nAdd, 9999);
-		m_NetworkGameInfo.ChharaInfo[nPlayerId].nKizunaPoint = nKizuna;
+		m_NetworkGameInfo.CharaInfo[nPlayerId].nKizunaPoint = nKizuna;
 	}
 }
 void AppParam::SubKizunaPoint(int nPlayerId, int nSub)
@@ -71,7 +73,7 @@ void AppParam::SubKizunaPoint(int nPlayerId, int nSub)
 	// 接続完了している時は通信用情報を更新
 	auto pManager = TransferManager::Get();
 	if(pManager->IsConnectSucess()){
-		auto& nKizuna = m_NetworkGameInfo.ChharaInfo[nPlayerId].nKizunaPoint;
+		auto& nKizuna = m_NetworkGameInfo.CharaInfo[nPlayerId].nKizunaPoint;
 		nKizuna = std::max(nKizuna - nSub, 0);
 
 		// プレイヤーIDが自身のIDなら自分用も更新
@@ -84,12 +86,12 @@ void AppParam::SubKizunaPoint(int nPlayerId, int nSub)
 	else if(nPlayerId == 0){
 		auto& nKizuna = m_CharaInfo.nKizunaPoint;
 		nKizuna = std::max(nKizuna - nSub, 0);
-		m_NetworkGameInfo.ChharaInfo[nPlayerId].nKizunaPoint = nKizuna;
+		m_NetworkGameInfo.CharaInfo[nPlayerId].nKizunaPoint = nKizuna;
 	}
 }
 int AppParam::GetKizunaPoint(int nPlayerId) const
 {
-	return m_NetworkGameInfo.ChharaInfo[nPlayerId].nKizunaPoint;
+	return m_NetworkGameInfo.CharaInfo[nPlayerId].nKizunaPoint;
 }
 
 void AppParam::AddItem(int nPlayerId, int nItemNo, int nNum)
@@ -99,7 +101,7 @@ void AppParam::AddItem(int nPlayerId, int nItemNo, int nNum)
 	// 接続完了している時は通信用情報を更新
 	auto pManager = TransferManager::Get();
 	if(pManager->IsConnectSucess()) {
-		auto& uItemNum = m_NetworkGameInfo.ChharaInfo[nPlayerId].uItemNum[nItemNo];
+		auto& uItemNum = m_NetworkGameInfo.CharaInfo[nPlayerId].uItemNum[nItemNo];
 		uItemNum = std::min((int)uItemNum + nNum, UINT8_MAX);
 
 		// プレイヤーIDが自身のIDなら自分用も更新
@@ -121,7 +123,7 @@ void AppParam::SubItem(int nPlayerId, int nItemNo, int nNum)
 	// 接続完了している時は通信用情報を更新
 	auto pManager = TransferManager::Get();
 	if(pManager->IsConnectSucess()) {
-		auto& uItemNum = m_NetworkGameInfo.ChharaInfo[nPlayerId].uItemNum[nItemNo];
+		auto& uItemNum = m_NetworkGameInfo.CharaInfo[nPlayerId].uItemNum[nItemNo];
 		uItemNum = std::max((int)uItemNum - nNum, 0);
 
 		// プレイヤーIDが自身のIDなら自分用も更新
@@ -144,7 +146,7 @@ int AppParam::GetItemNum(int nPlayerId, int nItemNo) const
 	// 接続完了している時は通信用情報から取得
 	auto pManager = TransferManager::Get();
 	if(pManager->IsConnectSucess()) {
-		return m_NetworkGameInfo.ChharaInfo[nPlayerId].uItemNum[nItemNo];
+		return m_NetworkGameInfo.CharaInfo[nPlayerId].uItemNum[nItemNo];
 	}
 	// 接続できていない時は自身の情報から取得
 	return m_CharaInfo.uItemNum[nItemNo];
@@ -168,7 +170,7 @@ void AppParam::DumpNetworkInfo()
 	DEBUG_LOG_A("CurrentPlayerId[%d]\n", m_NetworkGameInfo.nCurrentPlayerId);
 	DEBUG_LOG_A("CurrentTurn[%d]\n", m_NetworkGameInfo.nCurrentTurn);
 	for(int i = 0; i < NET_CONNECT_MAX; ++i){
-		DEBUG_LOG_A("Player[%d]:Kizuna[%d]\n", i + 1, m_NetworkGameInfo.ChharaInfo[i].nKizunaPoint);
+		DEBUG_LOG_A("Player[%d]:Kizuna[%d]\n", i + 1, m_NetworkGameInfo.CharaInfo[i].nKizunaPoint);
 	}
 }
 

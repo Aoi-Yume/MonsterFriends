@@ -55,6 +55,17 @@ const AppItemList::ItemInfo& AppItemList::GetItemInfo(int nIdx) const
 	return m_aItemInfo[nIdx];
 }
 
+int AppItemList::GetItemNoFromName(const char* pName) const
+{
+	for(int i = 0; auto& it : m_aItemInfo){
+		if(std::strcmp(it.name.c_str(), pName) == 0){
+			return i;
+		}
+		i++;
+	}
+	return -1;
+}
+
 bool AppItemList::IsUsePossible(int nIdx, int nPlayerId) const
 {
 	const std::string& useType = m_aItemInfo[nIdx].useType;

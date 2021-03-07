@@ -25,7 +25,7 @@ public:
 			int 	nKizunaPoint;
 			uint8_t uItemNum[eItemKind_Max];
 		};
-		CharaInfo	ChharaInfo[NET_CONNECT_MAX];
+		CharaInfo	CharaInfo[NET_CONNECT_MAX];
 	};
 
 	struct CharacterInfo {

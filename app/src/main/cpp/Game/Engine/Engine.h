@@ -55,13 +55,14 @@ public:
 	void LoadAsset(const char* pFileName, void** pBuffer, long *pSize, bool bAllocate);
 
 	void ShowSoftwareKeyboard();
-	bool IsShowSofrwareKeyboard() const;
+	bool IsShowSoftwareKeyboard() const;
 	void GetInputText(char* pText, int nSize) const;
 
 	void StartNearbyAdvertising(const char* pConnectName);
 	void StopNearbyAdvertising();
 	void StartNearbyDiscovery(const char* pConnectName);
 	void StopNearbyDiscovery();
+	void DisconnectNearbyAllEndPoint();
 	void SendData(const char* pId, jbyte* pData, int nSize);
 
 public:

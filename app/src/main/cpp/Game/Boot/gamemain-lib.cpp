@@ -91,7 +91,10 @@ Java_com_aoiyume_Game_GameMainRender_SurfaceDraw(
 	FADE()->Update(eGameMessage_Draw, nullptr);
 
 	//glDisable(GL_DEPTH_TEST);
-	DELAY_INPUT()->Update();
+	const float deltaTime = Engine::GetEngine()->GetDeltaTime();
+	if(deltaTime < 60 * 60 * 24) {
+		DELAY_INPUT()->Update(deltaTime);
+	}
 }
 
 END_EXTERN_C

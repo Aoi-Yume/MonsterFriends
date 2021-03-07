@@ -8,6 +8,7 @@
 #include "TransformComponent.h"
 #include "LayoutComponent.h"
 #include "CameraComponent.h"
+#include "AnimationComponent.h"
 
 Entity::Entity()
 : EntityBase()
@@ -150,10 +151,21 @@ bool Entity::CreateCameraComponent(Entity *pEntity)
     return true;
 }
 
+AnimationComponent* Entity::CreateAnimationComponent(Entity* pEntity)
+{
+	CreateTransformComponent(pEntity);
+
+	if(pEntity->m_pComponent[eComponentKind_Animation]){
+		return reinterpret_cast<AnimationComponent*>(pEntity->m_pComponent[eComponentKind_Animation]);
+	}
+	pEntity->m_pComponent[eComponentKind_Animation] = new AnimationComponent(pEntity);
+	return reinterpret_cast<AnimationComponent*>(pEntity->m_pComponent[eComponentKind_Animation]);
+}
+
 bool Entity::CreateDebugSquareImageComponent(Entity *pEntity)
 {
 //	DEBUG_LOG("Create Debug Square Image Component");
-	!CreateTransformComponent(pEntity);
+	CreateTransformComponent(pEntity);
 	if( pEntity->m_pComponent[eComponentKind_Layout] ){ return false; }
 	DebugSquareImageComponent* pComponent = new DebugSquareImageComponent(pEntity);
 

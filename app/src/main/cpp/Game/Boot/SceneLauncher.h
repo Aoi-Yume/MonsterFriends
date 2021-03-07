@@ -31,10 +31,7 @@ private:
 	enum SceneButton{
 		eButton_Title,
 		eButton_GameMain,
-		eButton_Adv,
-		eButton_SpendTime,
-		eButton_Work,
-		eButton_Shop,
+		eButton_Result,
 		eButton_Max
 	};
 

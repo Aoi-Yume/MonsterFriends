@@ -5,8 +5,7 @@
 
 #include <LayoutComponent.h>
 #include "SceneGameMain.h"
-#include "SceneSpendTime.h"
-#include "SceneWork.h"
+#include "SceneResult.h"
 #include <EntityManager.h>
 #include <Button/ButtonManager.h>
 #include <Button/SimpleButton.h>
@@ -30,193 +29,221 @@ SceneBase* SceneGameMain::CreateScene()
 	return new SceneGameMain();
 }
 
-//==========================================
-//==========================================
-void StateFadeIn::Begin(void *pUserPtr)
-{
-	FADE()->In();
-}
-
-//==========================================
-//==========================================
-void StateFadeIn::Update(void* pUserPtr)
-{
-	if (FADE()->IsFadeInEnd()) {
-		ChangeState(SceneGameMain::eState_GameMain);
-	}
-}
-
-//==========================================
-//==========================================
-void StateGameMain::Begin(void* pUserPtr)
-{
-	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
-	auto pBtn = p->m_aBtnManager[SceneGameMain::eBtnKind_Main];
-	pBtn->SetControlPlayerId(AppParam::Get()->GetNetworkInfo().nCurrentPlayerId);
-	pBtn->Unlock();
-	pBtn->SetVisible(true);
-	// プレイヤーIDが更新されていなかった。名前が更新するため呼び出す
-	p->m_pInformationPlate->UpdatePlate();
-	DEBUG_LOG("State GameMain Begin\n");
-}
-void StateGameMain::Update(void* pUserPtr)
-{
-	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
-	auto pBtn = p->m_aBtnManager[SceneGameMain::eBtnKind_Main];
-
-	switch (pBtn->GetDecide()){
-		case eBtn_Adv: {
-			//SCENE_MANAGER()->ChangeScene(SceneAdv::CreateScene());
-			ChangeState(SceneGameMain::eState_Adv);
-			break;
+namespace {
+	//==========================================
+	//==========================================
+	class StateFadeIn : public StateBase {
+		void Begin(void *pUserPtr) override {
+			FADE()->In();
 		}
-		case eBtn_Work: {
-			ChangeState(SceneGameMain::eState_NextPlayer);
-			break;
+
+		void Update(void *pUserPtr) override {
+			if (FADE()->IsFadeInEnd()) {
+				ChangeState(SceneGameMain::eState_GameMain);
+			}
 		}
-		case eBtn_Item: {
-			ChangeState(SceneGameMain::eState_SelectItemUseOrShop);
-			break;
+	};
+
+	//==========================================
+	//==========================================
+	class StateGameMain : public StateBase {
+		enum {
+			eBtn_Adv,
+			eBtn_Work,
+			eBtn_Item,
+			eBtn_Max
+		};
+
+		void Begin(void *pUserPtr) override {
+			auto p = reinterpret_cast<SceneGameMain *>(pUserPtr);
+			auto pBtn = p->m_aBtnManager[SceneGameMain::eBtnKind_Main];
+			pBtn->SetControlPlayerId(AppParam::Get()->GetNetworkInfo().nCurrentPlayerId);
+			pBtn->Unlock();
+			pBtn->SetVisible(true);
+			// プレイヤーIDが更新されていなかった。名前が更新するため呼び出す
+			p->m_pInformationPlate->UpdatePlate();
+			DEBUG_LOG("State GameMain Begin\n");
 		}
-		default:{ break; }
-	}
-}
-void StateGameMain::End(void *pUserPtr)
-{
-	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
-	auto pBtn = p->m_aBtnManager[SceneGameMain::eBtnKind_Main];
-	pBtn->Lock();
-	pBtn->Reset();
-	pBtn->SetVisible(false);
-}
 
-//==========================================
-//==========================================
-void StateAdv::Begin(void *pUserPtr)
-{
-	DEBUG_LOG("StateAdv");
-	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
-	p->m_pAdv->Open();
-}
-void StateAdv::Update(void *pUserPtr)
-{
-	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
-	if(p->m_pAdv->IsEnd()) {
-		ChangeState(SceneGameMain::eState_GameMain);
-	}
-}
-void StateAdv::End(void *pUserPtr)
-{
-	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
-	auto pBtn = p->m_aBtnManager[SceneGameMain::eBtnKind_Main]->GetButton(0);
-	pBtn->Disable();
-	pBtn->SetGray(true);
-	p->m_pAdv->Close();
-}
+		void Update(void *pUserPtr) override {
+			auto p = reinterpret_cast<SceneGameMain *>(pUserPtr);
+			auto pBtn = p->m_aBtnManager[SceneGameMain::eBtnKind_Main];
 
-//==========================================
-//==========================================
-void StateUseOrShopSelect::Begin(void *pUserPtr)
-{
-	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
-	auto pBtn = p->m_aBtnManager[SceneGameMain::eBtnKind_ItemOrShop];
-	pBtn->SetControlPlayerId(AppParam::Get()->GetNetworkInfo().nCurrentPlayerId);
-	pBtn->Unlock();
-	pBtn->SetVisible(true);
-}
-void StateUseOrShopSelect::Update(void* pUserPtr)
-{
-	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
-	auto pBtn = p->m_aBtnManager[SceneGameMain::eBtnKind_ItemOrShop];
-
-	switch (pBtn->GetDecide()){
-		case eBtn_Use: {
-			ChangeState(SceneGameMain::eState_UseItem);
-			break;
+			switch (pBtn->GetDecide()) {
+				case eBtn_Adv: {
+					//SCENE_MANAGER()->ChangeScene(SceneAdv::CreateScene());
+					ChangeState(SceneGameMain::eState_Adv);
+					break;
+				}
+				case eBtn_Work: {
+					ChangeState(SceneGameMain::eState_NextPlayer);
+					break;
+				}
+				case eBtn_Item: {
+					ChangeState(SceneGameMain::eState_SelectItemUseOrShop);
+					break;
+				}
+				default: {
+					break;
+				}
+			}
 		}
-		case eBtn_Shop: {
-			ChangeState(SceneGameMain::eState_Shop);
-			break;
+
+		void End(void *pUserPtr) override {
+			auto p = reinterpret_cast<SceneGameMain *>(pUserPtr);
+			auto pBtn = p->m_aBtnManager[SceneGameMain::eBtnKind_Main];
+			pBtn->Lock();
+			pBtn->Reset();
+			pBtn->SetVisible(false);
 		}
-		default:{ break; }
-	}
-}
-void StateUseOrShopSelect::End(void *pUserPtr)
-{
-	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
-	auto pBtn = p->m_aBtnManager[SceneGameMain::eBtnKind_ItemOrShop];
-	pBtn->Lock();
-	pBtn->Reset();
-	pBtn->SetVisible(false);
-}
+	};
 
-//==========================================
-//==========================================
-void StateShop::Begin(void *pUserPtr)
-{
-	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
-	p->m_pShop->Open();
-}
-void StateShop::Update(void *pUserPtr)
-{
-	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
-	if(p->m_pShop->IsEnd()) {
-		if(AppParam::Get()->IsClear()) {
-			ChangeState(SceneGameMain::eState_Clear);
+	//==========================================
+	//==========================================
+	class StateAdv : public StateBase {
+		void Begin(void *pUserPtr) override {
+			DEBUG_LOG("StateAdv");
+			auto p = reinterpret_cast<SceneGameMain *>(pUserPtr);
+			p->m_pAdv->Open();
 		}
-		else {
-			ChangeState(SceneGameMain::eState_GameMain);
+
+		void Update(void *pUserPtr) override {
+			auto p = reinterpret_cast<SceneGameMain *>(pUserPtr);
+			if (p->m_pAdv->IsEnd()) {
+				ChangeState(SceneGameMain::eState_GameMain);
+			}
 		}
-	}
-}
-void StateShop::End(void *pUserPtr)
-{
-	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
-	p->m_pShop->Close();
-}
 
-//==========================================
-//==========================================
-void StateUseItem::Begin(void *pUserPtr)
-{
-	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
-	p->m_pUseItem->Open();
-}
-void StateUseItem::Update(void *pUserPtr)
-{
-	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
-	if(p->m_pUseItem->IsEnd()) {
-		ChangeState(SceneGameMain::eState_GameMain);
-	}
-}
-void StateUseItem::End(void *pUserPtr)
-{
-	auto p = reinterpret_cast<SceneGameMain*>(pUserPtr);
-	p->m_pUseItem->Close();
-}
+		void End(void *pUserPtr) override {
+			auto p = reinterpret_cast<SceneGameMain *>(pUserPtr);
+			auto pBtn = p->m_aBtnManager[SceneGameMain::eBtnKind_Main]->GetButton(0);
+			pBtn->Disable();
+			pBtn->SetGray(true);
+			p->m_pAdv->Close();
+		}
+	};
 
-//==========================================
-//==========================================
-void StateNextPlayer::Begin(void *pUserPtr)
-{
-	const int nNum = TransferManager::Get()->GetConnectNum() + 1;
-	auto& networkInfo = AppParam::Get()->GetNetworkInfo();
-	networkInfo.nCurrentPlayerId = (networkInfo.nCurrentPlayerId + 1) % nNum;
-	networkInfo.nCurrentTurn++;
-	FADE()->Out();
-}
-void StateNextPlayer::Update(void* pUserPtr)
-{
-	if(FADE()->IsFadeOutEnd()){
-		SCENE_MANAGER()->ChangeScene(SceneGameMain::CreateScene());
-	}
-}
+	//==========================================
+	//==========================================
+	class StateUseOrShopSelect : public StateBase {
+		enum {
+			eBtn_Use,
+			eBtn_Shop,
+		};
 
-//==========================================
-//==========================================
-void StateClear::Begin(void* pUserPtr)
-{
-	DEBUG_LOG("Call Clear State");
+		void Begin(void *pUserPtr) override {
+			auto p = reinterpret_cast<SceneGameMain *>(pUserPtr);
+			auto pBtn = p->m_aBtnManager[SceneGameMain::eBtnKind_ItemOrShop];
+			pBtn->SetControlPlayerId(AppParam::Get()->GetNetworkInfo().nCurrentPlayerId);
+			pBtn->Unlock();
+			pBtn->SetVisible(true);
+		}
+
+		void Update(void *pUserPtr) override {
+			auto p = reinterpret_cast<SceneGameMain *>(pUserPtr);
+			auto pBtn = p->m_aBtnManager[SceneGameMain::eBtnKind_ItemOrShop];
+
+			switch (pBtn->GetDecide()) {
+				case eBtn_Use: {
+					ChangeState(SceneGameMain::eState_UseItem);
+					break;
+				}
+				case eBtn_Shop: {
+					ChangeState(SceneGameMain::eState_Shop);
+					break;
+				}
+				default: {
+					break;
+				}
+			}
+		}
+
+		void End(void *pUserPtr) override {
+			auto p = reinterpret_cast<SceneGameMain *>(pUserPtr);
+			auto pBtn = p->m_aBtnManager[SceneGameMain::eBtnKind_ItemOrShop];
+			pBtn->Lock();
+			pBtn->Reset();
+			pBtn->SetVisible(false);
+		}
+	};
+
+	//==========================================
+	//==========================================
+	class StateShop : public StateBase {
+		void Begin(void *pUserPtr) override {
+			auto p = reinterpret_cast<SceneGameMain *>(pUserPtr);
+			p->m_pShop->Open();
+		}
+
+		void Update(void *pUserPtr) override {
+			auto p = reinterpret_cast<SceneGameMain *>(pUserPtr);
+			if (p->m_pShop->IsEnd()) {
+				if (AppParam::Get()->IsClear()) {
+					ChangeState(SceneGameMain::eState_ClearFademOut);
+				} else {
+					ChangeState(SceneGameMain::eState_GameMain);
+				}
+			}
+		}
+
+		void End(void *pUserPtr) override {
+			auto p = reinterpret_cast<SceneGameMain *>(pUserPtr);
+			p->m_pShop->Close();
+		}
+	};
+
+	//==========================================
+	//==========================================
+	class StateUseItem : public StateBase {
+		void Begin(void *pUserPtr) override {
+			auto p = reinterpret_cast<SceneGameMain *>(pUserPtr);
+			p->m_pUseItem->Open();
+		}
+
+		void Update(void *pUserPtr) override {
+			auto p = reinterpret_cast<SceneGameMain *>(pUserPtr);
+			if (p->m_pUseItem->IsEnd()) {
+				ChangeState(SceneGameMain::eState_GameMain);
+			}
+		}
+
+		void End(void *pUserPtr) override {
+			auto p = reinterpret_cast<SceneGameMain *>(pUserPtr);
+			p->m_pUseItem->Close();
+		}
+	};
+
+	//==========================================
+	//==========================================
+	class StateNextPlayer : public StateBase {
+		void Begin(void *pUserPtr) override {
+			const int nNum = TransferManager::Get()->GetConnectNum() + 1;
+			auto &networkInfo = AppParam::Get()->GetNetworkInfo();
+			networkInfo.nCurrentPlayerId = (networkInfo.nCurrentPlayerId + 1) % nNum;
+			networkInfo.nCurrentTurn++;
+			FADE()->Out();
+		}
+
+		void Update(void *pUserPtr) override {
+			if (FADE()->IsFadeOutEnd()) {
+//			SCENE_MANAGER()->ChangeScene(SceneGameMain::CreateScene());
+			}
+		}
+	};
+
+	//==========================================
+	//==========================================
+	class StateClearFadeOut : public StateBase {
+		void Begin(void *pUserPtr) override {
+			FADE()->Out();
+		}
+
+		void Update(void *pUserPtr) override {
+			if (FADE()->IsFadeOutEnd()) {
+				SCENE_MANAGER()->ChangeScene(SceneResult::CreateScene());
+			}
+		}
+	};
 }
 
 //==========================================
@@ -229,6 +256,7 @@ SceneGameMain::SceneGameMain()
 , m_pShop(nullptr)
 , m_pInformationPlate(nullptr)
 , m_pMessageWindow(nullptr)
+, m_pStateManager(nullptr)
 , m_aBtnManager()
 {
 	DEBUG_LOG("Scene Game Main Constructor");
@@ -246,6 +274,7 @@ SceneGameMain::~SceneGameMain()
 	delete m_pUseItem;
 	delete m_pInformationPlate;
 	delete m_pMessageWindow;
+	delete m_pStateManager;
 	for(auto& it : m_aBtnManager) {
 		delete it;
 	}
@@ -315,7 +344,7 @@ void SceneGameMain::SceneSetup() {
 		m_pStateManager->CreateState<StateShop>();
 		m_pStateManager->CreateState<StateUseItem>();
 		m_pStateManager->CreateState<StateNextPlayer>();
-		m_pStateManager->CreateState<StateClear>();
+		m_pStateManager->CreateState<StateClearFadeOut>();
 		m_pStateManager->ChangeState(eState_FadeIn);
 	}
 	{
@@ -403,7 +432,7 @@ void SceneGameMain::SceneUpdate()
 
 	auto p = (TextImageComponent*)m_pCounter->GetComponent(eComponentKind_Layout);
 	char str[128];
-	std::snprintf(str, sizeof(str), "%d", DELAY_INPUT()->GetCurrentFrame());
+	std::snprintf(str, sizeof(str), "%.3f", DELAY_INPUT()->GetCurrentTime());
 	p->SetText(str);
 	//auto pTouchInput = Engine::GetEngine()->GetTouchInputInfoPtr(0);
 	//DEBUG_LOG_A("TouchEvent[%d], X[%.2f], Y[%.2f]\n", pTouchInput->nTouchEvent, pTouchInput->fTouchX, pTouchInput->fTouchY);

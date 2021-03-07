@@ -4,12 +4,14 @@
 
 
 #include "DelayInput.h"
+#include "../aoiyume_define.h"
+
 USE_SINGLETON_VARIABLE(DelayInput)
 
 DelayInput::DelayInput()
 	: m_uState(0U)
-	, m_nDelay(0U)
-	, m_uCurrentFrame(0U)
+	, m_fDelay(0.0f)
+	, m_fCurrentTime(0.0f)
 	, m_aTouchInputInfo()
 {
 }
@@ -18,19 +20,19 @@ DelayInput::~DelayInput()
 {
 }
 
-void DelayInput::Initialize(int nDelay)
+void DelayInput::Initialize(float fDelay)
 {
-	m_nDelay = nDelay;
+	m_fDelay = fDelay;
 }
 
-void DelayInput::Update()
+void DelayInput::Update(float fDeltaTime)
 {
 	if((m_uState & eSTATE_START) == 0U){ return; }
 	if((m_uState & eSTATE_STOP) != 0U){ return; }
 
 	for(auto& it : m_aTouchInputInfo){
 		while(!it.empty()){
-			if(it.front().uFrame < m_uCurrentFrame){
+			if(it.front().fTime < m_fCurrentTime){
 				it.pop_front();
 			}
 			else{
@@ -38,7 +40,7 @@ void DelayInput::Update()
 			}
 		}
 	}
-	m_uCurrentFrame++;
+	m_fCurrentTime += fDeltaTime;
 }
 
 void DelayInput::StartDelayInput()
@@ -52,26 +54,26 @@ void DelayInput::StopDelayInput()
 }
 void DelayInput::ResetDelayInput()
 {
-	m_uCurrentFrame = 0;
+	m_fCurrentTime = 0;
 	for(int i = 0; i < NET_CONNECT_MAX; ++i) {
 		ClearTouchInfo(i);
 	}
 }
 
-uint32_t DelayInput::GetCurrentFrame() const
+float DelayInput::GetCurrentTime() const
 {
-	return m_uCurrentFrame;
+	return m_fCurrentTime;
 }
 void DelayInput::AddTouchInfo(const TouchInputInfo& info, int nPlayer)
 {
-	m_aTouchInputInfo[nPlayer].emplace_back(DelayTouchInfo(m_uCurrentFrame + m_nDelay, info));
+	m_aTouchInputInfo[nPlayer].emplace_back(DelayTouchInfo(m_fCurrentTime + m_fDelay, info));
 }
 void DelayInput::AddDelayTouchInfo(const DelayTouchInfo& info, int nPlayer)
 {
-	uint32_t  uFrane = std::max(info.uFrame, m_uCurrentFrame + 3);
-	m_aTouchInputInfo[nPlayer].emplace_back(uFrane, info.info);
+	float  fTime = std::max(info.fTime, m_fCurrentTime + 1.0f / 30.0f);
+	m_aTouchInputInfo[nPlayer].emplace_back(fTime, info.info);
 	std::sort(m_aTouchInputInfo[nPlayer].begin(), m_aTouchInputInfo[nPlayer].end(),
-			[](const DelayTouchInfo& a, const DelayTouchInfo& b){ return a.uFrame < b.uFrame; });
+			[](const DelayTouchInfo& a, const DelayTouchInfo& b){ return a.fTime < b.fTime; });
 }
 void DelayInput::ClearTouchInfo(int nPlayer)
 {
@@ -82,7 +84,7 @@ bool DelayInput::FindDelayTouchInfo(TouchInputInfo& info, int nEvent, int nPlaye
 {
 	if(!m_aTouchInputInfo[nPlayer].empty()) {
 		for(auto& it : m_aTouchInputInfo[nPlayer]){
-			if(it.uFrame < m_uCurrentFrame){
+			if(it.fTime < m_fCurrentTime){
 				if(it.info.nTouchEvent == nEvent){
 					info = it.info;
 					return true;

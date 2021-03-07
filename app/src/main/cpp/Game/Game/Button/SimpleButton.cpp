@@ -6,6 +6,7 @@
 #include <LayoutComponent.h>
 #include <CollisionComponent.h>
 #include <TransformComponent.h>
+#include <AnimationComponent.h>
 #include "SimpleButton.h"
 
 SimpleButton::SimpleButton(const char* pResName)
@@ -14,6 +15,7 @@ SimpleButton::SimpleButton(const char* pResName)
 {
 	{
 		Entity::CreateLayoutComponent(this, pResName);
+		Entity::CreateAnimationComponent(this)->AddAnimation("Open", new SimpleOpenAnimation());
 
 		m_pLayoutComponent = (LayoutComponent *) GetComponent(eComponentKind_Layout);
 		m_pLayoutComponent->SetOrtho(true);
