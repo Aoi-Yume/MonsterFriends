@@ -12,6 +12,7 @@ DelayInput::DelayInput()
 	: m_uState(0U)
 	, m_fDelay(0.0f)
 	, m_fCurrentTime(0.0f)
+	, m_FLastDeltaTime(0.0f)
 	, m_aTouchInputInfo()
 {
 }
@@ -41,6 +42,7 @@ void DelayInput::Update(float fDeltaTime)
 		}
 	}
 	m_fCurrentTime += fDeltaTime;
+	m_FLastDeltaTime = fDeltaTime;
 }
 
 void DelayInput::StartDelayInput()
@@ -70,7 +72,7 @@ void DelayInput::AddTouchInfo(const TouchInputInfo& info, int nPlayer)
 }
 void DelayInput::AddDelayTouchInfo(const DelayTouchInfo& info, int nPlayer)
 {
-	float  fTime = std::max(info.fTime, m_fCurrentTime + 1.0f / 30.0f);
+	float  fTime = std::max(info.fTime, m_fCurrentTime + (m_FLastDeltaTime * 1.2f));
 	m_aTouchInputInfo[nPlayer].emplace_back(fTime, info.info);
 	std::sort(m_aTouchInputInfo[nPlayer].begin(), m_aTouchInputInfo[nPlayer].end(),
 			[](const DelayTouchInfo& a, const DelayTouchInfo& b){ return a.fTime < b.fTime; });

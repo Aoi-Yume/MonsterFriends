@@ -16,7 +16,7 @@
 
 ItemListUI::ItemListUI()
 : GameEntity()
-, m_nCurrentItemNo(0)
+, m_nCurrentItemIdx(0)
 , m_nSelectItemNo(-1)
 , m_aItemNo()
 , m_aButtonManager()
@@ -100,10 +100,10 @@ void ItemListUI::GameEntityUpdate(const void* param)
 		const int nDecide = m_aButtonManager[eButtonManager_LeftRight]->GetDecide();
 		const int nSize = m_aItemNo.size();
 		if (nDecide == 0){
-			m_nCurrentItemNo = (m_nCurrentItemNo + nSize - 1) % nSize;
+			m_nCurrentItemIdx = (m_nCurrentItemIdx + nSize - 1) % nSize;
 		}
 		else if(nDecide == 1){
-			m_nCurrentItemNo = (m_nCurrentItemNo + 1) % nSize;
+			m_nCurrentItemIdx = (m_nCurrentItemIdx + 1) % nSize;
 		}
 		if(nDecide >= 0){
 			m_aButtonManager[eButtonManager_LeftRight]->Reset();
@@ -113,8 +113,8 @@ void ItemListUI::GameEntityUpdate(const void* param)
 	{
 		const int nDecide = m_aButtonManager[eButtonManager_ItemList]->GetDecide();
 		if(nDecide == 1){
-			m_nSelectItemNo = m_aItemNo[m_nCurrentItemNo];
-			if(m_aItemNo[m_nCurrentItemNo] == -1){
+			m_nSelectItemNo = m_aItemNo[m_nCurrentItemIdx];
+			if(m_aItemNo[m_nCurrentItemIdx] == -1){
 				m_aButtonManager[eButtonManager_ItemList]->Reset();
 			}
 			else{
@@ -138,7 +138,7 @@ void ItemListUI::EntityUpdate(GameMessage message, const void* param)
 
 void ItemListUI::Open()
 {
-	m_nCurrentItemNo = 0;
+	m_nCurrentItemIdx = 0;
 	m_nSelectItemNo = -1;
 	m_aButtonManager[eButtonManager_ItemList]->Unlock();
 	m_aButtonManager[eButtonManager_ItemList]->SetVisible(true);
@@ -190,6 +190,11 @@ void ItemListUI::AddItemNo(int nNo)
 	m_aItemNo.emplace_back(nNo);
 }
 
+void ItemListUI::ChangeItemNo(int nIdx, int nNo)
+{
+	m_aItemNo[nIdx] = nNo;
+}
+
 void ItemListUI::ClearItemNo()
 {
 	m_aItemNo.clear();
@@ -200,11 +205,16 @@ int ItemListUI::GetSelectItemNo() const
 	return m_nSelectItemNo;
 }
 
+int ItemListUI::GetCurrentItemIdx() const
+{
+	return m_nCurrentItemIdx;
+}
+
 void ItemListUI::updateItemButton()
 {
 	const int nCenter = eButtonVisibleNum / 2;
 	const int nListSize = m_aItemNo.size();
-	int nStart = m_nCurrentItemNo;
+	int nStart = m_nCurrentItemIdx;
 	for(int i = 0; i < nCenter; ++i){
 		nStart = (nStart + nListSize - 1) % nListSize;
 	}

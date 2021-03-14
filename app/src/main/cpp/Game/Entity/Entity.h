@@ -12,6 +12,7 @@
 #include "../../Math/math_Vector.h"
 
 class ComponentBase;
+class LayoutComponent;
 class AnimationComponent;
 
 class Entity : public EntityBase
@@ -36,7 +37,7 @@ public:
 	bool IsVisible();
 public:
 	static bool CreateTextImageComponent(Entity* pEntity, const char* pText, int nFontSize);
-	static bool CreateLayoutComponent(Entity* pEntity, const char* pResName);
+	static LayoutComponent* CreateLayoutComponent(Entity* pEntity, const char* pResName);
 	static bool CreateTransformComponent(Entity* pEntity);
 	static bool CreateCollision2DRectComponent(Entity* pEntity);
     static bool CreateCameraComponent(Entity* pEntity);

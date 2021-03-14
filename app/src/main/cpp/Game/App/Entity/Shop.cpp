@@ -15,20 +15,17 @@
 #include <MessageWindow/MessageWindow.h>
 #include <InformationPlate.h>
 #include <ItemListUI.h>
+#include <Random.h>
 
 Shop::Shop()
 	: GameEntity()
 	, m_nStep(eStep_End)
-	, m_nItemNo()
 	, m_pMessageWindow(nullptr)
 	, m_pInformationPlate(nullptr)
 	, m_pItemListUI(nullptr)
 	, m_aButtonManager()
 {
 	DEBUG_LOG("Create Shop");
-	m_nItemNo[0] = 0;
-	m_nItemNo[1] = 3;
-	m_nItemNo[2] = 2;
 }
 
 Shop::~Shop()
@@ -45,10 +42,6 @@ void Shop::Open()
 	SetVisible(true);
 	m_aButtonManager[eBtnManager_Back]->Unlock();
 	m_aButtonManager[eBtnManager_Back]->SetVisible(true);
-	m_pItemListUI->ClearItemNo();
-	m_pItemListUI->AddItemNo(m_nItemNo[0]);
-	m_pItemListUI->AddItemNo(m_nItemNo[1]);
-	m_pItemListUI->AddItemNo(m_nItemNo[2]);
 	m_pItemListUI->Open();
 	m_nStep = eStep_SelectItemWait;
 }
@@ -91,6 +84,9 @@ void Shop::GameEntitySetup(const void* param) {
 	const int nCurrentPlayerId = AppParam::Get()->GetNetworkInfo().nCurrentPlayerId;
 	{
 		m_pItemListUI = new ItemListUI();
+		setNewItem(0);
+		setNewItem(1);
+		setNewItem(2);
 		AddChild(m_pItemListUI);
 	}
 	{
@@ -206,6 +202,7 @@ void Shop::GameEntityUpdate(const void* param)
 		if(nPlayerKizuna >= itemInfo.nCost){
 			AppParam::Get()->SubKizunaPoint(nPlayerId, itemInfo.nCost);
 			AppParam::Get()->AddItem(nPlayerId, nSelectItemNo, 1);
+			setNewItem(m_pItemListUI->GetCurrentItemIdx());
 			m_pMessageWindow->SetDirectMessage("まいどありにゃ");
 		}
 		else{
@@ -284,4 +281,30 @@ void Shop::EntityUpdate(GameMessage message, const void* param)
 		it->Update(message, param);
 	}
 	m_pMessageWindow->Update(message, param);
+}
+
+void Shop::setNewItem(int nIdx)
+{
+	const auto pItemList = AppItemList::Get();
+	const int nRandomVal = Random::GetSyncInt(0, 100);
+	int nAppearSum = 0;
+	for(int i = 0; i < pItemList->GetItemListSize(); ++i) {
+		nAppearSum += pItemList->GetItemInfo(i).nAppearVal;
+	}
+	int nNewItemIdx = -1;
+	float fAppearProbability = 0.0f;
+	for(int i = 0; i < pItemList->GetItemListSize(); ++i) {
+		fAppearProbability += (float)pItemList->GetItemInfo(i).nAppearVal / (float)nAppearSum * 100.0f;
+		if((float)nRandomVal <= fAppearProbability){
+			nNewItemIdx = i;
+			break;
+		}
+	}
+	assert(nNewItemIdx >= 0);
+	if(m_pItemListUI->GetRegisterItemNum() <= nIdx){
+		m_pItemListUI->AddItemNo(nNewItemIdx);
+	}
+	else {
+		m_pItemListUI->ChangeItemNo(nIdx, nNewItemIdx);
+	}
 }

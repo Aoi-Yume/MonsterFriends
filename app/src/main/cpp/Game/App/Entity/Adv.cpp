@@ -264,14 +264,19 @@ void Adv::updateBattleStep()
 	}
 	else if(m_nSubStep == 3){
 		if(m_pMessageWindow->IsNextMessage()) {
-			if(m_Chara.pDice->GetDice() == m_Enemy.pDice->GetDice()) {
+			const int nCharaDice = m_Chara.pDice->GetDice();
+			const int nEnemyDice = m_Enemy.pDice->GetDice();
+			if(nCharaDice == nEnemyDice) {
 				m_nSubStep = 0;
 				m_pMessageWindow->SetVisible(false);
 				m_Chara.pDice->ResetStopDice();
 				m_Enemy.pDice->ResetStopDice();
 			}
-			else {
+			else if (nCharaDice > nEnemyDice){
 				m_nSubStep = 4;
+			}
+			else {
+				m_nNextStep = eSTEP_END;
 			}
 		}
 	}

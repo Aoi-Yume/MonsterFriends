@@ -22,6 +22,7 @@
 #include <Adv.h>
 #include <Shop.h>
 #include <UseItem.h>
+#include <PlayerNotice.h>
 #include <Random.h>
 
 SceneBase* SceneGameMain::CreateScene()
@@ -40,6 +41,10 @@ namespace {
 		void Update(void *pUserPtr) override {
 			if (FADE()->IsFadeInEnd()) {
 				ChangeState(SceneGameMain::eState_GameMain);
+
+				auto p = reinterpret_cast<SceneGameMain *>(pUserPtr);
+				p->m_pPlayerNotice->SetVisible(true);
+				p->m_pPlayerNotice->Open(true, 1.0f);
 			}
 		}
 	};
@@ -226,7 +231,7 @@ namespace {
 
 		void Update(void *pUserPtr) override {
 			if (FADE()->IsFadeOutEnd()) {
-//			SCENE_MANAGER()->ChangeScene(SceneGameMain::CreateScene());
+				SCENE_MANAGER()->ChangeScene(SceneGameMain::CreateScene());
 			}
 		}
 	};
@@ -268,6 +273,7 @@ SceneGameMain::~SceneGameMain()
 {
 	delete m_pCounter;
 	delete m_pBgImage;
+	delete m_pPlayerNotice;
 	delete m_pChara;
 	delete m_pAdv;
 	delete m_pShop;
@@ -301,6 +307,10 @@ void SceneGameMain::SceneSetup() {
 		auto pLayoutComponent = (LayoutComponent *) m_pBgImage->GetComponent(eComponentKind_Layout);
 		pLayoutComponent->SetOrtho(true);
 		m_pBgImage->Update(eGameMessage_Setup, nullptr);
+	}
+	{
+		m_pPlayerNotice = new PlayerNotice(PlayerNotice::eNoticeType_CurrentPlayer, AppParam::Get()->GetNetworkInfo().nCurrentPlayerId);
+		m_pPlayerNotice->Update(eGameMessage_Setup, nullptr);
 	}
 	{
 		m_pChara = new Character(Character::CHARA_ID::eCHARA_01);
@@ -380,12 +390,6 @@ void SceneGameMain::SceneSetup() {
 			m_aBtnManager.emplace_back(pBtnManager);
 		}
 	}
-	auto pManager = TransferManager::Get();
-	if(pManager->IsConnectSucess()) {
-		if(!pManager->IsStartTransfer(TransferManager::eTransferKind_TouchInfo)) {
-			pManager->StartTransfer(TransferManager::eTransferKind_TouchInfo);
-		}
-	}
 	SKILL_LIST()->InitializeSkillTransfer();
 
 	DEBUG_LOG("Setup End");
@@ -460,6 +464,7 @@ void SceneGameMain::EntityUpdate(GameMessage message, const void* param)
 		m_pUseItem->Update(message, param);
 		m_pInformationPlate->Update(message, param);
 		m_pMessageWindow->Update(message, param);
+		m_pPlayerNotice->Update(message, param);
 		m_pCounter->Update(message, param);
 		for(auto& it : m_aBtnManager) {
 			it->Update(message, param);

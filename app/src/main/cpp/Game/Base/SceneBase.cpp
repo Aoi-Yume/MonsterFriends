@@ -152,6 +152,16 @@ void SceneBase::SceneUpdate()
 void SceneBase::SceneFinalize()
 {
 	m_nSceneState = eSceneState_Deactived;
+	auto pManager = TransferManager::Get();
+	if(pManager->IsConnectSucess()) {
+		if(!pManager->IsStartTransfer(TransferManager::eTransferKind_TouchInfo)){ return; }
+		auto pTransfer = pManager->GetTransfer<TransferBase>(TransferManager::eTransferKind_TouchInfo);
+		pTransfer->RequestEnd();
+		// 入力通信の終了待ち
+		while (!pTransfer->IsEnd()) {
+			std::this_thread::sleep_for(std::chrono::nanoseconds(1));
+		}
+	}
 	// 継承先で実装
 }
 

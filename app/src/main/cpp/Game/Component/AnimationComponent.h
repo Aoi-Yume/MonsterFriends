@@ -22,6 +22,7 @@ public:
 	void AddAnimation(const char* pName, AnimationBase* pAnimation);
 	void Play(const char* pName, float fSpeed = 1.0f);
 	void Stop(const char* pName);
+	bool IsEnd(const char* pName) const;
 	
 	virtual GameMessageResult Update(GameMessage message, const void* param) override;
 
@@ -42,6 +43,7 @@ public:
 		eState_Play,
 		eState_Pause,
 		eState_Stop,
+		eState_End,
 		eState_Max
 	};
 
@@ -61,6 +63,7 @@ public:
 	void Pause(){ m_State = eState_Pause; }
 
 	bool IsPlay() const{ return m_State == eState_Play; }
+	bool IsEnd() const { return m_State == eState_End; }
 	float GetTime() const{ return m_Time; }
 	float GetMaxTime() const{ return m_MaxTime; }
 	float GetRatio() const{ assert(m_MaxTime > 0.0f); return m_Time / m_MaxTime; }
@@ -68,7 +71,10 @@ public:
 	void SetSpeed(float fSpeed) { m_fSpeed = fSpeed; }
 
 protected:
-	virtual void update(const float fDeltaTime){ m_Time += fDeltaTime * m_fSpeed; }
+	virtual void update(const float fDeltaTime){
+		if(m_Time >= m_MaxTime){ m_State = eState_End; }
+		m_Time = std::min(m_Time + fDeltaTime * m_fSpeed, m_MaxTime);
+	}
 	EntityBase* GetEntityBase() const{ return m_pEntityBase; }
 
 private:
@@ -89,11 +95,33 @@ public:
 	SimpleOpenAnimation(float fDefaultScale = 1.0f, float fOverScale = 1.2f, float fMaxTime = 0.15f);
 	virtual ~SimpleOpenAnimation();
 
-public:
+protected:
 	void update(const float fDeltaTime) override;
 
 private:
 	float m_fDefaultScale;
 	float m_fOverScale;
+};
+
+class LinearAnimation : public AnimationBase
+{
+	typedef AnimationBase Super;
+public:
+	LinearAnimation(
+			std::pair<float, float>&& scale,
+			std::pair<float, float>&& rotZ,
+			std::pair<VEC3, VEC3>&& pos,
+			std::pair<float, float>&& alpha,
+			float fMaxTime = 0.2f);
+	virtual ~LinearAnimation();
+
+protected:
+	void update(const float fDeltaTaime) override;
+
+private:
+	std::pair<float, float> m_LinearScale;
+	std::pair<float, float> m_LinearRotZ;
+	std::pair<VEC3, VEC3> m_LinearPos;
+	std::pair<float, float> m_LinearAlpha;
 };
 #endif

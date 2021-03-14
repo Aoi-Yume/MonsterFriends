@@ -14,10 +14,6 @@ class AppItemList : public Singleton<AppItemList>
 {
 	USE_SINGLETON(AppItemList)
 public:
-	enum {
-		eItemList_Max = 10
-	};
-
 	struct ItemInfo {
 		std::string name;
 		std::string useType;
@@ -25,12 +21,14 @@ public:
 		int nCost;
 		std::string explain;
 		std::string skillName;
+		int nAppearVal;
 	};
 	
 public:
 	void Load();
 	const ItemInfo& GetItemInfo(int nIdx) const;
 	int GetItemNoFromName(const char* pName) const;
+	int GetItemListSize() const { return m_aItemInfo.size(); }
 
 	bool IsUsePossible(int nIdx, int nPlayerId) const;
 

@@ -13,6 +13,7 @@
 #include <FadeCtrl.h>
 #include <SceneManager.h>
 #include <Character.h>
+#include <PlayerNotice.h>
 #include <../Net/TransferManager.h>
 #include <../Net/TransferGameInfo.h>
 #include <../Net/TransferTouchInfo.h>
@@ -92,6 +93,8 @@ namespace {
 				m_nPlayer++;
 				if(m_nPlayer >= TransferManager::Get()->GetConnectNum() + 1){
 					m_nNextStep = 4;
+					p->m_pPlayerNotice->SetVisible(true);
+					p->m_pPlayerNotice->Open(false);
 				}
 				else {
 					m_nNextStep = 0;
@@ -147,6 +150,7 @@ SceneResult::SceneResult()
 : SceneBase("Reult")
 , m_pBgImage(nullptr)
 , m_CharaInfo()
+, m_pPlayerNotice(nullptr)
 , m_pStateManager(nullptr)
 , m_aBtnManager()
 {
@@ -161,6 +165,7 @@ SceneResult::~SceneResult()
 	for(int i = 0; i < NET_CONNECT_MAX; ++i) {
 		delete m_CharaInfo[i].pChara;
 	}
+	delete m_pPlayerNotice;
 	delete m_pStateManager;
 	for(auto& it : m_aBtnManager) {
 		delete it;
@@ -224,6 +229,10 @@ void SceneResult::SceneSetup() {
 			pEntity->SetPosition(0, 128, 0);
 			m_CharaInfo[i].pChara->SetPosition(fStartX + (float)(i + 1) * fAddX, -200.0f, 0);
 		}
+	}
+	{
+		m_pPlayerNotice = new PlayerNotice(PlayerNotice::eNoticeType_Winner, AppParam::Get()->GetNetworkInfo().nCurrentPlayerId);
+		m_pPlayerNotice->Update(eGameMessage_Setup, nullptr);
 	}
 	{
 		m_pStateManager = new StateManager(eState_Max);
@@ -296,6 +305,7 @@ void SceneResult::EntityUpdate(GameMessage message, const void* param)
 		for(int i = 0; i < NET_CONNECT_MAX; ++i) {
 			m_CharaInfo[i].pChara->Update(message, param);
 		}
+		m_pPlayerNotice->Update(message, param);
 		for(auto& it : m_aBtnManager) {
 			it->Update(message, param);
 		}

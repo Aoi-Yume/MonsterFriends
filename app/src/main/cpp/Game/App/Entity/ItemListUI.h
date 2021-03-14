@@ -40,14 +40,17 @@ public:
 	void Reset();
 
 	void AddItemNo(int nNo);
+	void ChangeItemNo(int nIdx, int nNo);
 	void ClearItemNo();
 	int GetSelectItemNo() const;
+	int GetCurrentItemIdx() const;
+	int GetRegisterItemNum() const { return m_aItemNo.size(); }
 
 private:
 	void updateItemButton();
 
 private:
-	int m_nCurrentItemNo;
+	int m_nCurrentItemIdx;
 	int m_nSelectItemNo;
 	std::vector<int>	m_aItemNo;
 	std::vector<ButtonManager*> m_aButtonManager;

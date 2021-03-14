@@ -101,18 +101,20 @@ bool Entity::CreateTextImageComponent(Entity* pEntity, const char* pText, int nF
 	return true;
 }
 
-bool Entity::CreateLayoutComponent(Entity* pEntity, const char* pResPath)
+LayoutComponent* Entity::CreateLayoutComponent(Entity* pEntity, const char* pResPath)
 {
 //    DEBUG_LOG("Create Layout Component");
     CreateTransformComponent(pEntity);
 
-	if( pEntity->m_pComponent[eComponentKind_Layout] ){ return false; }
+	if( pEntity->m_pComponent[eComponentKind_Layout] ){
+		return reinterpret_cast<LayoutComponent*>(pEntity->m_pComponent[eComponentKind_Layout]);
+	}
 	
 	LayoutComponent* pComponent = new LayoutComponent(pEntity);
 	pComponent->SetResPath(pResPath);
 	
 	pEntity->m_pComponent[eComponentKind_Layout] = pComponent;
-	return true;
+	return pComponent;
 }
 
 bool Entity::CreateTransformComponent(Entity* pEntity)

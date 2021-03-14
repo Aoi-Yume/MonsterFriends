@@ -15,10 +15,8 @@ AppParam::AppParam()
 {
 	DEBUG_LOG("Create AppParam");
 	m_CharaInfo.nKizunaPoint = 100;
-	m_CharaInfo.uItemNum[3] = 2;
 	for(int i = 0; i < NET_CONNECT_MAX; ++i){
 		m_NetworkGameInfo.CharaInfo[i].nKizunaPoint = 100;
-		m_NetworkGameInfo.CharaInfo[i].uItemNum[3] = 2;
 	}
 }
 

@@ -28,7 +28,7 @@ void AppItemList::Load()
 	std::vector<std::string>	aSplitText;
 	Util::SplitCSVText(aSplitText, str);
 
-	const int nParamNum = 6;
+	const int nParamNum = 7;
 	m_aItemInfo.resize(aSplitText.size() / nParamNum);
 	assert(aSplitText.size() % nParamNum == 0);
 	for(int i = 0; i < aSplitText.size(); ++i){
@@ -38,15 +38,16 @@ void AppItemList::Load()
 		if(nParamNo == 0){ info.name = aSplitText[i]; }
 		if(nParamNo == 1){ info.useType = aSplitText[i]; }
 		else if(nParamNo == 2){ info.fileName = aSplitText[i]; }
-		else if(nParamNo == 3){ info.nCost = atoi(aSplitText[i].c_str()); }
+		else if(nParamNo == 3){ info.nCost = std::stoi(aSplitText[i]); }
 		else if(nParamNo == 4){ info.explain = aSplitText[i]; }
 		else if(nParamNo == 5){ info.skillName = aSplitText[i]; }
+		else if(nParamNo == 6){ info.nAppearVal = std::stoi(aSplitText[i]); }
 	}
 	for(int i = 0; i < m_aItemInfo.size(); ++i) {
 		auto& it = m_aItemInfo[i];
-		DEBUG_LOG_A("ItemNo[%d]：[%s][%s][%s][%d][%s][%s]\n",
+		DEBUG_LOG_A("ItemNo[%d]：[%s][%s][%s][%d][%s][%s][%d]\n",
 				i + 1, it.name.c_str(), it.useType.c_str(), it.fileName.c_str(), it.nCost,
-				it.explain.c_str(), it.skillName.c_str());
+				it.explain.c_str(), it.skillName.c_str(), it.nAppearVal);
 	}
 }
 

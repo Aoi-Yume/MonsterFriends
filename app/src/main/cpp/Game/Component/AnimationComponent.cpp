@@ -8,6 +8,7 @@
 #include "TransformComponent.h"
 #include "Entity.h"
 #include "vector"
+#include "DrawComponent.h"
 
 //==========================================
 //==========================================
@@ -48,6 +49,14 @@ void AnimationComponent::Stop(const char* pName)
 {
 	if(m_aAnimation.find(pName) == m_aAnimation.end()){ return; }
 	m_aAnimation[pName]->Stop();
+}
+
+//------------------------------------------
+//------------------------------------------
+bool AnimationComponent::IsEnd(const char* pName) const
+{
+	if(m_aAnimation.find(pName) == m_aAnimation.end()){ return false; }
+	return m_aAnimation.at(pName)->IsEnd();
 }
 
 //------------------------------------------
@@ -124,6 +133,52 @@ void SimpleOpenAnimation::update(const float fDeltaTime)
 	const float fDefaultRatio = std::min(std::max(fBaseRatio - 0.8f, 0.0f) / 0.2f, 1.0f);
 	const float fScale = m_fOverScale * fOverRatio * (1.0f - fDefaultRatio) + m_fDefaultScale * fDefaultRatio;
 	transform->SetScale({fScale, fScale, fScale});
+
+	Super::update(fDeltaTime);
+}
+
+//==========================================
+//==========================================
+LinearAnimation::LinearAnimation(
+	std::pair<float, float>&& scale,
+	std::pair<float, float>&& rotZ,
+	std::pair<VEC3, VEC3>&& pos,
+	std::pair<float, float>&& alpha,
+	float fMaxTime)
+	: Super(fMaxTime)
+	, m_LinearScale(std::forward<std::pair<float, float>>(scale))
+	, m_LinearRotZ(std::forward<std::pair<float, float>>(rotZ))
+	, m_LinearPos(std::forward<std::pair<VEC3, VEC3>>(pos))
+	, m_LinearAlpha(std::forward<std::pair<float, float>>(alpha))
+{
+}
+
+//------------------------------------------
+//------------------------------------------
+LinearAnimation::~LinearAnimation()
+{
+}
+
+//------------------------------------------
+//------------------------------------------
+void LinearAnimation::update(const float fDeltaTime)
+{
+	auto transform = reinterpret_cast<TransformComponent*>(GetEntityBase()->GetComponent(eComponentKind_Transform));
+	auto draw = reinterpret_cast<DrawComponent*>(GetEntityBase()->GetComponent(eComponentKind_Layout));
+	const float fBaseRatio = GetRatio();
+	const float fScale = Lerp(m_LinearScale.first, m_LinearScale.second,  fBaseRatio);
+	transform->SetScale({fScale, fScale, fScale});
+
+	const auto& rot = transform->GetRotate();
+	const float fRotZ = Lerp(m_LinearRotZ.first, m_LinearRotZ.second, fBaseRatio);
+	transform->SetRotate({rot.GetX(), rot.GetY(), DEGTORAD(fRotZ)});
+
+	const auto& pos = Lerp(m_LinearPos.first, m_LinearPos.second, fBaseRatio);
+	transform->SetTranslate(pos);
+
+	const auto& color = draw->GetColor();
+	const float alpha = Lerp(m_LinearAlpha.first, m_LinearAlpha.second, fBaseRatio);
+	draw->SetColor({color.GetX(), color.GetY(), color.GetZ(), alpha});
 
 	Super::update(fDeltaTime);
 }

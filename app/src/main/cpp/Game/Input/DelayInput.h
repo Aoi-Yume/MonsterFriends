@@ -72,6 +72,7 @@ private:
 	uint8_t  m_uState;
 	float m_fDelay;
 	float m_fCurrentTime;
+	float m_FLastDeltaTime;
 	std::deque<DelayTouchInfo>		m_aTouchInputInfo[NET_CONNECT_MAX];
 };
 

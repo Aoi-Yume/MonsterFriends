@@ -35,6 +35,9 @@ public:
 	void EntityUpdate(GameMessage message, const void* param) override;
 
 private:
+	void setNewItem(int nIdx);
+
+private:
 	enum {
 		eStep_SelectItemWait,
 		eStep_ShowDetail,
@@ -57,11 +60,6 @@ private:
 		eBtnManager_Back,
 	};
 	enum {
-		eBtn_Item_01 = 0,
-		eBtn_Item_02,
-		eBtn_Item_03,
-		eBtn_Item_Max,
-
 		eBtn_Buy = 0,
 		eBtn_BuyCancel,
 
@@ -69,7 +67,6 @@ private:
 	};
 
 	int 				m_nStep;
-	int 				m_nItemNo[eBtn_Item_Max];
 	MessageWindow* 		m_pMessageWindow;
 	InformationPlate*	m_pInformationPlate;
 	ItemListUI*			m_pItemListUI;

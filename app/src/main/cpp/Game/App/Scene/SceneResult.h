@@ -17,6 +17,7 @@ class StateManager;
 class ComponentBase;
 class Character;
 class MessageWindow;
+class PlayerNotice;
 
 //==========================================
 //==========================================
@@ -54,6 +55,7 @@ public:
 		Character *pChara;
 	};
 	CharaInfo	m_CharaInfo[NET_CONNECT_MAX];
+	PlayerNotice*	m_pPlayerNotice;
 
 	StateManager*	m_pStateManager;
 	std::vector<ButtonManager*>	m_aBtnManager;

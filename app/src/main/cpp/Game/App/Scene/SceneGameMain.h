@@ -21,6 +21,7 @@ class MessageWindow;
 class Adv;
 class Shop;
 class UseItem;
+class PlayerNotice;
 
 //==========================================
 //==========================================
@@ -68,6 +69,7 @@ public:
 	Adv*		m_pAdv;
 	Shop*		m_pShop;
 	UseItem*	m_pUseItem;
+	PlayerNotice*		m_pPlayerNotice;
 
 	InformationPlate* m_pInformationPlate;
 	MessageWindow* m_pMessageWindow;
