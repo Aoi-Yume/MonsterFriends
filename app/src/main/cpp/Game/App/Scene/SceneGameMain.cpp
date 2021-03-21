@@ -45,6 +45,8 @@ namespace {
 				auto p = reinterpret_cast<SceneGameMain *>(pUserPtr);
 				p->m_pPlayerNotice->SetVisible(true);
 				p->m_pPlayerNotice->Open(true, 1.0f);
+				// スキル更新
+				SKILL_LIST()->UpdateSkill(AppParam::Get()->GetNetworkInfo().nCurrentPlayerId, AppSkillList::eSkillTiming_SelfTurn);
 			}
 		}
 	};

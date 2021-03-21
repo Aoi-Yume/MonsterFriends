@@ -177,6 +177,7 @@ void UseItem::GameEntityUpdate(const void* param)
 		if(bUsePossible) {
 			AppParam::Get()->SubItem(nPlayer, nSelectItemNo, 1);
 		}
+		// スキル使用設定
 		const char* pSkillName = AppItemList::Get()->GetItemInfo(nSelectItemNo).skillName.c_str();
 		const int nSkillNo = SKILL_LIST()->GetSkillNoFromSkillName(pSkillName);
 		SKILL_LIST()->BeginItemSkill(nPlayer, nSkillNo);
@@ -189,6 +190,9 @@ void UseItem::GameEntityUpdate(const void* param)
 				pManager->GetTransfer<TransferSkillInfo>(
 						TransferManager::eTransferKind_SkillInfo)->Dump();
 			}
+			const int nPlayer = AppParam::Get()->GetNetworkInfo().nCurrentPlayerId;
+			// スキル使用更新
+			SKILL_LIST()->UpdateSkill(nPlayer, AppSkillList::eSkillTiming_Now);
 			m_nStep = eStep_Reset;
 		}
 	}

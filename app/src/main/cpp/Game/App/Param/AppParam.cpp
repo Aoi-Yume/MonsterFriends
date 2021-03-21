@@ -158,6 +158,83 @@ bool AppParam::IsClear() const {
 	return m_NetworkGameInfo.bClear;
 }
 
+void AppParam::SetUseSkillInfo(int nNo, int nDuration, int nParam, int nSendPlayer, int nTargetPlayer)
+{
+	assert(nNo >= 0 && nNo < AppSkillList::eSkillList_Max);
+
+	// 接続完了している時は通信用情報を更新
+	auto pManager = TransferManager::Get();
+	if(pManager->IsConnectSucess()) {
+		auto &skillInfo = m_NetworkGameInfo.CharaInfo[nSendPlayer].useSkill[nNo];
+		skillInfo.bEnable = true;
+		skillInfo.Duration = nDuration;
+		skillInfo.Param = nParam;
+		skillInfo.SendPlayer = nSendPlayer;
+		skillInfo.TargetPlayer = nTargetPlayer;
+
+		// プレイヤーIDが自身のIDなら自分用も更新
+		const int nNetPlayerId = pManager->GetPlayerIdFromNetId(pManager->GetSelfConnect().Id.c_str());
+		if(nNetPlayerId == nSendPlayer){
+			m_CharaInfo.useSkill[nNo] = skillInfo;
+		}
+	}
+	// 接続できていない時はプレイヤーIDが０の時だけ更新
+	else if(nSendPlayer == 0){
+		auto &skillInfo = m_CharaInfo.useSkill[nNo];
+		skillInfo.bEnable = true;
+		skillInfo.Duration = nDuration;
+		skillInfo.Param = nParam;
+		skillInfo.SendPlayer = nSendPlayer;
+		skillInfo.TargetPlayer = nTargetPlayer;
+	}
+}
+
+const AppParam::UseSkillInfo* AppParam::GetUseSkillInfo(int nPlayerId) const
+{
+	// 接続完了している時は通信用情報から取得
+	auto pManager = TransferManager::Get();
+	if(pManager->IsConnectSucess()) {
+		return m_NetworkGameInfo.CharaInfo[nPlayerId].useSkill;
+	}
+	// 接続できていない時は自身の情報から取得
+	return m_CharaInfo.useSkill;
+}
+
+void AppParam::UpdateSkillDuration(int nNo, int nPlayerId)
+{
+	// 接続完了している時は通信用情報を更新
+	auto pManager = TransferManager::Get();
+	if(pManager->IsConnectSucess()) {
+		auto& skillInfo = m_NetworkGameInfo.CharaInfo[nPlayerId].useSkill[nNo];
+		if(skillInfo.Duration < 0){ return; }	// 無限継続
+		skillInfo.Duration--;
+		if(skillInfo.Duration == 0){ skillInfo.bEnable = false; }
+
+		// プレイヤーIDが自身のIDなら自分用も更新
+		const int nNetPlayerId = pManager->GetPlayerIdFromNetId(pManager->GetSelfConnect().Id.c_str());
+		if(nNetPlayerId == nPlayerId){
+			m_CharaInfo.useSkill[nNo] = skillInfo;
+		}
+	}
+	// 接続できていない時はプレイヤーIDが０の時だけ更新
+	else if(nPlayerId == 0) {
+		auto& skillInfo = m_CharaInfo.useSkill[nNo];
+		if (skillInfo.Duration < 0) { return; }    // 無限継続
+		skillInfo.Duration--;
+		if (skillInfo.Duration == 0) { skillInfo.bEnable = false; }
+	}
+}
+
+void AppParam::DumpUseSkillInfo(int nPlayerId)
+{
+	auto pUseSkill = GetUseSkillInfo(nPlayerId);
+	for(int i = 0; i < AppSkillList::eSkillList_Max; ++i){
+		auto& skill = AppSkillList::Get()->GetSkillInfo(i);
+		DEBUG_LOG_A("[%d][%s]:[%d][%d][%d][%d][%d]\n",
+				i + 1, skill.name.c_str(), pUseSkill[i].bEnable, pUseSkill[i].Duration, pUseSkill[i].Param, pUseSkill[i].SendPlayer, pUseSkill[i].TargetPlayer);
+	}
+}
+
 AppParam::GameNetworkInfo& AppParam::GetNetworkInfo()
 {
 	return m_NetworkGameInfo;
@@ -185,3 +262,4 @@ void AppParam::DumpNetworkSkillInfo()
 	DEBUG_LOG_A("Duration[%d]\n", m_NetworkSkillInfo.Duration);
 	DEBUG_LOG_A("Param[%d]\n", m_NetworkSkillInfo.Param);
 }
+

@@ -8,6 +8,7 @@
 
 #include "../Engine/Engine.h"
 #include <Singleton.h>
+#include <AppSkillList.h>
 
 class AppParam : public Singleton<AppParam>
 {
@@ -17,6 +18,14 @@ public:
 		eItemKind_Max = 10
 	};
 
+	struct UseSkillInfo {
+		bool bEnable;
+		int Duration;
+		int Param;
+		int SendPlayer;
+		int TargetPlayer;
+	};
+
 	struct GameNetworkInfo {
 		bool bClear;
 		int8_t  nCurrentPlayerId;
@@ -24,6 +33,7 @@ public:
 		struct CharaInfo {
 			int 	nKizunaPoint;
 			uint8_t uItemNum[eItemKind_Max];
+			UseSkillInfo useSkill[AppSkillList::eSkillList_Max];
 		};
 		CharaInfo	CharaInfo[NET_CONNECT_MAX];
 	};
@@ -32,6 +42,7 @@ public:
 		char cCharaName[32];
 		int 	nKizunaPoint;
 		uint8_t uItemNum[eItemKind_Max];
+		UseSkillInfo useSkill[AppSkillList::eSkillList_Max];
 	};
 
 	struct SkillNetworkInfo {
@@ -59,12 +70,16 @@ public:
 	void SetClear(bool bClear);
 	bool IsClear() const;
 
+	void SetUseSkillInfo(int nNo, int nDuration, int nParam, int nSendPlayer, int nTargetPlayer);
+	const UseSkillInfo* GetUseSkillInfo(int nPlayerId) const;
+	void UpdateSkillDuration(int nNo, int nPlayerId);
+	void DumpUseSkillInfo(int nPlayerId);
+
 	GameNetworkInfo& GetNetworkInfo();
 	void DumpNetworkInfo();
 
 	SkillNetworkInfo& GetSkillInfo();
 	void DumpNetworkSkillInfo();
-
 private:
 	CharacterInfo 		m_CharaInfo;
 	GameNetworkInfo		m_NetworkGameInfo;

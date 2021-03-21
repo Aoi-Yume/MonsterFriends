@@ -8,7 +8,7 @@
 
 #include "../Engine/Engine.h"
 #include <Singleton.h>
-#include <vector>
+#include <array>
 
 class AppSkillList : public Singleton<AppSkillList>
 {
@@ -18,20 +18,19 @@ public:
 		eSkillList_Max = 10
 	};
 
+	enum SkillTiming{
+		eSKillTiming_None,
+		eSkillTiming_Now,
+		eSkillTiming_SelfTurn,
+	};
+
 	struct SkillInfo {
 		std::string name;
 		std::string Type;
+		std::string Timing;
 		int Duration;
 		int minParam;
 		int maxParam;
-	};
-
-	struct UpdateSkillInfo{
-		std::string Type;
-		int nSendPlayer;
-		int nTargetPlayer;
-		int Duration;
-		int nParam;
 	};
 
 public:
@@ -45,13 +44,16 @@ public:
 	void BeginItemSkill(int nPlayer, int nSkillNo);
 	bool IsEndItemSkill() const;
 
-	void UpdateSkill(const UpdateSkillInfo& info);
+	void UpdateSkill(int nPlayer, SkillTiming timing);
 
 private:
-	void sendNetSkillInfo(int nSkillNo, const UpdateSkillInfo& info);
+	void sendNetSkillInfo(int nSkillNo, int nDuration, int nParam, int nSendPlayer, int nTargetPlayer);
+
+	int getSkillParam(int nSkillNo, int nPlayer) const;
+	int getSkillTiming(const char* str) const;
 
 private:
-	std::vector<SkillInfo>	m_aSkillInfo;
+	std::array<SkillInfo, eSkillList_Max>	m_aSkillInfo;
 };
 
 #define SKILL_LIST() AppSkillList::Get()
