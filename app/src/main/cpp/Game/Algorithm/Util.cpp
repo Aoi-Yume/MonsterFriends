@@ -37,7 +37,7 @@ namespace Util {
 					continue;
 				}
 			}
-			if (splitText.size() > 0) {
+			if (!splitText.empty()) {
 				aSplitText.emplace_back(splitText);
 			}
 		}

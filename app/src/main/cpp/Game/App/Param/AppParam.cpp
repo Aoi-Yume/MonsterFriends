@@ -235,6 +235,13 @@ void AppParam::DumpUseSkillInfo(int nPlayerId)
 	}
 }
 
+int AppParam::GetDiceNum(int nPlayer) const
+{
+	const int nSkillNo = AppSkillList::Get()->GetSkillNoFromSkillName("サイコロプラス");
+	auto pUseSkill = GetUseSkillInfo(nPlayer);
+	return pUseSkill[nSkillNo].Param + 1;
+}
+
 AppParam::GameNetworkInfo& AppParam::GetNetworkInfo()
 {
 	return m_NetworkGameInfo;

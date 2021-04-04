@@ -315,7 +315,8 @@ void SceneGameMain::SceneSetup() {
 		m_pPlayerNotice->Update(eGameMessage_Setup, nullptr);
 	}
 	{
-		m_pChara = new Character(Character::CHARA_ID::eCHARA_01);
+		// TODO プレイヤーキャラ設定
+		m_pChara = new Character(0);
 		m_pChara->Update(eGameMessage_Setup, nullptr);
 		m_pChara->SetPosition(0, -150.0f, 0);
 	}

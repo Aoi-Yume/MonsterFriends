@@ -146,8 +146,7 @@ void MessageWindow::updatePosition()
 {
 	float fCurrentY = (float)(m_nCurrentUseLine / 2) * 40.0f * m_fTextScale;
 	for(int i = 0; i < m_nCurrentUseLine; ++i){
-		auto pChild = reinterpret_cast<Entity*>(GetChild(i));
-		pChild->SetPosition(VEC3(0, fCurrentY, 0));
+		GetChild(i)->SetPosition(VEC3(0, fCurrentY, 0));
 		fCurrentY -= 40.0f * m_fTextScale;
 	}
 }

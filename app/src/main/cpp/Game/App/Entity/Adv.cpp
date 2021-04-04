@@ -13,7 +13,9 @@
 #include <Dice.h>
 #include <SceneManager.h>
 #include <AppParam.h>
+#include <AppCharaList.h>
 #include <Button/ButtonManager.h>
+#include <Random.h>
 
 //------------------------------------------
 //------------------------------------------
@@ -24,8 +26,8 @@ Adv::Adv()
 	, m_nStepCnt(0)
 	, m_nSubStep(0)
 	, m_nSubStepCnt(0)
-	, m_Chara()
-	, m_Enemy()
+	, m_pChara(nullptr)
+	, m_pEnemy(nullptr)
 	, m_pBtnManager(nullptr)
 	, m_pMessageWindow(nullptr)
 {
@@ -36,10 +38,8 @@ Adv::Adv()
 //------------------------------------------
 Adv::~Adv()
 {
-	// m_pCharaのpCharaは外部参照
-	delete m_Chara.pDice;
-	delete m_Enemy.pChara;
-	delete m_Enemy.pDice;
+	// m_pCharaは外部参照
+	delete m_pEnemy;
 	delete m_pBtnManager;
 }
 
@@ -48,17 +48,15 @@ Adv::~Adv()
 void Adv::Open()
 {
 	{
-		m_Chara.pChara->SetPosition(-350.0f, -150.0f, 0);
-		m_Chara.pDice->InVisible();
-		m_Chara.prePos = m_Chara.pChara->GetPosition();
-		m_Chara.pDice->SetPosition(VEC3(-350.0f, 90.0f, 0));
+		m_pChara->SetPosition(-350.0f, -150.0f, 0);
+		m_pChara->InVisibleDice();
+//		m_Chara.prePos = m_Chara.pChara->GetPosition();
 	}
 	{
-		m_Enemy.pChara->SetPosition(350.0f, -150.0f, 0);
-		m_Enemy.pChara->SetScale(VEC3(-1.0f, 1.0f, 1.0f));
-		m_Enemy.pChara->SetVisible(true);
-		m_Enemy.pDice->InVisible();
-		m_Enemy.pDice->SetPosition(VEC3(350.0f, 90.0f, 0));
+		m_pEnemy->SetPosition(350.0f, -150.0f, 0);
+		m_pEnemy->SetScale(VEC3(-1.0f, 1.0f, 1.0f));
+		m_pEnemy->SetVisible(true);
+		m_pEnemy->InVisibleDice();
 	}
 	{
 		auto pBtn = m_pBtnManager->GetButton(0);
@@ -71,7 +69,9 @@ void Adv::Open()
 	}
 	{
 		m_pMessageWindow->SetTextScale(1.5f);
-		m_pMessageWindow->SetDirectMessage("敵のスライムが現れた！");
+		char message[128];
+		std::snprintf(message, sizeof(message), "敵の%sが現れた！", AppCharaList::Get()->GetCharaInfo(m_pEnemy->GetCharaId()).name.c_str());
+		m_pMessageWindow->SetDirectMessage(message);
 		m_pMessageWindow->SetVisible(true);
 		m_pMessageWindow->SetControlPlayerId(AppParam::Get()->GetNetworkInfo().nCurrentPlayerId);
 	}
@@ -86,10 +86,10 @@ void Adv::Open()
 //------------------------------------------
 void Adv::Close()
 {
-	m_Chara.pChara->SetPosition(m_Chara.prePos);
-	m_Chara.pDice->InVisible();
-	m_Enemy.pChara->SetVisible(false);
-	m_Enemy.pDice->InVisible();
+//	m_Chara.pChara->SetPosition(m_Chara.prePos);
+	m_pChara->InVisibleDice();
+	m_pEnemy->SetVisible(false);
+	m_pEnemy->InVisibleDice();
 	m_pBtnManager->SetVisible(false);
 	m_pBtnManager->Reset();
 	m_pBtnManager->Lock();
@@ -108,7 +108,7 @@ bool Adv::IsEnd() const
 //------------------------------------------
 void Adv::SetCharacter(Character* pChara)
 {
-	m_Chara.pChara = pChara;
+	m_pChara = pChara;
 }
 
 //------------------------------------------
@@ -125,19 +125,11 @@ void Adv::GameEntitySetup(const void* param) {
 	DEBUG_LOG("Adv Call Setup");
 
 	{
-		m_Chara.pDice = new Dice();
-		m_Chara.pDice->Update(eGameMessage_Setup, nullptr);
-		m_Chara.pDice->InVisible();
-	}
-	{
-		// TODO 敵をランダム設定
-		m_Enemy.pChara = new Character(Character::eCHARA_01);
-		m_Enemy.pChara->Update(eGameMessage_Setup, nullptr);
-		m_Enemy.pChara->SetVisible(false);
-
-		m_Enemy.pDice = new Dice();
-		m_Enemy.pDice->Update(eGameMessage_Setup, nullptr);
-		m_Enemy.pDice->InVisible();
+		const int nEnemyNo = Random::GetSyncInt(0, AppCharaList::Get()->GetCharaListSize() - 1);
+		m_pEnemy = new Character(nEnemyNo);
+		m_pEnemy->SetCom(true);
+		m_pEnemy->Update(eGameMessage_Setup, nullptr);
+		m_pEnemy->SetVisible(false);
 	}
 	{
 		m_pBtnManager = new ButtonManager();
@@ -179,9 +171,7 @@ void Adv::EntityUpdate(GameMessage message, const void* param)
 	Super::EntityUpdate(message, param);
 
 	if(message != eGameMessage_Setup) {
-		m_Enemy.pChara->Update(message, param);
-		m_Chara.pDice->Update(message, param);
-		m_Enemy.pDice->Update(message, param);
+		m_pEnemy->Update(message, param);
 		m_pBtnManager->Update(message, param);
 	}
 }
@@ -223,71 +213,81 @@ void Adv::updateBattleStep()
 		pBtn->SetVisible(true);
 		pBtn->Enable();
 		m_pBtnManager->Reset();
-//		Engine::GetEngine()->ResetTouchEvent();
-		m_Chara.pDice->SetVisible(0, true);
-		m_Chara.pDice->StartDice();
-		m_Enemy.pDice->SetVisible(0, true);
-		m_Enemy.pDice->StartDice();
+		m_pChara->SetUseDice(AppParam::Get()->GetDiceNum(AppParam::Get()->GetNetworkInfo().nCurrentPlayerId));
+		m_pChara->ResetStopDice();
+		m_pChara->BeginDice();
+		const int nEnemyDice = AppCharaList::Get()->GetCharaInfo(m_pEnemy->GetCharaId()).nDice;
+		m_pEnemy->SetUseDice(nEnemyDice);
+		m_pEnemy->ResetStopDice();
+		m_pEnemy->BeginComDice();
 		m_nSubStep = 1;
 	}
 	else if(m_nSubStep == 1){
 		if(m_pBtnManager->GetDecide() == 0){
-			auto pBtn = m_pBtnManager->GetButton(0);
-			pBtn->SetVisible(false);
-			pBtn->Disable();
-			m_pBtnManager->Reset();
-			m_Chara.pDice->StopDice();
-			m_Enemy.pDice->StopDice();
+			m_pChara->StopDice();
 			m_nSubStep = 2;
 		}
 	}
 	else if(m_nSubStep == 2){
-		if(m_nSubStepCnt >= 60){
-			const auto chDice = m_Chara.pDice->GetDice();
-			const auto eneDice = m_Enemy.pDice->GetDice();
-			char cText[256];
-			if(chDice > eneDice) {
-				snprintf(cText, sizeof(cText), "%d対%dできみの勝ち！", chDice, eneDice);
+		if(!m_pChara->IsStopDiceState()) {
+			if (!m_pChara->IsEndDice()) {
+				m_pBtnManager->Reset();
+				m_nSubStep = 1;
+			} else {
+				auto pBtn = m_pBtnManager->GetButton(0);
+				pBtn->SetVisible(false);
+				pBtn->Disable();
+				m_pBtnManager->Reset();
+				m_nSubStep = 3;
 			}
-			else if(chDice < eneDice){
-				snprintf(cText, sizeof(cText), "%d対%dできみの負け！", chDice, eneDice);
+		}
+	}
+	else if(m_nSubStep == 3){
+		if(m_nSubStepCnt >= 60 && m_pEnemy->IsEndDice()){
+			const int nCharaDice = m_pChara->GetDiceSumVal();
+			const int nEnemyDice = m_pEnemy->GetDiceSumVal();
+			char cText[256];
+			if(nCharaDice > nEnemyDice) {
+				snprintf(cText, sizeof(cText), "%d対%dできみの勝ち！", nCharaDice, nEnemyDice);
+			}
+			else if(nCharaDice < nEnemyDice){
+				snprintf(cText, sizeof(cText), "%d対%dできみの負け！", nCharaDice, nEnemyDice);
 			}
 			else {
-				snprintf(cText, sizeof(cText), "%d対%dで引き分け！　もう一度勝負！", chDice, eneDice);
+				snprintf(cText, sizeof(cText), "%d対%dで引き分け！　もう一度勝負！", nCharaDice, nEnemyDice);
 			}
 			cText[sizeof(cText) - 1] = '\0';
 			m_pMessageWindow->SetDirectMessage(cText);
 			m_pMessageWindow->SetVisible(true);
-//			Engine::GetEngine()->ResetTouchEvent();
-			m_nSubStep = 3;
+			m_nSubStep = 4;
 		}
 	}
-	else if(m_nSubStep == 3){
+	else if(m_nSubStep == 4){
 		if(m_pMessageWindow->IsNextMessage()) {
-			const int nCharaDice = m_Chara.pDice->GetDice();
-			const int nEnemyDice = m_Enemy.pDice->GetDice();
+			const int nCharaDice = m_pChara->GetDiceSumVal();
+			const int nEnemyDice = m_pEnemy->GetDiceSumVal();
 			if(nCharaDice == nEnemyDice) {
 				m_nSubStep = 0;
 				m_pMessageWindow->SetVisible(false);
-				m_Chara.pDice->ResetStopDice();
-				m_Enemy.pDice->ResetStopDice();
 			}
 			else if (nCharaDice > nEnemyDice){
-				m_nSubStep = 4;
+				m_nSubStep = 5;
 			}
 			else {
 				m_nNextStep = eSTEP_END;
 			}
 		}
 	}
-	else if(m_nSubStep == 4){
-		// TODO キズナ値調整
-		m_pMessageWindow->SetDirectMessage("キズナが10増えた！");
-		AppParam::Get()->AddKizunaPoint(AppParam::Get()->GetNetworkInfo().nCurrentPlayerId, 10);
-//		Engine::GetEngine()->ResetTouchEvent();
-		m_nSubStep = 5;
-	}
 	else if(m_nSubStep == 5){
+		const int nGetPoint = AppCharaList::Get()->GetCharaInfo(m_pEnemy->GetCharaId()).nGetPoint;
+		char message[128];
+		std::snprintf(message, sizeof(message), "キズナが%d増えた！", nGetPoint);
+		m_pMessageWindow->SetDirectMessage(message);
+		AppParam::Get()->AddKizunaPoint(AppParam::Get()->GetNetworkInfo().nCurrentPlayerId, nGetPoint);
+//		Engine::GetEngine()->ResetTouchEvent();
+		m_nSubStep = 6;
+	}
+	else if(m_nSubStep == 6){
 		if(m_pMessageWindow->IsNextMessage()) {
 			m_nNextStep = eSTEP_END;
 		}

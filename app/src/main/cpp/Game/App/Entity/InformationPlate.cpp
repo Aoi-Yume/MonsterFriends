@@ -78,7 +78,7 @@ void InformationPlate::UpdatePlate()
 {
 	const int nCurrentPlayerId = AppParam::Get()->GetNetworkInfo().nCurrentPlayerId;
 	{
-		Entity* pChild = reinterpret_cast<Entity*>(GetChild(eChild_Name));
+		Entity* pChild = GetChild(eChild_Name);
 		auto pText = (TextImageComponent *) pChild->GetComponent(eComponentKind_Layout);
 		const char* pName = nullptr;
 		if(TransferManager::Get()->IsConnectSucess()) {
@@ -90,7 +90,7 @@ void InformationPlate::UpdatePlate()
 		pText->SetText(pName);
 	}
 	{
-		Entity* pChild = reinterpret_cast<Entity*>(GetChild(eChild_Point));
+		Entity* pChild = GetChild(eChild_Point);
 		auto pText = (TextImageComponent *) pChild->GetComponent(eComponentKind_Layout);
 		char pointStr[64];
 		std::snprintf(pointStr, sizeof(pointStr), "%d", AppParam::Get()->GetKizunaPoint(nCurrentPlayerId));

@@ -71,9 +71,9 @@ void Shop::SetVisible(bool bVisible)
 {
 	const int nChildSize = GetChildSize();
 	for(int i = 0; i < nChildSize; ++i){
-		auto pComponent = GetChild(i)->GetComponent(eComponentKind_Layout);
+		auto pComponent = GetChild(i)->GetComponent<LayoutComponent*>(eComponentKind_Layout);
 		if(pComponent){
-			reinterpret_cast<LayoutComponent*>(pComponent)->SetVisible(bVisible);
+			pComponent->SetVisible(bVisible);
 		}
 	}
 }
@@ -202,7 +202,6 @@ void Shop::GameEntityUpdate(const void* param)
 		if(nPlayerKizuna >= itemInfo.nCost){
 			AppParam::Get()->SubKizunaPoint(nPlayerId, itemInfo.nCost);
 			AppParam::Get()->AddItem(nPlayerId, nSelectItemNo, 1);
-			setNewItem(m_pItemListUI->GetCurrentItemIdx());
 			m_pMessageWindow->SetDirectMessage("まいどありにゃ");
 		}
 		else{
@@ -221,11 +220,13 @@ void Shop::GameEntityUpdate(const void* param)
 		const auto& itemInfo = AppItemList::Get()->GetItemInfo(nSelectItemNo);
 		m_nStep = eStep_Reset;
 		if(itemInfo.name == "キズナクリスタル"){
-			if(AppParam::Get()->GetItemNum(nPlayerId, nSelectItemNo) >= 3){
+			const int nNum = AppParam::Get()->GetItemNum(nPlayerId, nSelectItemNo);
+			if(nNum >= 3){
 				AppParam::Get()->SetClear(true);
 				m_nStep = eStep_ClearMessage;
 			}
 		}
+		setNewItem(m_pItemListUI->GetCurrentItemIdx());
 	}
 	else if(m_nStep == eStep_ClearMessage){
 		m_pMessageWindow->SetDirectMessage(

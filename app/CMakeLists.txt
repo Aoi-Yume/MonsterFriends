@@ -90,7 +90,8 @@ add_library(	game-lib SHARED
 add_library(	app_param-lib SHARED
 				src/main/cpp/Game/App/Param/AppParam.cpp
 				src/main/cpp/Game/App/Param/AppItemList.cpp
-				src/main/cpp/Game/App/Param/AppSkillList.cpp)
+				src/main/cpp/Game/App/Param/AppSkillList.cpp
+				src/main/cpp/Game/App/Param/AppCharaList.cpp)
 
 add_library(	app_entity-lib SHARED
 				src/main/cpp/Game/App/Entity/Character.cpp

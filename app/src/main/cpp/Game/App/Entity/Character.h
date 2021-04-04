@@ -10,23 +10,25 @@
 #include "entity_define.h"
 #include "GameEntity.h"
 
+class Dice;
 class Character : public GameEntity
 {
 	typedef GameEntity Super;
 public:
-	enum CHARA_ID {
-		eCHARA_NONE = -1,
-		eCHARA_01,		// スライム
-	};
-
 	enum State{
 		eState_None,
 		eState_Wait,
-		eState_Work,
+		eState_ComBattleStandby,
+		eState_StopDice,
+		eState_CheckEndDice,
+		eState_EndDice,
+	};
+	enum {
+		eDice_Max = 3
 	};
 
 public:
-	Character(CHARA_ID charaId);
+	Character(int charaId);
 	virtual ~Character();
 
 	void GameEntitySetup(const void* param) override;
@@ -34,12 +36,34 @@ public:
 	void EntityUpdate(GameMessage message, const void* param) override;
 
 public:
+	int GetCharaId() const{ return m_nCharaId; }
+	void SetCom(bool bCom){ m_bCom = bCom; }
+	bool IsCom() const { return m_bCom; }
+
+	void SetUseDice(int nUseDice) { m_nUseDice = CLAMP(nUseDice, 1, (int)eDice_Max); }
+	void ResetStopDice();
+
+	void BeginDice();
+	void StopDice();
+	int GetDiceSumVal() const;
+
+	void BeginComDice();
+	void InVisibleDice();
+
+	bool IsStopDiceState() const { return GetState() == eState_StopDice || GetState() == eState_CheckEndDice; }
+	bool IsEndDice() const { return GetState() == eState_EndDice; }
 
 private:
-	void actWorkState();
+	void actComBattleStandbyState();
+	void actStopDiceState();
+	void actCheckEndDiceState();
 
 private:
-	CHARA_ID m_nCharaId;
+	bool 	m_bCom;
+	int 	m_nCharaId;
+	int 	m_nUseDice;
+	int 	m_nStopDice;
+	float	m_fJumpStartY;
 };
 
 #endif

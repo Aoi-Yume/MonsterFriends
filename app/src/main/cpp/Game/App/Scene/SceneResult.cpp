@@ -55,12 +55,13 @@ namespace {
 
 		void Update(void *pUserPtr) override {
 			auto p = reinterpret_cast<SceneResult *>(pUserPtr);
-			auto child = reinterpret_cast<Entity*>(p->m_CharaInfo[m_nPlayer].pChara->GetChild(0));
+			auto pChara = p->m_CharaInfo[m_nPlayer].pChara;
+			auto child = pChara->GetChild(pChara->GetChildSize() - 1);
 
 			if(m_nStep == 0){
 				if(m_fTime <= 0.0f){
-					auto anim = reinterpret_cast<AnimationComponent*>(child->GetComponent(eComponentKind_Animation));
-					auto layout = reinterpret_cast<LayoutComponent*>(child->GetComponent(eComponentKind_Layout));
+					auto anim = child->GetComponent<AnimationComponent*>(eComponentKind_Animation);
+					auto layout = child->GetComponent<LayoutComponent*>(eComponentKind_Layout);
 					anim->Play("Open");
 					layout->SetVisible(true);
 				}
@@ -75,8 +76,8 @@ namespace {
 						m_nNextStep = 3;
 					}
 					else {
-						auto pIcon = reinterpret_cast<Entity*>(child->GetChild(m_nItemNo));
-						auto anim = reinterpret_cast<AnimationComponent *>(pIcon->GetComponent(eComponentKind_Animation));
+						auto pIcon =child->GetChild(m_nItemNo);
+						auto anim = pIcon->GetComponent<AnimationComponent *>(eComponentKind_Animation);
 						anim->Play("Open");
 						pIcon->SetVisible(true);
 						m_nNextStep = 2;
@@ -190,7 +191,8 @@ void SceneResult::SceneSetup() {
 		const float fStartX = -fScreenX * 0.5f;
 		for(int i = 0; i < NET_CONNECT_MAX; ++i) {
 			const bool bVisible = (i < TransferManager::Get()->GetConnectNum() + 1);
-			m_CharaInfo[i].pChara = new Character(Character::CHARA_ID::eCHARA_01);
+			// TODO プレイヤーキャラ設定
+			auto pChara = m_CharaInfo[i].pChara = new Character(0);
 
 			auto pEntity = new Entity();
 			{
@@ -209,9 +211,11 @@ void SceneResult::SceneSetup() {
 					pEntity->AddChild(icon_Entity);
 				}
 			}
-			m_CharaInfo[i].pChara->AddChild(pEntity);
-			m_CharaInfo[i].pChara->Update(eGameMessage_Setup, nullptr);
-			m_CharaInfo[i].pChara->SetVisible(bVisible);
+			pEntity->Update(eGameMessage_Setup, nullptr);
+			pChara->Update(eGameMessage_Setup, nullptr);
+			pChara->AddChild(pEntity);
+			pChara->SetVisible(bVisible);
+			pChara->InVisibleDice();
 			pEntity->SetVisible(false);
 			{
 				const int nItemNo = AppItemList::Get()->GetItemNoFromName("キズナクリスタル");
@@ -221,13 +225,13 @@ void SceneResult::SceneSetup() {
 				const float fIconStartX = -fWidth * 0.5f;
 				const float fIconAddX = fWidth / (float)(m_CharaInfo[i].nCristalNum + 1.0f);
 				for(int j = 0; j < 3; ++j) {
-					auto pIcon = reinterpret_cast<Entity *>(m_CharaInfo[i].pChara->GetChild(0)->GetChild(j));
+					auto pIcon = pChara->GetChild(pChara->GetChildSize() - 1)->GetChild(j);
 					pIcon->SetPosition(fIconStartX + (float)(j + 1) * fIconAddX, 128, 0);
 					pIcon->SetVisible(false);
 				}
 			}
 			pEntity->SetPosition(0, 128, 0);
-			m_CharaInfo[i].pChara->SetPosition(fStartX + (float)(i + 1) * fAddX, -200.0f, 0);
+			pChara->SetPosition(fStartX + (float)(i + 1) * fAddX, -200.0f, 0);
 		}
 	}
 	{

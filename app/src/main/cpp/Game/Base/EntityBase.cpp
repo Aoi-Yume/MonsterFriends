@@ -12,7 +12,6 @@ EntityBase::EntityBase()
 , m_nMessageCnt(0)
 , m_prevMessage(eGameMessage_Max)
 {
-	DEBUG_LOG("Call EntityBase Constructor");
 	for(int i = 0; i < eComponentKind_Max; ++i){
 		m_pComponent[i] = nullptr;
 	}
@@ -20,7 +19,6 @@ EntityBase::EntityBase()
 
 EntityBase::~EntityBase()
 {
-    DEBUG_LOG("Call EntityBase Deconstructor");
 	for(int i = 0; i < eComponentKind_Max; ++i){
 		delete m_pComponent[i];
 	}
@@ -49,15 +47,10 @@ void EntityBase::Update(GameMessage message, const void* param)
 	m_nMessageCnt++;
 }
 
-ComponentBase* EntityBase::GetComponent(ComponentKind nKind)
-{
-    return m_pComponent[nKind];
-}
-
 void EntityBase::AddChild(EntityBase* pEntity, bool bLinkTransform)
 {
 	pEntity->SetParent(this, bLinkTransform);
-	m_svpChild.push_back(pEntity);
+	m_svpChild.emplace_back(pEntity);
 }
 
 void EntityBase::ResizeChild(unsigned long num)
@@ -70,12 +63,6 @@ void EntityBase::SetChild(unsigned long idx, EntityBase* pEntity, bool bLinkTran
 	assert(idx >= 0 && idx < m_svpChild.size());
 	pEntity->SetParent(this, bLinkTransform);
 	m_svpChild.at(idx) = pEntity;
-}
-
-EntityBase* EntityBase::GetChild(unsigned long idx)
-{
-	assert(idx >= 0 && idx < m_svpChild.size());
-	return m_svpChild.at(idx);
 }
 
 size_t EntityBase::GetChildSize() const

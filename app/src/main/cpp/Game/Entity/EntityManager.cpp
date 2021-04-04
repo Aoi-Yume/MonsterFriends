@@ -43,17 +43,17 @@ void EntityManager::Update(GameMessage message, const void* param)
 				const size_t iChildSize = pEntityBaseA->GetChildSize();
 				const size_t jChildSize = pEntityBaseB->GetChildSize();
 				for(uint jChild = 0; jChild < jChildSize; ++jChild) {
-					checkCollisin(pEntityBaseA, pEntityBaseB->GetChild(jChild));
+					checkCollisin(pEntityBaseA, pEntityBaseB->GetChild<EntityBase*>(jChild));
 				}
 				// 逆の親子関係もやる
 				for(uint iChild = 0; iChild < iChildSize; ++iChild) {
-					checkCollisin(pEntityBaseB, pEntityBaseA->GetChild(iChild));
+					checkCollisin(pEntityBaseB, pEntityBaseA->GetChild<EntityBase*>(iChild));
 				}
 
 				// 子同士の衝突判定
 				for(uint iChild = 0; iChild < iChildSize; ++iChild) {
 					for(uint jChild = 0; jChild < jChildSize; ++jChild) {
-						checkCollisin(pEntityBaseA->GetChild(iChild), pEntityBaseB->GetChild(jChild));
+						checkCollisin(pEntityBaseA->GetChild<EntityBase*>(iChild), pEntityBaseB->GetChild<EntityBase*>(jChild));
 					}
 				}
 			}

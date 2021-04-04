@@ -147,7 +147,7 @@ void ItemListUI::Open()
 	m_aButtonManager[eButtonManager_LeftRight]->SetVisible(true);
 	m_aButtonManager[eButtonManager_LeftRight]->Reset();
 
-	auto p = (LayoutComponent*)GetChild(0)->GetComponent(eComponentKind_Layout);
+	auto p = GetChild(0)->GetComponent<LayoutComponent*>(eComponentKind_Layout);
 	p->SetVisible(true);
 
 	// 表示分までは無効領域を詰めておく
@@ -164,7 +164,7 @@ void ItemListUI::Close()
 	m_aButtonManager[eButtonManager_LeftRight]->Lock();
 	m_aButtonManager[eButtonManager_LeftRight]->SetVisible(false);
 
-	auto p = (LayoutComponent*)GetChild(0)->GetComponent(eComponentKind_Layout);
+	auto p = GetChild(0)->GetComponent<LayoutComponent*>(eComponentKind_Layout);
 	p->SetVisible(false);
 }
 

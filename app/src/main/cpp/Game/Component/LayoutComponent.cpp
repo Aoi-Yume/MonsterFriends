@@ -311,14 +311,10 @@ void LayoutComponent::setupShaderParam()
 //------------------------------------------
 void LayoutComponent::setupUniformShaderParam()
 {
-	TransformComponent *pTransform = reinterpret_cast<TransformComponent*>(GetEntityBase()->GetComponent(eComponentKind_Transform));
+	TransformComponent *pTransform = GetEntityBase()->GetComponent<TransformComponent*>(eComponentKind_Transform);
 	CameraComponent *pCamera = reinterpret_cast<CameraComponent*>(Engine::GetEngine()->GetCameraComponent());
-	// リンク情報で親を辿ってトランスフォーム設定
-	if(GetEntityBase()->GetLinkTransform()) {
-		glUniformMatrix4fv(m_nTransformLocation, 1, GL_FALSE, pTransform->GetWorldMatrix()->Get());
-	}else{
-		glUniformMatrix4fv(m_nTransformLocation, 1, GL_FALSE, pTransform->GetLocalMatrix()->Get());
-	}
+	glUniformMatrix4fv(m_nTransformLocation, 1, GL_FALSE, pTransform->GetWorldMatrix()->Get());
+
 	if( !IsOrtho() ) {
 		glUniformMatrix4fv(m_nViewportInvLocation, 1, GL_FALSE, pCamera->GetViewportInv().Get());
 	}

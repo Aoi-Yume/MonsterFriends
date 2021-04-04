@@ -75,6 +75,8 @@ public:
 	void UpdateSkillDuration(int nNo, int nPlayerId);
 	void DumpUseSkillInfo(int nPlayerId);
 
+	int GetDiceNum(int nPlayer) const;
+
 	GameNetworkInfo& GetNetworkInfo();
 	void DumpNetworkInfo();
 

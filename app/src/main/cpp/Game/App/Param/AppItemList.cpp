@@ -43,6 +43,8 @@ void AppItemList::Load()
 		else if(nParamNo == 5){ info.skillName = aSplitText[i]; }
 		else if(nParamNo == 6){ info.nAppearVal = std::stoi(aSplitText[i]); }
 	}
+	free(pBuffer);
+
 	for(int i = 0; i < m_aItemInfo.size(); ++i) {
 		auto& it = m_aItemInfo[i];
 		DEBUG_LOG_A("ItemNo[%d]：[%s][%s][%s][%d][%s][%s][%d]\n",

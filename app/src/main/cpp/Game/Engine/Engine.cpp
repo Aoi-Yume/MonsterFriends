@@ -157,12 +157,13 @@ void Engine::LoadAsset(const char *pFileName, void **pBuffer, long *pSize, bool 
 
 	if(pBuffer) {
 		if (!*pBuffer && bAllocate) {
-			*pBuffer = new char[nSize];
+			*pBuffer = malloc(nSize + 1);
 			DEBUG_LOG_A("Allocate Data[%ld]", nSize);
 		}
 		if (*pBuffer) {
 			int nReadSize = AAsset_read(pAsset, *pBuffer, (size_t) nSize);
 			DEBUG_LOG_A("Read[%d]", nReadSize);
+			reinterpret_cast<char*>(*pBuffer)[nSize] = '\0';
 		}
 	}
 	AAsset_close(pAsset);

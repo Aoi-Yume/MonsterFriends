@@ -12,6 +12,7 @@
 #include "BaseDefine.h"
 
 class ComponentBase;
+class Entity;
 
 class EntityBase
 {
@@ -21,12 +22,14 @@ public:
 
 	void Update(GameMessage message, const void* param);
 
-	ComponentBase* GetComponent(ComponentKind nKind);
+	template<class T = ComponentBase*> T GetComponent(ComponentKind nKind);
 
 	void AddChild(EntityBase* pEntity, bool bLinkTransform = true);
 	void ResizeChild(unsigned long num);
 	void SetChild(unsigned long idx, EntityBase* pEntity, bool bLinkTransform = true);
-	EntityBase* GetChild(unsigned long idx);
+
+	template<class T = Entity*> T GetChild(unsigned long idx);
+	template<class T = Entity*> const T GetChild(unsigned long idx) const;
 	size_t GetChildSize() const;
 
 	void SetParent(EntityBase* pEntity, bool bLinkTransform);
@@ -50,5 +53,23 @@ protected:
 	GameMessage	m_prevMessage;
 
 };
+
+template<class T>
+inline T EntityBase::GetComponent(ComponentKind nKind)
+{
+	return reinterpret_cast<T>(m_pComponent[nKind]);
+}
+
+template <class T>
+inline T EntityBase::GetChild(unsigned long idx) {
+	assert(idx >= 0 && idx < m_svpChild.size());
+	return reinterpret_cast<T>(m_svpChild.at(idx));
+}
+
+template <class T>
+inline const T EntityBase::GetChild(unsigned long idx) const {
+	assert(idx >= 0 && idx < m_svpChild.size());
+	return reinterpret_cast<T>(m_svpChild.at(idx));
+}
 
 #endif

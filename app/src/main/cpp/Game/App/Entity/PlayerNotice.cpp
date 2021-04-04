@@ -77,7 +77,7 @@ void PlayerNotice::GameEntityUpdate(const void* param)
 {
 	Super::GameEntityUpdate(param);
 
-	auto pAnimComponent = reinterpret_cast<AnimationComponent*>(GetChild(0)->GetComponent(eComponentKind_Animation));
+	auto pAnimComponent = GetChild(0)->GetComponent<AnimationComponent*>(eComponentKind_Animation);
 	if(m_State == eState_Open){
 		if(pAnimComponent->IsEnd("Open")){
 			m_State = (m_bAutoClose ? eState_Wait : eState_Idle);
@@ -107,7 +107,7 @@ void PlayerNotice::Open(bool bAutoClose, float fDelay)
 {
 	for(int i = 0; i < GetChildSize(); ++i) {
 		auto pChild = GetChild(i);
-		reinterpret_cast<AnimationComponent *>(pChild->GetComponent(eComponentKind_Animation))->Play("Open");
+		pChild->GetComponent<AnimationComponent *>(eComponentKind_Animation)->Play("Open");
 	}
 	m_State = eState_Open;
 	m_bAutoClose = bAutoClose;
@@ -118,7 +118,7 @@ void PlayerNotice::Close()
 {
 	for(int i = 0; i < GetChildSize(); ++i) {
 		auto pChild = GetChild(i);
-		reinterpret_cast<AnimationComponent *>(pChild->GetComponent(eComponentKind_Animation))->Play("Close");
+		pChild->GetComponent<AnimationComponent *>(eComponentKind_Animation)->Play("Close");
 	}
 	m_State = eState_Close;
 }

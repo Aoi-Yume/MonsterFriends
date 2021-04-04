@@ -18,7 +18,7 @@ Dice::Dice()
 , m_nDiceChangeInterval(10)
 , m_uDiceRoulette()
 {
-	DEBUG_LOG("Create InformationPlate");
+	DEBUG_LOG("Create Dice");
 	for(int i = 0; i < eDICE_MAX; ++i){
 		m_uDiceRoulette[i] = i + 1;
 	}
@@ -41,9 +41,9 @@ void Dice::GameEntitySetup(const void* param)
 		imagePath[sizeof(imagePath) - 1] = '\0';
 		auto pChild = new Entity();
 		Entity::CreateLayoutComponent(pChild, imagePath);
-		auto pComponent = (LayoutComponent *)pChild->GetComponent(eComponentKind_Layout);
+		auto pComponent = pChild->GetComponent<LayoutComponent *>(eComponentKind_Layout);
 		pComponent->SetOrtho(true);
-		pComponent->SetVisible(i == 0);
+		pComponent->SetVisible(false);
 		AddChild(pChild);
 	}
 }
@@ -69,15 +69,13 @@ void Dice::EntityUpdate(GameMessage message, const void* param)
 
 void Dice::SetVisible(int nIdx, bool bVisible)
 {
-	auto pComponent = reinterpret_cast<LayoutComponent*>(GetChild(nIdx)->GetComponent(eComponentKind_Layout));
-	pComponent->SetVisible(bVisible);
+	GetChild(nIdx)->GetComponent<LayoutComponent*>(eComponentKind_Layout)->SetVisible(bVisible);
 }
 
 void Dice::InVisible()
 {
 	for(int i = 0; i < eDICE_MAX; ++i) {
-		auto pComponent = reinterpret_cast<LayoutComponent*>(GetChild(i)->GetComponent(eComponentKind_Layout));
-		pComponent->SetVisible(false);
+		GetChild(i)->GetComponent<LayoutComponent*>(eComponentKind_Layout)->SetVisible(false);
 	}
 }
 

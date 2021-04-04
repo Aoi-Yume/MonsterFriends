@@ -63,6 +63,8 @@ END_EXTERN_C
 EXTERN_CXX
 
 #include <string>
+#include <vector>
+#include <array>
 
 using SYSTEM_CLOCK = std::chrono::system_clock;
 using DURATION = std::chrono::milliseconds;

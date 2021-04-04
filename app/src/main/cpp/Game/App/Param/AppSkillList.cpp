@@ -45,6 +45,7 @@ void AppSkillList::Load()
 		else if(nParamNo == 4){ info.minParam = atoi(aSplitText[i].c_str()); }
 		else if(nParamNo == 5){ info.maxParam = atoi(aSplitText[i].c_str()); }
 	}
+	free(pBuffer);
 	for(int i = 0; i < m_aSkillInfo.size(); ++i) {
 		auto& it = m_aSkillInfo[i];
 		DEBUG_LOG_A("SkillNo[%d]：[%s][%s][%s][%d][%d][%d]\n",
@@ -167,8 +168,12 @@ int AppSkillList::getSkillParam(int nSkillNo, int nPlayer) const
 	int nParam = Random::GetInt(skill.minParam, skill.maxParam);
 
 	// 特定のスキルは効果が重複する
+	const auto& info = AppParam::Get()->GetUseSkillInfo(nPlayer)[nSkillNo];
 	if(skill.Type == "キズナプラス") {
-		nParam += AppParam::Get()->GetUseSkillInfo(nPlayer)[nSkillNo].Param;
+		nParam += info.Param;
+	}
+	else if(skill.Type == "サイコロプラス") {
+		nParam = std::min(nParam + info.Param, 2);
 	}
 	return nParam;
 }

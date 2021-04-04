@@ -47,11 +47,6 @@ private:
 	void updateBattleStep();
 
 private:
-	struct CharaInfo{
-		Character* 	pChara = nullptr;
-		Dice*		pDice = nullptr;
-		VEC3		prePos = {};
-	};
 
 	int 		m_nStep;
 	int 		m_nNextStep;
@@ -60,8 +55,8 @@ private:
 	int 		m_nSubStep;
 	int 		m_nSubStepCnt;
 
-	CharaInfo	m_Chara;
-	CharaInfo	m_Enemy;
+	Character*	m_pChara;
+	Character*	m_pEnemy;
 
 	ButtonManager*	m_pBtnManager;
 	MessageWindow* m_pMessageWindow;

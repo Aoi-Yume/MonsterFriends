@@ -256,9 +256,9 @@ void UseItem::SetVisible(bool bVisible)
 {
 	const int nChildSize = GetChildSize();
 	for(int i = 0; i < nChildSize; ++i){
-		auto pComponent = GetChild(i)->GetComponent(eComponentKind_Layout);
+		auto pComponent = GetChild(i)->GetComponent<LayoutComponent*>(eComponentKind_Layout);
 		if(pComponent){
-			reinterpret_cast<LayoutComponent*>(pComponent)->SetVisible(bVisible);
+			pComponent->SetVisible(bVisible);
 		}
 	}
 }
