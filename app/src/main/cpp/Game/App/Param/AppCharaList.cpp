@@ -30,7 +30,7 @@ void AppCharaList::Load()
 
 	const int nParamNum = 5;
 	m_aCharaInfo.resize(aSplitText.size() / nParamNum);
-	assert(aSplitText.size() % nParamNum == 0);
+	ASSERT(aSplitText.size() % nParamNum == 0);
 	for(int i = 0; i < aSplitText.size(); ++i){
 		const int nIdx = i / nParamNum;
 		const int nParamNo = i % nParamNum;

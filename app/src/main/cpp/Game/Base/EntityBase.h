@@ -62,13 +62,13 @@ inline T EntityBase::GetComponent(ComponentKind nKind)
 
 template <class T>
 inline T EntityBase::GetChild(unsigned long idx) {
-	assert(idx >= 0 && idx < m_svpChild.size());
+	ASSERT(idx >= 0 && idx < m_svpChild.size());
 	return reinterpret_cast<T>(m_svpChild.at(idx));
 }
 
 template <class T>
 inline const T EntityBase::GetChild(unsigned long idx) const {
-	assert(idx >= 0 && idx < m_svpChild.size());
+	ASSERT(idx >= 0 && idx < m_svpChild.size());
 	return reinterpret_cast<T>(m_svpChild.at(idx));
 }
 

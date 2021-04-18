@@ -214,14 +214,17 @@ void UseItem::GameEntityUpdate(const void* param)
 		m_aButtonManager[eBtnManager_UseOrCancel]->SetVisible(false);
 		m_aButtonManager[eBtnManager_UseOrCancel]->Reset();
 		m_aButtonManager[eBtnManager_UseOrCancel]->Lock();
-		// UIを更新するため一度閉じて開きなおす
+		// UI更新
 		{
-			m_pItemListUI->Close();
-			updateItemList();
-			m_pItemListUI->Open();
+			const int nPlayer = AppParam::Get()->GetNetworkInfo().nCurrentPlayerId;
+			const int nItemNum = AppParam::Get()->GetItemNum(nPlayer, nSelectItemNo);
+			if(nItemNum <= 0) {
+				m_pItemListUI->ChangeItemNo(m_pItemListUI->GetCurrentItemIdx(), -1);
+			}
 			m_pItemListUI->Reset();
 			m_pItemListUI->UnLock();
 		}
+
 		m_aButtonManager[eBtnManager_Back]->Reset();
 		m_aButtonManager[eBtnManager_Back]->Unlock();
 		m_aButtonManager[eBtnManager_Back]->SetVisible(true);

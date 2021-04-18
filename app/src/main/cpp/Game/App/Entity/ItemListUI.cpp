@@ -64,7 +64,6 @@ void ItemListUI::GameEntitySetup(const void* param) {
 				pBtn->SetPosition(btnList[i]);
 			}
 			else{
-				// TODO アイテムNONE画像
 				auto pBtn = pBtnManager->CreateButton("image/shop_item_none.png");
 				pBtn->SetPosition(btnList[i]);
 			}
@@ -91,6 +90,9 @@ void ItemListUI::GameEntitySetup(const void* param) {
 		m_aButtonManager.emplace_back(pBtnManager);
 	}
 
+	// 子供のEntityに関してはこの関数を抜けた後にSetupが呼ばれるので
+	// コンポーネントを参照するアイテム画像更新が呼べない
+	// updateItemIcon();
 	updateItemButton();
 }
 
@@ -107,6 +109,7 @@ void ItemListUI::GameEntityUpdate(const void* param)
 		}
 		if(nDecide >= 0){
 			m_aButtonManager[eButtonManager_LeftRight]->Reset();
+			updateItemIcon();
 			updateItemButton();
 		}
 	}
@@ -154,6 +157,7 @@ void ItemListUI::Open()
 	while(m_aItemNo.size() < eButtonVisibleNum){
 		m_aItemNo.emplace_back(-1);
 	}
+	updateItemIcon();
 	updateItemButton();
 }
 
@@ -188,11 +192,16 @@ void ItemListUI::Reset()
 void ItemListUI::AddItemNo(int nNo)
 {
 	m_aItemNo.emplace_back(nNo);
+	// TODO 最初にアイテムを追加する場合はアイテム画像のEntityがセットアップされていない
+	// TODO 途中からアイテム管理数を増やしたときはアイテム画像の更新を呼ぶべきだが…。
+	// updateItemIcon();
 }
+
 
 void ItemListUI::ChangeItemNo(int nIdx, int nNo)
 {
 	m_aItemNo[nIdx] = nNo;
+	updateItemIcon();
 }
 
 void ItemListUI::ClearItemNo()
@@ -221,16 +230,6 @@ void ItemListUI::updateItemButton()
 	auto pBtnManager = m_aButtonManager[eButtonManager_ItemList];
 	for(int i = 0; i < eButtonVisibleNum; ++i){
 		auto pBtn = pBtnManager->GetButton(i);
-		auto p = (LayoutComponent*)pBtn->GetComponent(eComponentKind_Layout);
-		if(m_aItemNo[nStart] >= 0) {
-			const auto &itemInfo = AppItemList::Get()->GetItemInfo(m_aItemNo[nStart]);
-			p->ChangeTexture(itemInfo.fileName.c_str());
-		}
-		else{
-			p->ChangeTexture("image/shop_item_none.png");
-		}
-		nStart = (nStart + 1) % nListSize;
-
 		if(i == nCenter){
 			pBtn->SetGray(false);
 			pBtn->Enable();
@@ -241,3 +240,26 @@ void ItemListUI::updateItemButton()
 		}
 	}
 };
+
+void ItemListUI::updateItemIcon()
+{
+	const int nCenter = eButtonVisibleNum / 2;
+	const int nListSize = m_aItemNo.size();
+
+	int nStart = m_nCurrentItemIdx;
+	for(int i = 0; i < nCenter; ++i){
+		nStart = (nStart + nListSize - 1) % nListSize;
+	}
+	auto pBtnManager = m_aButtonManager[eButtonManager_ItemList];
+	for(int i = 0; i < eButtonVisibleNum; ++i) {
+		auto pBtn = pBtnManager->GetButton(i);
+		auto p = (LayoutComponent *) pBtn->GetComponent(eComponentKind_Layout);
+		if (m_aItemNo[nStart] >= 0) {
+			const auto &itemInfo = AppItemList::Get()->GetItemInfo(m_aItemNo[nStart]);
+			p->ChangeTexture(itemInfo.fileName.c_str());
+		} else {
+			p->ChangeTexture("image/shop_item_none.png");
+		}
+		nStart = (nStart + 1) % nListSize;
+	}
+}

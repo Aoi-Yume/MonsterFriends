@@ -80,7 +80,7 @@ void ObjectLoader::SetClassID(const char* className)
 jclass ObjectLoader::GetClassID(const char* className)
 {
 	auto it = m_pInner->m_ObjectInfo.find(className);
-    assert(it != m_pInner->m_ObjectInfo.end());
+	ASSERT(it != m_pInner->m_ObjectInfo.end());
 	return (*it).second.m_ClassInfo;
 }
 
@@ -102,7 +102,7 @@ jfieldID ObjectLoader::GetFieledID(const char* className, const char* fieldName)
 	jclass classID = GetClassID(className);
 
     auto it = m_pInner->m_ObjectInfo[className].m_Filed.find(fieldName);
-    assert(it != m_pInner->m_ObjectInfo[className].m_Filed.end());
+	ASSERT(it != m_pInner->m_ObjectInfo[className].m_Filed.end());
 
     return (*it).second;
 }
@@ -124,7 +124,7 @@ jfieldID ObjectLoader::GetEnumID(const char *className, const char *enumName)
     jclass classID = GetClassID(className);
 
     auto it = m_pInner->m_ObjectInfo[className].m_Filed.find(enumName);
-    assert(it != m_pInner->m_ObjectInfo[className].m_Filed.end());
+	ASSERT(it != m_pInner->m_ObjectInfo[className].m_Filed.end());
     return (*it).second;
 }
 
@@ -162,7 +162,7 @@ jmethodID ObjectLoader::GetMethodID(const char *className, const char *methodNam
     jclass classID = GetClassID(className);
 
     auto it = m_pInner->m_ObjectInfo[className].m_Method.find(methodName);
-    assert(it != m_pInner->m_ObjectInfo[className].m_Method.end());
+	ASSERT(it != m_pInner->m_ObjectInfo[className].m_Method.end());
 
     return (*it).second;
 }

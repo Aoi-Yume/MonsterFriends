@@ -149,7 +149,7 @@ void Engine::LoadAsset(const char *pFileName, void **pBuffer, long *pSize, bool 
 	DEBUG_LOG_A("////// Begin LoadAsset[%s] //////", pFileName);
 	if(!pAsset) {
 		DEBUG_LOG_A("Not Found Asset[%s]", pFileName);
-		assert(pAsset);
+		ASSERT(pAsset);
 	}
 
 	const long nSize = AAsset_getLength(pAsset);

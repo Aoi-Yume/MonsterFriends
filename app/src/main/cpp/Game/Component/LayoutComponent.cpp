@@ -158,7 +158,7 @@ LayoutComponent::~LayoutComponent()
 //------------------------------------------
 void LayoutComponent::SetResPath(const char *pResPath){
 	const size_t nStrlen = strlen(pResPath);
-	assert(nStrlen < sizeof(m_cResPath));
+	ASSERT(nStrlen < sizeof(m_cResPath));
 	strcpy(m_cResPath, pResPath);
 	SetUseTex(true);
 }

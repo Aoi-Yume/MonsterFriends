@@ -62,8 +62,8 @@ public:
 	
 	template<class T>
 	T* GetTransfer(int nKind) {
-		assert(nKind >= 0 && nKind < eTransferKind_Max);
-		assert(nKind < m_aTransfer.size());
+		ASSERT(nKind >= 0 && nKind < eTransferKind_Max);
+		ASSERT(nKind < m_aTransfer.size());
 		return reinterpret_cast<T*>(m_aTransfer[nKind]);
 	}
 

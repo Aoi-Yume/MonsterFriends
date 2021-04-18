@@ -94,7 +94,7 @@ int AppParam::GetKizunaPoint(int nPlayerId) const
 
 void AppParam::AddItem(int nPlayerId, int nItemNo, int nNum)
 {
-	assert(nItemNo >= 0 && nItemNo < eItemKind_Max);
+	ASSERT(nItemNo >= 0 && nItemNo < eItemKind_Max);
 
 	// 接続完了している時は通信用情報を更新
 	auto pManager = TransferManager::Get();
@@ -116,7 +116,7 @@ void AppParam::AddItem(int nPlayerId, int nItemNo, int nNum)
 }
 void AppParam::SubItem(int nPlayerId, int nItemNo, int nNum)
 {
-	assert(nItemNo >= 0 && nItemNo < eItemKind_Max);
+	ASSERT(nItemNo >= 0 && nItemNo < eItemKind_Max);
 
 	// 接続完了している時は通信用情報を更新
 	auto pManager = TransferManager::Get();
@@ -139,7 +139,7 @@ void AppParam::SubItem(int nPlayerId, int nItemNo, int nNum)
 
 int AppParam::GetItemNum(int nPlayerId, int nItemNo) const
 {
-	assert(nItemNo >= 0 && nItemNo < eItemKind_Max);
+	ASSERT(nItemNo >= 0 && nItemNo < eItemKind_Max);
 
 	// 接続完了している時は通信用情報から取得
 	auto pManager = TransferManager::Get();
@@ -160,7 +160,7 @@ bool AppParam::IsClear() const {
 
 void AppParam::SetUseSkillInfo(int nNo, int nDuration, int nParam, int nSendPlayer, int nTargetPlayer)
 {
-	assert(nNo >= 0 && nNo < AppSkillList::eSkillList_Max);
+	ASSERT(nNo >= 0 && nNo < AppSkillList::eSkillList_Max);
 
 	// 接続完了している時は通信用情報を更新
 	auto pManager = TransferManager::Get();

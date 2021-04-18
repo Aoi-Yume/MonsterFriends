@@ -33,7 +33,7 @@ void AppSkillList::Load()
 	Util::SplitCSVText(aSplitText, str);
 
 	const int nParamNum = 6;
-	assert(aSplitText.size() / nParamNum < eSkillList_Max);
+	ASSERT(aSplitText.size() / nParamNum < eSkillList_Max);
 	for(int i = 0; i < aSplitText.size(); ++i){
 		const int nIdx = i / nParamNum;
 		const int nParamNo = i % nParamNum;

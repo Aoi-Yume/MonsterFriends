@@ -34,7 +34,7 @@ bool TransferGameInfo::updateTransfer()
 	const auto pManager = TransferManager::Get();
 	if(pManager->IsHost()) {
 		jbyte data[1024];
-		assert(m_nSize + 2 < sizeof(data));
+		ASSERT(m_nSize + 2 < sizeof(data));
 		data[0] = m_Data.uKind;
 		data[1] = m_Data.bReqEnd;
 		memcpy(&data[2], m_Data.pData, m_nSize);

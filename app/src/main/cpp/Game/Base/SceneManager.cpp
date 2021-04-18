@@ -13,7 +13,7 @@ static SceneManager* s_pSceneManger = nullptr;
 //------------------------------------------
 SceneManager* SceneManager::CreateSceneMaanger(SceneBase* pBootScene)
 {
-	assert(s_pSceneManger == nullptr);
+	ASSERT(s_pSceneManger == nullptr);
 	s_pSceneManger = new SceneManager(pBootScene);
 	return s_pSceneManger;
 }

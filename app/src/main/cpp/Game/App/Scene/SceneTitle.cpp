@@ -73,6 +73,7 @@ namespace {
 				char charName[64];
 				Engine::GetEngine()->GetInputText(charName, sizeof(charName));
 				AppParam::Get()->SetCharaName(charName);
+				// TODO いい加減に名前で通信を切り替えるのをやめる
 				if (strcmp(charName, "親") == 0) {
 					Engine::GetEngine()->StartNearbyAdvertising(charName);
 					TransferManager::Get()->Initialize(true);

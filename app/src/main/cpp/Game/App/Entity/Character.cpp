@@ -66,7 +66,7 @@ void Character::ResetStopDice()
 
 void Character::BeginDice()
 {
-	const float fWidth = 600.0f;
+	const float fWidth = 750.0f;
 	const float fAddX = fWidth / (float)(m_nUseDice + 1);
 	const float fStartX = -fWidth * 0.5f;
 	const float fOffset = AppCharaList::Get()->GetCharaInfo(m_nCharaId).fDiceOffsetY;

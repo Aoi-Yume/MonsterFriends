@@ -48,6 +48,7 @@ public:
 
 private:
 	void updateItemButton();
+	void updateItemIcon();
 
 private:
 	int m_nCurrentItemIdx;

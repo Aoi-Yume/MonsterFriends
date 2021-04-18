@@ -68,7 +68,7 @@ DebugButton* ButtonManager::CreateDebugButton(
 //-----------------------------------------
 ButtonBase* ButtonManager::GetButton(int nIdx)
 {
-	assert(nIdx >= 0 && nIdx < m_aButtons.size());
+	ASSERT(nIdx >= 0 && nIdx < m_aButtons.size());
 	return m_aButtons[nIdx];
 }
 

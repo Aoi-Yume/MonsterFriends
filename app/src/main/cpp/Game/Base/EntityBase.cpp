@@ -60,7 +60,7 @@ void EntityBase::ResizeChild(unsigned long num)
 
 void EntityBase::SetChild(unsigned long idx, EntityBase* pEntity, bool bLinkTransform)
 {
-	assert(idx >= 0 && idx < m_svpChild.size());
+	ASSERT(idx >= 0 && idx < m_svpChild.size());
 	pEntity->SetParent(this, bLinkTransform);
 	m_svpChild.at(idx) = pEntity;
 }

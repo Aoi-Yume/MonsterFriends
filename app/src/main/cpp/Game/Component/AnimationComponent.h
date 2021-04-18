@@ -66,7 +66,7 @@ public:
 	bool IsEnd() const { return m_State == eState_End; }
 	float GetTime() const{ return m_Time; }
 	float GetMaxTime() const{ return m_MaxTime; }
-	float GetRatio() const{ assert(m_MaxTime > 0.0f); return m_Time / m_MaxTime; }
+	float GetRatio() const{ ASSERT(m_MaxTime > 0.0f); return m_Time / m_MaxTime; }
 
 	void SetSpeed(float fSpeed) { m_fSpeed = fSpeed; }
 

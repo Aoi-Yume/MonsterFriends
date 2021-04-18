@@ -30,7 +30,7 @@ void AppItemList::Load()
 
 	const int nParamNum = 7;
 	m_aItemInfo.resize(aSplitText.size() / nParamNum);
-	assert(aSplitText.size() % nParamNum == 0);
+	ASSERT(aSplitText.size() % nParamNum == 0);
 	for(int i = 0; i < aSplitText.size(); ++i){
 		const int nIdx = i / nParamNum;
 		const int nParamNo = i % nParamNum;

@@ -203,6 +203,9 @@ void Shop::GameEntityUpdate(const void* param)
 			AppParam::Get()->SubKizunaPoint(nPlayerId, itemInfo.nCost);
 			AppParam::Get()->AddItem(nPlayerId, nSelectItemNo, 1);
 			m_pMessageWindow->SetDirectMessage("まいどありにゃ");
+
+			// TODO 直度系のアイテムスキルは使い忘れることが多いので買ったら即反映にしたいけど
+			// TODO 通信が関わってくるので少々面倒か…。
 		}
 		else{
 			m_pMessageWindow->SetDirectMessage("キズナが足りないにゃ");
@@ -286,6 +289,9 @@ void Shop::EntityUpdate(GameMessage message, const void* param)
 
 void Shop::setNewItem(int nIdx)
 {
+	// TODO 変更前と同じアイテムが選ばれるとアイテムが変わったかが分かりづらい
+	// TODO 変更前と同じアイテムが選ばれないようにするか、変更時にアニメを追加するか？
+
 	const auto pItemList = AppItemList::Get();
 	const int nRandomVal = Random::GetSyncInt(0, 100);
 	int nAppearSum = 0;
@@ -295,13 +301,15 @@ void Shop::setNewItem(int nIdx)
 	int nNewItemIdx = -1;
 	float fAppearProbability = 0.0f;
 	for(int i = 0; i < pItemList->GetItemListSize(); ++i) {
-		fAppearProbability += (float)pItemList->GetItemInfo(i).nAppearVal / (float)nAppearSum * 100.0f;
+		const float fAppear = (float)pItemList->GetItemInfo(i).nAppearVal / (float)nAppearSum * 100.0f;
+		fAppearProbability += roundf(fAppear + 0.99999f);	// 計算誤差を防ぐためにひとまず繰り上げ
 		if((float)nRandomVal <= fAppearProbability){
 			nNewItemIdx = i;
 			break;
 		}
 	}
-	assert(nNewItemIdx >= 0);
+
+	ASSERT_MSG_A(nNewItemIdx >= 0, "nRandomVal[%d], fAppearProbability[%f]", nRandomVal, fAppearProbability);
 	if(m_pItemListUI->GetRegisterItemNum() <= nIdx){
 		m_pItemListUI->AddItemNo(nNewItemIdx);
 	}

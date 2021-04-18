@@ -74,9 +74,9 @@ GLuint DrawComponent::loadShader(GLenum type, const GLchar* pShaderCode)
 void DrawComponent::createShader(const char* pVtxSource, const char* pFragSource)
 {
 	m_nVtxShader = loadShader(GL_VERTEX_SHADER, pVtxSource);
-	assert(m_nVtxShader != 0);
+	ASSERT(m_nVtxShader != 0);
 	m_nFragShader = loadShader(GL_FRAGMENT_SHADER, pFragSource);
-	assert(m_nFragShader != 0);
+	ASSERT(m_nFragShader != 0);
 
 	m_nShaderProgram = glCreateProgram();
 	glAttachShader(m_nShaderProgram, m_nVtxShader);

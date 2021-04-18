@@ -78,19 +78,19 @@ void TransferManager::ResetConnect()
 
 void TransferManager::SetTransfer(int nKind, TransferBase* pTransfer)
 {
-	assert(nKind >= 0 && nKind < eTransferKind_Max);
+	ASSERT(nKind >= 0 && nKind < eTransferKind_Max);
 	m_aTransfer[nKind] = pTransfer;
 }
 
 void TransferManager::StartTransfer(int nKind)
 {
-	assert(nKind >= 0 && nKind < eTransferKind_Max);
+	ASSERT(nKind >= 0 && nKind < eTransferKind_Max);
 	m_aTransfer[nKind]->startTransfer();
 }
 
 void TransferManager::StopTransfer(int nKind)
 {
-	assert(nKind >= 0 && nKind < eTransferKind_Max);
+	ASSERT(nKind >= 0 && nKind < eTransferKind_Max);
 	m_aTransfer[nKind]->stopTransfer();
 }
 
@@ -103,7 +103,7 @@ void TransferManager::StopAllTransfer()
 
 bool TransferManager::IsStartTransfer(int nKind) const
 {
-	assert(nKind >= 0 && nKind < eTransferKind_Max);
+	ASSERT(nKind >= 0 && nKind < eTransferKind_Max);
 	return m_aTransfer[nKind]->IsStart();
 }
 
