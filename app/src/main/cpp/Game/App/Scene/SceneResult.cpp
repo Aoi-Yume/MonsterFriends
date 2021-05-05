@@ -104,7 +104,7 @@ namespace {
 			}
 			else if(m_nStep == 4){
 				if(m_fTime >= 3.0f){
-					ChangeState(SceneResult::eState_FadeOut);
+					ChangeState(SceneResult::eState_Ads);
 				}
 			}
 
@@ -122,6 +122,22 @@ namespace {
 		int m_nPlayer;
 		int m_nItemNo;
 		float m_fTime;
+	};
+
+	//==========================================
+	//==========================================
+	class StateAds : public StateBase {
+		void Begin(void* pUserPtr) override {
+			(void)(pUserPtr);
+			Engine::GetEngine()->ShowAds();
+		}
+		void Update(void* pUserPtr) override {
+			auto p = reinterpret_cast<SceneResult *>(pUserPtr);
+			const int nStateCount = p->m_pStateManager->GetStateCount();
+			if(nStateCount > 60 && !Engine::GetEngine()->IsShowAds()){
+				ChangeState(SceneResult::eState_FadeOut);
+			}
+		}
 	};
 
 	//==========================================
@@ -191,8 +207,7 @@ void SceneResult::SceneSetup() {
 		const float fStartX = -fScreenX * 0.5f;
 		for(int i = 0; i < NET_CONNECT_MAX; ++i) {
 			const bool bVisible = (i < TransferManager::Get()->GetConnectNum() + 1);
-			// TODO プレイヤーキャラ設定
-			auto pChara = m_CharaInfo[i].pChara = new Character(0);
+			auto pChara = m_CharaInfo[i].pChara = new Character(TransferManager::Get()->GetCharaIdFromPlayerId(i));
 
 			auto pEntity = new Entity();
 			{
@@ -243,9 +258,11 @@ void SceneResult::SceneSetup() {
 		m_pStateManager->SetUserPtr(this);
 		m_pStateManager->CreateState<StateFadeIn>();
 		m_pStateManager->CreateState<StateResultMain>();
+		m_pStateManager->CreateState<StateAds>();
 		m_pStateManager->CreateState<StateFadeOut>();
 		m_pStateManager->ChangeState(eState_FadeIn);
 	}
+	Engine::GetEngine()->LoadAds();
 
 	DEBUG_LOG("Setup End");
 }

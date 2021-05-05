@@ -24,14 +24,15 @@ public:
 public:
 	void SetPosition(float x, float y, float z);
 	void SetPosition(const VEC3& pos);
-	const VEC3 GetPosition();
+	VEC3 GetPosition() const;
 
 	void SetRotate(float x, float y, float z);
 	void SetRotate(const VEC3& rot);
+	VEC3 GetRotate() const;
 
 	void SetScale(float x, float y, float z);
 	void SetScale(const VEC3& scale);
-	const VEC3 GetScale();
+	VEC3 GetScale() const;
 
 	void SetVisible(bool bVisible);
 	bool IsVisible();

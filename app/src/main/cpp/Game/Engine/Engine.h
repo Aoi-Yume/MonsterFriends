@@ -65,6 +65,10 @@ public:
 	void DisconnectNearbyAllEndPoint();
 	void SendData(const char* pId, jbyte* pData, int nSize);
 
+	void LoadAds();
+	void ShowAds();
+	bool IsShowAds() const;
+
 public:
 	static void Create();
 	static void Destroy();

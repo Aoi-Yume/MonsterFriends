@@ -23,7 +23,7 @@ Java_com_aoiyume_Game_Engine_AccecpNearEndPoint(JNIEnv *env, jclass clazz, jstri
 												jstring name) {
 	const char* pEndPoint = env->GetStringUTFChars(end_point, nullptr);
 	const char* pName = env->GetStringUTFChars(name, nullptr);
-	TransferManager::Get()->AddConnect(TransferManager::ConnectInfo(pEndPoint, pName));
+	TransferManager::Get()->AddConnect(TransferManager::ConnectInfo(pEndPoint, pName, 0xFF));
 	env->ReleaseStringUTFChars(end_point, pEndPoint);
 	env->ReleaseStringUTFChars(name, pName);
 }

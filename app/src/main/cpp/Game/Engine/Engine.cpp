@@ -264,6 +264,34 @@ void Engine::SendData(const char* pId, jbyte* pData, int nSize)
 
 //-----------------------------------------
 //-----------------------------------------
+void Engine::LoadAds()
+{
+	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SYSTEM);
+	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SYSTEM, "LoadAds");
+//	jstring connectName = GetEnv()->NewStringUTF(pConnectName);
+	GetEnv()->CallStaticVoidMethod(classID, methodID_1);
+}
+
+//-----------------------------------------
+//-----------------------------------------
+void Engine::ShowAds()
+{
+	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SYSTEM);
+	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SYSTEM, "ShowAds");
+	GetEnv()->CallStaticVoidMethod(classID, methodID_1);
+}
+
+//-----------------------------------------
+//-----------------------------------------
+bool Engine::IsShowAds() const
+{
+	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SYSTEM);
+	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SYSTEM, "IsShowAds");
+	return GetEnv()->CallStaticBooleanMethod(classID, methodID_1);
+}
+
+//-----------------------------------------
+//-----------------------------------------
 void Engine::Create()
 {
 	if( !s_AoYumeEngine ){

@@ -14,6 +14,9 @@
 
 class ComponentBase;
 class StateManager;
+class Egg;
+class Character;
+class MessageWindow;
 
 class SceneTitle : public SceneBase
 {
@@ -23,12 +26,30 @@ public:
 	enum {
 		eState_FadeIn,
 		eState_WaitPressButton,
+		eState_BorneStartMonster,
+		eState_BorneFadeOut,
+		eState_BorneFadeIn,
+		eState_BorneMessage,
 		eState_WaitKeyboardEnable,
 		eState_WaitInput,
+		eState_StartNearby,
 		eState_WaitNearbyConnect,
 		eState_WaitNearbyTransferPlayerId,
 		eState_FadeOut,
 		eState_Max
+	};
+
+	enum {
+		eBTN_MANAGER_TITLE,
+		eBTN_MANAGER_ROOM,
+	};
+
+	enum {
+		eBTN_LOCAL = 0,
+		eBTN_TUTORIAL,
+
+		eBTN_MAKE_ROOM = 0,
+		eBTN_JOIN_ROOM,
 	};
 
 public:
@@ -44,12 +65,12 @@ protected:
 	void EntityUpdate(GameMessage message, const void* param) override;
 
 public:
-	float 		m_fEggCnt;
 	Entity*		m_pBgImage;
-	Entity*		m_pEggImage;
+	Egg*		m_pEgg;
+	Character*	m_pChara;
 	Entity*		m_pTitleImage;
-	Entity*		m_pPlayerName;
-	ButtonManager*	m_pButtonManager;
+	std::vector<ButtonManager*>	m_aButtonManager;
+	MessageWindow*	m_pMessageWindow;
 
 	StateManager*	m_pStateManager;
 };

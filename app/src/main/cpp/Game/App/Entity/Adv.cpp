@@ -133,7 +133,7 @@ void Adv::GameEntitySetup(const void* param) {
 	}
 	{
 		m_pBtnManager = new ButtonManager();
-		m_pBtnManager->CreateButton("image/button_dice.png");
+		m_pBtnManager->CreateButton("image/button_Adv.png");
 		m_pBtnManager->SetVisible(false);
 		m_pBtnManager->Lock();
 	}

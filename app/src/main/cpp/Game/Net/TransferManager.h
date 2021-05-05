@@ -29,19 +29,22 @@ public:
 	struct ConnectInfo {
 		bool bHost = false;
 		int nPlayerId = -1;
+		uint8_t  uCharaId = 0;
 		std::string Id = "";
 		std::string	Name = "";
 
 		ConnectInfo()
 		: bHost(false)
 		, nPlayerId(-1)
+		, uCharaId(0)
 		, Id("")
 		, Name("")
 		{}
 
-		ConnectInfo(const char* pId, const char* pName)
+		ConnectInfo(const char* pId, const char* pName, uint8_t uCharaId)
 		: bHost(false)
 		, nPlayerId(-1)
+		, uCharaId(uCharaId)
 		, Id(pId)
 		, Name(pName)
 		{}
@@ -71,6 +74,8 @@ public:
 
 	void SetSelfConnect(const ConnectInfo& info);
 	const ConnectInfo& GetSelfConnect() const;
+	void SetSelfCharaId(uint8_t uCharaId);
+	uint8_t GetSelfCharaId() const;
 
 	void AddConnect(const ConnectInfo& info);
 	const ConnectInfo& GetConnect(int nNo) const;
@@ -78,6 +83,7 @@ public:
 	int GetConnectNum() const;
 
 	void SetConnectHost(const char* id, bool bHost);
+	void SetConnectCharaId(const char* id, uint8_t uCharaId);
 	void SetConnectPlayerId(const char* id, int nPlayerId);
 
 	void SendHost(jbyte* pData, int nSize);
@@ -89,6 +95,7 @@ public:
 	int GetConnectNoFromNetId(const char* id) const;
 	int GetConnectNoFromPlayerId(int nPlayerId) const;
 	int GetPlayerIdFromNetId(const char* id) const;
+	uint8_t GetCharaIdFromPlayerId(int nPlayerId) const;
 
 private:
 	void sendData(const char* id, jbyte* pData, int nSize);

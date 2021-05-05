@@ -23,8 +23,8 @@ class FadeCtrl : public Singleton<FadeCtrl>
 	};
 	
 public:
-	void In(float fDuration = 0.25f);
-	void Out(float fDuration = 0.25f);
+	void In(const VEC3& color = {0, 0, 0}, float fDuration = 0.25f);
+	void Out(const VEC3& color = {0, 0, 0}, float fDuration = 0.25f);
 
 	bool IsFadeInEnd() const;
 	bool IsFadeOutEnd() const;
@@ -37,6 +37,7 @@ private:
 private:
 	float 		m_fFadeTime;
 	float	 	m_fFadeDuration;
+	VEC3		m_Color;
 	FadeState	m_FadeState;
 	Entity*		m_pFadeEntity;
 };

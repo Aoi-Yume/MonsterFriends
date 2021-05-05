@@ -11,6 +11,7 @@ FadeCtrl::FadeCtrl()
 : Singleton<FadeCtrl>()
 , m_fFadeTime(0.0f)
 , m_fFadeDuration(0.0f)
+, m_Color(0, 0, 0)
 , m_FadeState(eFadeState_None)
 , m_pFadeEntity(nullptr)
 {
@@ -34,17 +35,19 @@ FadeCtrl::~FadeCtrl()
 	DEBUG_LOG("Destroy FadeCtrl");
 }
 
-void FadeCtrl::In(float fDuration)
+void FadeCtrl::In(const VEC3& color, float fDuration)
 {
 	m_FadeState = eFadeState_In;
 	m_fFadeTime = 0.0f;
+	m_Color = color;
 	m_fFadeDuration = fDuration;
 }
 
-void FadeCtrl::Out(float fDuration)
+void FadeCtrl::Out(const VEC3& color, float fDuration)
 {
 	m_FadeState = eFadeState_Out;
 	m_fFadeTime = 0.0f;
+	m_Color = color;
 	m_fFadeDuration = fDuration;
 }
 
@@ -73,7 +76,7 @@ void FadeCtrl::fadeUpdate()
 	auto p = (LayoutComponent*)m_pFadeEntity->GetComponent(eComponentKind_Layout);
 	if(m_FadeState == eFadeState_In) {
 		const float alpha = 1.0f - std::min(m_fFadeTime / m_fFadeDuration, 1.0f);
-		p->SetColor({0, 0, 0, alpha});
+		p->SetColor({m_Color.GetX(), m_Color.GetY(), m_Color.GetZ(), alpha});
 		m_pFadeEntity->SetVisible(true);
 
 		if(m_fFadeTime >= m_fFadeDuration){
@@ -82,7 +85,7 @@ void FadeCtrl::fadeUpdate()
 	}
 	else if(m_FadeState == eFadeState_Out){
 		const float alpha = std::min(m_fFadeTime / m_fFadeDuration, 1.0f);
-		p->SetColor({0, 0, 0, alpha});
+		p->SetColor({m_Color.GetX(), m_Color.GetY(), m_Color.GetZ(), alpha});
 		m_pFadeEntity->SetVisible(true);
 
 		if(m_fFadeTime >= m_fFadeDuration){

@@ -315,8 +315,8 @@ void SceneGameMain::SceneSetup() {
 		m_pPlayerNotice->Update(eGameMessage_Setup, nullptr);
 	}
 	{
-		// TODO プレイヤーキャラ設定
-		m_pChara = new Character(0);
+		const int uCharaId = TransferManager::Get()->GetCharaIdFromPlayerId(AppParam::Get()->GetNetworkInfo().nCurrentPlayerId);
+		m_pChara = new Character(uCharaId);
 		m_pChara->Update(eGameMessage_Setup, nullptr);
 		m_pChara->SetPosition(0, -150.0f, 0);
 	}
@@ -365,13 +365,14 @@ void SceneGameMain::SceneSetup() {
 		{
 			auto pBtnManager = new ButtonManager();
 			const std::pair<const char *, VEC3> btnList[] = {
-					{"image/button_Adv.png",  VEC3(-250.0f, -400.0f, 0)},
-					{"image/button_Work.png", VEC3(0.0f, -400.0f, 0)},
-					{"image/button_item.png", VEC3(250.0f, -400.0f, 0)},
+					{"image/button_Adv.png",  VEC3(-230.0f, -400.0f, 0)},
+					{"image/button_next.png", VEC3(0.0f, -400.0f, 0)},
+					{"image/button_item.png", VEC3(230.0f, -400.0f, 0)},
 			};
 			for (int i = 0; i < sizeof(btnList) / sizeof(btnList[0]); ++i) {
 				auto pBtn = pBtnManager->CreateButton(btnList[i].first);
 				pBtn->SetPosition(btnList[i].second);
+				pBtn->SetScale(VEC3(0.8f, 0.8f, 0.8f));
 			}
 			pBtnManager->SetVisible(false);
 			pBtnManager->Lock();
@@ -381,7 +382,7 @@ void SceneGameMain::SceneSetup() {
 		{
 			auto pBtnManager = new ButtonManager();
 			const std::pair<const char *, VEC3> btnList[] = {
-					{"image/button_use.png",  VEC3(-250.0f, -400.0f, 0)},
+					{"image/button_bag.png",  VEC3(-250.0f, -400.0f, 0)},
 					{"image/button_shop.png", VEC3(250.0f, -400.0f, 0)},
 			};
 			for (int i = 0; i < sizeof(btnList) / sizeof(btnList[0]); ++i) {
@@ -407,10 +408,8 @@ void SceneGameMain::SceneSync()
 	auto pManager = TransferManager::Get();
 	if(GetSyncStep() == eSyncStep_UserSync) {
 		// ゲーム情報の送受信設定
-		auto pInfo = pManager->GetTransfer<TransferGameInfo>(
-				TransferManager::eTransferKind_GameInfo);
-		pInfo->SetGameInfoData(&AppParam::Get()->GetNetworkInfo(),
-							   sizeof(AppParam::GameNetworkInfo));
+		auto pInfo = pManager->GetTransfer<TransferGameInfo>(TransferManager::eTransferKind_GameInfo);
+		pInfo->SetGameInfoData(&AppParam::Get()->GetNetworkInfo(), sizeof(AppParam::GameNetworkInfo));
 		pInfo->SetReceiveCallBack([](void *pData) {
 			auto &pParam = AppParam::Get()->GetNetworkInfo();
 			pParam = *reinterpret_cast<AppParam::GameNetworkInfo *>(pData);

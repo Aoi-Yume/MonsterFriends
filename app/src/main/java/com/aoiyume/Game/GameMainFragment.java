@@ -17,8 +17,15 @@ import android.widget.TextView;
 
 import com.aoiyume.monsterfriends.MainActivity;
 import com.aoiyume.monsterfriends.R;
+import com.google.android.gms.ads.AdError;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.gms.nearby.connection.Payload;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
@@ -33,6 +40,7 @@ public class GameMainFragment extends Fragment {
     static int m_CurrentInpuTextNo = 0;
     static final int m_InputTextMax = 2;
     static NearbyClient m_NearbyClient = null;
+    static InterstitialAd m_InterstitialAd = null;
 
     static Runnable ShowSoftKeyborad = new Runnable() {
         @Override
@@ -156,5 +164,56 @@ public class GameMainFragment extends Fragment {
     public static void SendData(String Id, byte[] data)
     {
         m_NearbyClient.SendData(Id, data);
+    }
+
+    public static void LoadAds()
+    {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                // TODO 製品版では正規のユニットIDを使用する
+                InterstitialAd.load(
+                        MainActivity.GetContext(), "ca-app-pub-3940256099942544/1033173712",
+                        new AdRequest.Builder().build(), new InterstitialAdLoadCallback() {
+                            @Override
+                            public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                                super.onAdLoaded(interstitialAd);
+                                m_InterstitialAd = interstitialAd;
+                                m_InterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
+                                    @Override
+                                    public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
+                                        super.onAdFailedToShowFullScreenContent(adError);
+                                        m_InterstitialAd = null;
+                                    }
+
+                                    @Override
+                                    public void onAdDismissedFullScreenContent() {
+                                        super.onAdDismissedFullScreenContent();
+                                        m_InterstitialAd = null;
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                                super.onAdFailedToLoad(loadAdError);
+                            }
+                        });
+            }
+        });
+    }
+    public static void ShowAds()
+    {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                m_InterstitialAd.show(MainActivity.GetContext());
+            }
+        });
+    }
+
+    public static boolean IsShowAds()
+    {
+        return m_InterstitialAd != null;
     }
 }

@@ -183,6 +183,9 @@ void ObjectLoader::SetDefaultLoad() {
 		s_ObjectLoader->SetMethodID(pClassName,"StopNearbyDiscovery", "()V", true);
 		s_ObjectLoader->SetMethodID(pClassName,"DisconnectNearbyAllEndPoint", "()V", true);
 		s_ObjectLoader->SetMethodID(pClassName,"SendData", "(Ljava/lang/String;[B)V", true);
+		s_ObjectLoader->SetMethodID(pClassName, "LoadAds", "()V", true);
+		s_ObjectLoader->SetMethodID(pClassName, "ShowAds", "()V", true);
+		s_ObjectLoader->SetMethodID(pClassName, "IsShowAds", "()Z", true);
 	}
     // Class Utility
     {

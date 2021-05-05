@@ -6,10 +6,13 @@
 #include "TransferConnect.h"
 #include "TransferManager.h"
 #include <Random.h>
+#include <AppParam.h>
 
 TransferConnect::TransferConnect()
 : TransferBase(TransferManager::eTransferKind_Connect, 500 * 1000 * 1000)
 , m_Data()
+, m_bReceiveSelfConnect(false)
+, m_bReceiveHost(false)
 {
 }
 
@@ -23,7 +26,11 @@ void TransferConnect::initialize()
 	auto pManager = TransferManager::Get();
 	m_Data.uKind = TransferManager::eTransferKind_Connect;
 	m_Data.bHost = TransferManager::Get()->IsHost();
+	m_Data.uCharaId = TransferManager::Get()->GetSelfCharaId();
 	m_Data.uRandomSeed = Random::GetSyncSeed();
+
+	m_bReceiveSelfConnect = false;
+	m_bReceiveHost = false;
 }
 
 bool TransferConnect::updateTransfer()
@@ -40,7 +47,6 @@ bool TransferConnect::updateTransfer()
 void TransferConnect::updateReceive(const char* Id, void* pData)
 {
 	if(IsEnd()){ return; }
-	if(std::strlen(m_Data.SelfId) > 0){ return; }
 	TransferBase::updateReceive(Id, pData);
 
 	auto pManager = TransferManager::Get();
@@ -58,23 +64,31 @@ void TransferConnect::updateReceive(const char* Id, void* pData)
 		if(bHit){
 			continue;
 		}
-		std::snprintf(m_Data.SelfId, sizeof(m_Data.SelfId), "%s", idInfo.OpponentId);
-		m_Data.SelfId[sizeof(m_Data.SelfId) - 1] = '\0';
+		char selfId[16];
+		std::snprintf(selfId, sizeof(selfId), "%s", idInfo.OpponentId);
+		selfId[sizeof(selfId) - 1] = '\0';
 
-		TransferManager::ConnectInfo info(m_Data.SelfId, "");
+		TransferManager::ConnectInfo info(selfId, "", TransferManager::Get()->GetSelfCharaId());
 		pManager->SetSelfConnect(info);
-		RequestEnd();
+		m_bReceiveSelfConnect = true;
 	}
 	if(pReceiveData->bHost){
 		Random::SetSyncSeed(pReceiveData->uRandomSeed);
+		m_bReceiveHost = true;
 	}
 	pManager->SetConnectHost(Id, pReceiveData->bHost);
+	pManager->SetConnectCharaId(Id, pReceiveData->uCharaId);
+
+	if(m_bReceiveSelfConnect && (m_bReceiveHost || m_Data.bHost)){
+		RequestEnd();
+	}
 }
 
 void TransferConnect::Dump()
 {
-	DEBUG_LOG_A("SelfId:[%s]\n", m_Data.SelfId);
+	auto pManager = TransferManager::Get();
+	DEBUG_LOG_A("SelfId:[%s], CharaId[%u]\n", pManager->GetSelfConnect().Id.c_str(), pManager->GetSelfCharaId());
 	for(int i = 0; i < TransferManager::Get()->GetConnectNum(); ++i){
-		DEBUG_LOG_A("ConnectId:[%s]\n", m_Data.IDInfo[i].OpponentId);
+		DEBUG_LOG_A("ConnectId:[%s], CharaId[%u]\n", m_Data.IDInfo[i].OpponentId, pManager->GetConnect(i).uCharaId);
 	}
 }

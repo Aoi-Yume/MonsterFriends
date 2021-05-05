@@ -31,14 +31,17 @@ private:
 	struct Data {
 		uint8_t  	uKind;
 		bool bHost;
-		char SelfId[16];
 		unsigned int uRandomSeed;
+		uint8_t 	uCharaId;
 		struct IDInfo {
 			char OpponentId[16];
 		};
 		IDInfo		IDInfo[NET_CONNECT_MAX - 1];
 	};
 	Data m_Data;
+
+	bool m_bReceiveSelfConnect;
+	bool m_bReceiveHost;
 };
 
 #endif

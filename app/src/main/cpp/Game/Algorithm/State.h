@@ -37,6 +37,8 @@ public:
 	void ChangeState(int nState);
 	void SetUserPtr(void* pPtr);
 
+	int GetStateCount() const { return m_nStateCount; }
+
 	template<class T>
 	T* CreateState(){
 		auto pState = new T;

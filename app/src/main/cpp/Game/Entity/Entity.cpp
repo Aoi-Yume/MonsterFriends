@@ -21,55 +21,70 @@ Entity::~Entity()
 
 void Entity::SetPosition(float x, float y, float z)
 {
-	TransformComponent* pTransform = reinterpret_cast<TransformComponent*>(GetComponent(eComponentKind_Transform));
+	auto pTransform = GetComponent<TransformComponent*>(eComponentKind_Transform);
+	ASSERT(pTransform);
 	pTransform->SetTranslate(VEC3(x, y, z));
 }
 
 void Entity::SetPosition(const VEC3& pos)
 {
-	TransformComponent* pTransform = reinterpret_cast<TransformComponent*>(GetComponent(eComponentKind_Transform));
+	auto pTransform = GetComponent<TransformComponent*>(eComponentKind_Transform);
+	ASSERT(pTransform);
 	pTransform->SetTranslate(pos);
 }
 
-const VEC3 Entity::GetPosition()
+VEC3 Entity::GetPosition() const
 {
-	TransformComponent* pTransform = reinterpret_cast<TransformComponent*>(GetComponent(eComponentKind_Transform));
+	auto pTransform = GetComponent<TransformComponent*>(eComponentKind_Transform);
+	ASSERT(pTransform);
 	return pTransform->GetTranslate();
 }
 
 void Entity::SetRotate(float x, float y, float z)
 {
-	TransformComponent* pTransform = reinterpret_cast<TransformComponent*>(GetComponent(eComponentKind_Transform));
+	auto pTransform = GetComponent<TransformComponent*>(eComponentKind_Transform);
+	ASSERT(pTransform);
 	pTransform->SetRotate(VEC3(x, y, z));
 }
 
 void Entity::SetRotate(const VEC3 &rot)
 {
-	TransformComponent* pTransform = reinterpret_cast<TransformComponent*>(GetComponent(eComponentKind_Transform));
+	auto pTransform = GetComponent<TransformComponent*>(eComponentKind_Transform);
+	ASSERT(pTransform);
 	pTransform->SetRotate(rot);
+}
+
+VEC3 Entity::GetRotate() const
+{
+	auto pTransform = GetComponent<TransformComponent*>(eComponentKind_Transform);
+	ASSERT(pTransform);
+	return pTransform->GetRotate();
 }
 
 void Entity::SetScale(float x, float y, float z)
 {
-	TransformComponent* pTransform = reinterpret_cast<TransformComponent*>(GetComponent(eComponentKind_Transform));
+	auto pTransform = GetComponent<TransformComponent*>(eComponentKind_Transform);
+	ASSERT(pTransform);
 	pTransform->SetScale(VEC3(x, y, z));
 }
 
 void Entity::SetScale(const VEC3& scale)
 {
-	TransformComponent* pTransform = reinterpret_cast<TransformComponent*>(GetComponent(eComponentKind_Transform));
+	auto pTransform = GetComponent<TransformComponent*>(eComponentKind_Transform);
+	ASSERT(pTransform);
 	pTransform->SetScale(scale);
 }
 
-const VEC3 Entity::GetScale()
+VEC3 Entity::GetScale() const
 {
-	TransformComponent* pTransofem = reinterpret_cast<TransformComponent*>(GetComponent(eComponentKind_Transform));
-	return pTransofem->GetScale();
+	auto pTransform = GetComponent<TransformComponent*>(eComponentKind_Transform);
+	ASSERT(pTransform);
+	return pTransform->GetScale();
 }
 
 void Entity::SetVisible(bool bVisible)
 {
-	auto pDrawComponent = reinterpret_cast<DrawComponent*>(GetComponent(eComponentKind_Layout));
+	auto pDrawComponent = GetComponent<DrawComponent*>(eComponentKind_Layout);
 	if(pDrawComponent){
 		pDrawComponent->SetVisible(bVisible);
 	}
@@ -81,7 +96,7 @@ void Entity::SetVisible(bool bVisible)
 
 bool Entity::IsVisible()
 {
-	auto pDrawComponent = reinterpret_cast<DrawComponent*>(GetComponent(eComponentKind_Layout));
+	auto pDrawComponent = GetComponent<DrawComponent*>(eComponentKind_Layout);
 	if(pDrawComponent){
 		return pDrawComponent->IsVisible();
 	}
@@ -90,10 +105,9 @@ bool Entity::IsVisible()
 
 bool Entity::CreateTextImageComponent(Entity* pEntity, const char* pText, int nFontSize)
 {
-//	DEBUG_LOG("Create Text Image Component");
 	CreateTransformComponent(pEntity);
 	if( pEntity->m_pComponent[eComponentKind_Layout] ){ return false; }
-	TextImageComponent* pComponent = new TextImageComponent(pEntity);
+	auto pComponent = new TextImageComponent(pEntity);
 	pComponent->SetText(pText);
 	pComponent->SetFontSize(nFontSize);
 
@@ -103,14 +117,13 @@ bool Entity::CreateTextImageComponent(Entity* pEntity, const char* pText, int nF
 
 LayoutComponent* Entity::CreateLayoutComponent(Entity* pEntity, const char* pResPath)
 {
-//    DEBUG_LOG("Create Layout Component");
     CreateTransformComponent(pEntity);
 
 	if( pEntity->m_pComponent[eComponentKind_Layout] ){
 		return reinterpret_cast<LayoutComponent*>(pEntity->m_pComponent[eComponentKind_Layout]);
 	}
-	
-	LayoutComponent* pComponent = new LayoutComponent(pEntity);
+
+	auto pComponent = new LayoutComponent(pEntity);
 	pComponent->SetResPath(pResPath);
 	
 	pEntity->m_pComponent[eComponentKind_Layout] = pComponent;
@@ -119,10 +132,7 @@ LayoutComponent* Entity::CreateLayoutComponent(Entity* pEntity, const char* pRes
 
 bool Entity::CreateTransformComponent(Entity* pEntity)
 {
-//	DEBUG_LOG("Create Transform Component");
-	if(  pEntity->m_pComponent[eComponentKind_Transform] )
-	{
-//		DEBUG_LOG("Create Transform Component Filed");
+	if(  pEntity->m_pComponent[eComponentKind_Transform] ) {
 		return false;
 	}
 	pEntity->m_pComponent[eComponentKind_Transform] = new TransformComponent(pEntity);
@@ -131,10 +141,7 @@ bool Entity::CreateTransformComponent(Entity* pEntity)
 
 bool Entity::CreateCollision2DRectComponent(Entity *pEntity)
 {
-//	DEBUG_LOG("Create Collision2DRect Component");
-	if(  pEntity->m_pComponent[eComponentKind_Collision] )
-	{
-//		DEBUG_LOG("Create Collision2DRect Component Filed");
+	if(  pEntity->m_pComponent[eComponentKind_Collision] ) {
 		return false;
 	}
 	pEntity->m_pComponent[eComponentKind_Collision] = new Collision2DRectComponent(pEntity);
@@ -143,10 +150,7 @@ bool Entity::CreateCollision2DRectComponent(Entity *pEntity)
 
 bool Entity::CreateCameraComponent(Entity *pEntity)
 {
-//    DEBUG_LOG("Create Camera Component");
-    if( pEntity->m_pComponent[eComponentKind_Camera] )
-    {
- //       DEBUG_LOG("Create Camera Component Filed");
+    if( pEntity->m_pComponent[eComponentKind_Camera] ) {
         return false;
     }
     pEntity->m_pComponent[eComponentKind_Camera] = new CameraComponent(pEntity);
@@ -166,10 +170,9 @@ AnimationComponent* Entity::CreateAnimationComponent(Entity* pEntity)
 
 bool Entity::CreateDebugSquareImageComponent(Entity *pEntity)
 {
-//	DEBUG_LOG("Create Debug Square Image Component");
 	CreateTransformComponent(pEntity);
 	if( pEntity->m_pComponent[eComponentKind_Layout] ){ return false; }
-	DebugSquareImageComponent* pComponent = new DebugSquareImageComponent(pEntity);
+	auto pComponent = new DebugSquareImageComponent(pEntity);
 
 	pEntity->m_pComponent[eComponentKind_Layout] = pComponent;
 	return true;

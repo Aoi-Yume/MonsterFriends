@@ -10,6 +10,7 @@ GameEntity::GameEntity()
 , m_nState(0)
 , m_nNextState(0)
 , m_nStateCnt(0)
+, m_fStateTime(0.0f)
 {
 }
 
@@ -58,9 +59,11 @@ void GameEntity::StateUpdate()
 	if(m_nNextState != m_nState){
 		m_nState = m_nNextState;
 		m_nStateCnt = 0;
+		m_fStateTime = 0.0f;
 	}
 	else{
 		m_nStateCnt++;
+		m_fStateTime += Engine::GetEngine()->GetDeltaTime();
 	}
 }
 	
@@ -77,4 +80,9 @@ int GameEntity::GetNextState() const
 int GameEntity::GetStateCount() const
 {
 	return m_nStateCnt;
+}
+
+float GameEntity::GetStateTime() const
+{
+	return m_fStateTime;
 }

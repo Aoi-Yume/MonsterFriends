@@ -29,6 +29,7 @@ public:
 	enum {
 		eState_FadeIn,
 		eState_ResultMain,
+		eState_Ads,
 		eState_FadeOut,
 		eState_Max
 	};

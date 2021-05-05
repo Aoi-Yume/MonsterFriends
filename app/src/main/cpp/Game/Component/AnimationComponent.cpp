@@ -112,6 +112,7 @@ void AnimationComponent::destroy()
 //==========================================
 SimpleOpenAnimation::SimpleOpenAnimation(float fDefaultScale, float fOverScale, float fMaxTime)
 	: Super(fMaxTime)
+	, m_BaseScale(1.0f, 1.0f, 1.0f)
 	, m_fDefaultScale(fDefaultScale)
 	, m_fOverScale(fOverScale)
 {
@@ -128,11 +129,16 @@ SimpleOpenAnimation::~SimpleOpenAnimation()
 void SimpleOpenAnimation::update(const float fDeltaTime)
 {
 	auto transform = reinterpret_cast<TransformComponent*>(GetEntityBase()->GetComponent(eComponentKind_Transform));
+	if(GetTime() <= 0.0f) {
+		m_BaseScale = transform->GetScale();
+	}
+
+
 	const float fBaseRatio = GetRatio();
 	const float fOverRatio = std::min(fBaseRatio / 0.8f, 1.0f);
 	const float fDefaultRatio = std::min(std::max(fBaseRatio - 0.8f, 0.0f) / 0.2f, 1.0f);
 	const float fScale = m_fOverScale * fOverRatio * (1.0f - fDefaultRatio) + m_fDefaultScale * fDefaultRatio;
-	transform->SetScale({fScale, fScale, fScale});
+	transform->SetScale(m_BaseScale * fScale);
 
 	Super::update(fDeltaTime);
 }

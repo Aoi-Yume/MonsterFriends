@@ -13,7 +13,12 @@
 #include <../Net/TransferManager.h>
 #include <../Net/TransferBase.h>
 #include <State.h>
+#include <Random.h>
 #include <FadeCtrl.h>
+#include <MessageWindow/MessageWindow.h>
+#include <Egg.h>
+#include <Character.h>
+#include <AppCharaList.h>
 
 SceneBase* SceneTitle::CreateScene()
 {
@@ -40,11 +45,77 @@ namespace {
 	class StateWaitPressButton : public StateBase {
 		void Begin(void* pUserPtr) override{
 			auto p = reinterpret_cast<SceneTitle *>(pUserPtr);
-			p->m_pButtonManager->SetVisible(true);
+			p->m_aButtonManager[SceneTitle::eBTN_MANAGER_TITLE]->SetVisible(true);
+			p->m_aButtonManager[SceneTitle::eBTN_MANAGER_TITLE]->Unlock();
 		}
 		void Update(void *pUserPtr) override {
 			auto p = reinterpret_cast<SceneTitle *>(pUserPtr);
-			if (p->m_pButtonManager->GetDecide() != -1) {
+			if (p->m_aButtonManager[SceneTitle::eBTN_MANAGER_TITLE]->GetDecide() == SceneTitle::eBTN_LOCAL) {
+				p->m_aButtonManager[SceneTitle::eBTN_MANAGER_TITLE]->Lock();
+				p->m_aButtonManager[SceneTitle::eBTN_MANAGER_TITLE]->SetVisible(false);
+				ChangeState(SceneTitle::eState_BorneStartMonster);
+			}
+		}
+	};
+
+	//==========================================
+	//==========================================
+	class StateBorneStartMonster : public StateBase {
+		void Begin(void* pUserPtr) override {
+			auto p = reinterpret_cast<SceneTitle*>(pUserPtr);
+			p->m_pEgg->StartBorne();
+		}
+		void Update(void* pUserPtr) override {
+			auto p = reinterpret_cast<SceneTitle*>(pUserPtr);
+			if(p->m_pEgg->IsBorneEnd()){ ChangeState(SceneTitle::eState_BorneFadeOut); }
+		}
+	};
+
+	//==========================================
+	//==========================================
+	class StateBorneFadeOut : public StateBase {
+		void Begin(void *pUserPtr) override {
+			FADE()->Out({1, 1, 1});
+		}
+
+		void Update(void *pUserPtr) override {
+			if (FADE()->IsFadeOutEnd()) {
+				auto p = reinterpret_cast<SceneTitle*>(pUserPtr);
+				p->m_pEgg->SetVisible(false);
+				p->m_pChara->SetVisible(true);
+				p->m_pChara->InVisibleDice();
+				ChangeState(SceneTitle::eState_BorneFadeIn);
+			}
+		}
+	};
+
+	//==========================================
+	//==========================================
+	class StateBorneFadeIn : public StateBase {
+		void Begin(void *pUserPtr) override {
+			FADE()->In({1, 1, 1});
+		}
+
+		void Update(void *pUserPtr) override {
+			if (FADE()->IsFadeInEnd()) {
+				ChangeState(SceneTitle::eState_BorneMessage);
+			}
+		}
+	};
+
+	//==========================================
+	//==========================================
+	class StateBorneMessage : public StateBase{
+		void Begin(void* pUserPtr) override {
+			auto p = reinterpret_cast<SceneTitle*>(pUserPtr);
+			p->m_pMessageWindow->SetVisible(true);
+			p->m_pMessageWindow->SetDirectMessage("モンスターがうまれたね。\n名前をつけてあげよう！");
+		}
+
+		void Update(void* pUserPtr) override{
+			auto p = reinterpret_cast<SceneTitle*>(pUserPtr);
+			if(p->m_pMessageWindow->IsNextMessage()){
+				p->m_pMessageWindow->SetVisible(false);
 				ChangeState(SceneTitle::eState_WaitKeyboardEnable);
 			}
 		}
@@ -73,16 +144,42 @@ namespace {
 				char charName[64];
 				Engine::GetEngine()->GetInputText(charName, sizeof(charName));
 				AppParam::Get()->SetCharaName(charName);
-				// TODO いい加減に名前で通信を切り替えるのをやめる
-				if (strcmp(charName, "親") == 0) {
-					Engine::GetEngine()->StartNearbyAdvertising(charName);
-					TransferManager::Get()->Initialize(true);
-					DEBUG_LOG("親NEarby\n");
-				} else {
-					Engine::GetEngine()->StartNearbyDiscovery(charName);
-					TransferManager::Get()->Initialize(false);
-					DEBUG_LOG("子NEarby\n");
-				}
+				ChangeState(SceneTitle::eState_StartNearby);
+			}
+		}
+	};
+
+	//==========================================
+	//==========================================
+	class StateStartNearby : public StateBase{
+		void Begin(void* pUserPtr) override {
+			auto p = reinterpret_cast<SceneTitle*>(pUserPtr);
+			auto pBtnMgr = p->m_aButtonManager[SceneTitle::eBTN_MANAGER_ROOM];
+			pBtnMgr->SetVisible(true);
+			pBtnMgr->Reset();
+			pBtnMgr->Unlock();
+		}
+		void Update(void* pUserPtr) override {
+			auto p = reinterpret_cast<SceneTitle*>(pUserPtr);
+			auto pBtnMgr = p->m_aButtonManager[SceneTitle::eBTN_MANAGER_ROOM];
+			const char* pCharaName = AppParam::Get()->GetCharaName();
+			const int nDecide = pBtnMgr->GetDecide();
+			bool bRet = false;
+			if(nDecide == SceneTitle::eBTN_MAKE_ROOM){
+				Engine::GetEngine()->StartNearbyAdvertising(pCharaName);
+				TransferManager::Get()->Initialize(true);
+				DEBUG_LOG("親NEarby\n");
+				bRet = true;
+			}
+			else if(nDecide == SceneTitle::eBTN_JOIN_ROOM){
+				Engine::GetEngine()->StartNearbyDiscovery(pCharaName);
+				TransferManager::Get()->Initialize(false);
+				DEBUG_LOG("子NEarby\n");
+				bRet = true;
+			}
+			if(bRet){
+				pBtnMgr->Lock();
+				pBtnMgr->SetVisible(false);
 				TransferManager::Get()->StartTransfer(TransferManager::eTransferKind_Connect);
 				ChangeState(SceneTitle::eState_WaitNearbyConnect);
 			}
@@ -93,21 +190,22 @@ namespace {
 	//==========================================
 	class StateWaitNearbyConnect : public StateBase {
 		void Begin(void *pUserPtr) override {
+			auto p = reinterpret_cast<SceneTitle *>(pUserPtr);
 			m_fTime = 0.0f;
+			p->m_pMessageWindow->SetVisible(true);
+			p->m_pMessageWindow->SetDirectMessage("接続中・");
 		}
 
 		void Update(void *pUserPtr) override {
 			auto p = reinterpret_cast<SceneTitle *>(pUserPtr);
-			auto pTextImage = (TextImageComponent *) (p->m_pPlayerName->GetComponent(eComponentKind_Layout));
-			pTextImage->SetVisible(true);
 			if (m_fTime >= 3.0f) {
 				m_fTime = 0.0f;
 			} else if (m_fTime >= 2.0f) {
-				pTextImage->SetText("接続中・・・", 5.0f);
+				p->m_pMessageWindow->SetDirectMessage("接続中・・・");
 			} else if (m_fTime >= 1.0f) {
-				pTextImage->SetText("接続中・・", 5.0f);
+				p->m_pMessageWindow->SetDirectMessage("接続中・・");
 			} else {
-				pTextImage->SetText("接続中・", 5.0f);
+				p->m_pMessageWindow->SetDirectMessage("接続中・");
 			}
 			m_fTime += Engine::GetEngine()->GetDeltaTime();
 
@@ -129,21 +227,22 @@ namespace {
 	//==========================================
 	class StateWaitNearbyTransferPlayerId : public StateBase {
 		void Begin(void *pUserPtr) override {
+			auto p = reinterpret_cast<SceneTitle *>(pUserPtr);
 			m_fTime = 0.0f;
+			p->m_pMessageWindow->SetVisible(true);
+			p->m_pMessageWindow->SetDirectMessage("通信中・");
 		}
 
 		void Update(void *pUserPtr) override {
 			auto p = reinterpret_cast<SceneTitle *>(pUserPtr);
-			auto pTextImage = (TextImageComponent *) (p->m_pPlayerName->GetComponent(eComponentKind_Layout));
-			pTextImage->SetVisible(true);
 			if (m_fTime >= 3.0f) {
 				m_fTime = 0.0f;
 			} else if (m_fTime >= 2.0f) {
-				pTextImage->SetText("接続中・・・", 5.0f);
+				p->m_pMessageWindow->SetDirectMessage("通信中・・・");
 			} else if (m_fTime >= 1.0f) {
-				pTextImage->SetText("接続中・・", 5.0f);
+				p->m_pMessageWindow->SetDirectMessage("通信中・・");
 			} else {
-				pTextImage->SetText("接続中・", 5.0f);
+				p->m_pMessageWindow->SetDirectMessage("通信中・");
 			}
 			m_fTime += Engine::GetEngine()->GetDeltaTime();
 
@@ -178,11 +277,12 @@ namespace {
 //==========================================
 SceneTitle::SceneTitle()
 : SceneBase("title")
-, m_fEggCnt(0.0f)
 , m_pBgImage(nullptr)
-, m_pEggImage(nullptr)
+, m_pEgg(nullptr)
+, m_pChara(nullptr)
 , m_pTitleImage(nullptr)
-, m_pButtonManager(nullptr)
+, m_aButtonManager()
+, m_pMessageWindow(nullptr)
 , m_pStateManager(nullptr)
 {
 	DEBUG_LOG("Scene Title Constructor");
@@ -192,10 +292,13 @@ SceneTitle::SceneTitle()
 //------------------------------------------
 SceneTitle::~SceneTitle()
 {
-	delete m_pPlayerName;
-	delete m_pButtonManager;
+	for(auto& it : m_aButtonManager){
+		delete it;
+	}
+	delete m_pMessageWindow;
 	delete m_pTitleImage;
-	delete m_pEggImage;
+	delete m_pChara;
+	delete m_pEgg;
 	delete m_pBgImage;
 	delete m_pStateManager;
 }
@@ -205,6 +308,7 @@ SceneTitle::~SceneTitle()
 void SceneTitle::SceneSetup() {
 	Super::SceneSetup();
 	DEBUG_LOG("Title Call Setup");
+	TransferManager::Get()->ResetConnect();
 	{
 		m_pBgImage = new Entity();
 		Entity::CreateLayoutComponent(m_pBgImage, "image/monfri_bg.png");
@@ -213,13 +317,17 @@ void SceneTitle::SceneSetup() {
 		m_pBgImage->Update(eGameMessage_Setup, nullptr);
 	}
 	{
-		m_pEggImage = new Entity();
-		Entity::CreateLayoutComponent(m_pEggImage, "image/egg_plane.png");
-		auto pLayoutComponent = (LayoutComponent *) m_pEggImage->GetComponent(
-				eComponentKind_Layout);
-		pLayoutComponent->SetOrtho(true);
-		m_pEggImage->SetPosition(0, -80, 0);
-		m_pEggImage->Update(eGameMessage_Setup, nullptr);
+		m_pEgg = new Egg();
+		m_pEgg->Update(eGameMessage_Setup, nullptr);
+		m_pEgg->SetPosition(0, -80, 0);
+	}
+	{
+		const int nCharaNo = Random::GetInt(0, AppCharaList::Get()->GetCharaListSize() - 1);
+		m_pChara = new Character(nCharaNo);
+		m_pChara->Update(eGameMessage_Setup, nullptr);
+		m_pChara->SetVisible(false);
+		m_pChara->SetPosition(0, -150.0f, 0);
+		TransferManager::Get()->SetSelfCharaId(nCharaNo);	// 自分のキャラとしてひとまず設定
 	}
 	{
 		m_pTitleImage = new Entity();
@@ -231,38 +339,58 @@ void SceneTitle::SceneSetup() {
 		m_pTitleImage->Update(eGameMessage_Setup, nullptr);
 	}
 	{
-		m_pButtonManager = new ButtonManager();
-		std::pair<const char *, VEC3> btnList[] = {
-				{"image/online_button.png", VEC3(-500.0f, -400.0f, 0)},
-				{"image/local_button.png",  VEC3(500.0f, -400.0f, 0)}
-		};
-		for (int i = 0; i < sizeof(btnList) / sizeof(btnList[0]); ++i) {
-			auto btn = m_pButtonManager->CreateButton(btnList[i].first);
-			btn->SetPosition(btnList[i].second);
+		{
+			ButtonManager *pButtonManager = new ButtonManager();
+			std::pair<const char *, VEC3> btnList[] = {
+					{"image/button_local.png",    VEC3(0.0f, -400.0f, 0)},
+					{"image/button_tutorial.png", VEC3(900.0f, 400.0f, 0)},
+			};
+			for (int i = 0; i < sizeof(btnList) / sizeof(btnList[0]); ++i) {
+				auto btn = pButtonManager->CreateButton(btnList[i].first);
+				btn->SetPosition(btnList[i].second);
+			}
+			pButtonManager->SetVisible(false);
+			pButtonManager->Lock();
+			m_aButtonManager.push_back(pButtonManager);
 		}
-		m_pButtonManager->SetVisible(false);
+		{
+			ButtonManager *pButtonManager = new ButtonManager();
+			std::pair<const char *, VEC3> btnList[] = {
+					{"image/button_make_room.png",    VEC3(-500.0f, -400.0f, 0)},
+					{"image/button_join_room.png", VEC3(500.0f, -400.0f, 0)},
+			};
+			for (int i = 0; i < sizeof(btnList) / sizeof(btnList[0]); ++i) {
+				auto btn = pButtonManager->CreateButton(btnList[i].first);
+				btn->SetPosition(btnList[i].second);
+			}
+			pButtonManager->SetVisible(false);
+			pButtonManager->Lock();
+			m_aButtonManager.push_back(pButtonManager);
+		}
 	}
 	{
-		m_pPlayerName = new Entity();
-		Entity::CreateTextImageComponent(m_pPlayerName, "", 32);
-		auto pTextImage = (TextImageComponent*)(m_pPlayerName->GetComponent(eComponentKind_Layout));
-		pTextImage->SetVisible(false);
-		pTextImage->SetOrtho(true);
-		m_pPlayerName->Update(eGameMessage_Setup, nullptr);
+		m_pMessageWindow = new MessageWindow("image/message_window.png");
+		m_pMessageWindow->Update(eGameMessage_Setup, nullptr);
+		m_pMessageWindow->SetVisible(false);
+		m_pMessageWindow->SetTextScale(1.5f);
 	}
 	{
 		m_pStateManager = new StateManager(eState_Max);
 		m_pStateManager->SetUserPtr(this);
 		m_pStateManager->CreateState<StateFadeIn>();
 		m_pStateManager->CreateState<StateWaitPressButton>();
+		m_pStateManager->CreateState<StateBorneStartMonster>();
+		m_pStateManager->CreateState<StateBorneFadeOut>();
+		m_pStateManager->CreateState<StateBorneFadeIn>();
+		m_pStateManager->CreateState<StateBorneMessage>();
 		m_pStateManager->CreateState<StateWaitKeyboardEnable>();
 		m_pStateManager->CreateState<StateWaitInput>();
+		m_pStateManager->CreateState<StateStartNearby>();
 		m_pStateManager->CreateState<StateWaitNearbyConnect>();
 		m_pStateManager->CreateState<StateWaitNearbyTransferPlayerId>();
 		m_pStateManager->CreateState<StateFadeOut>();
 		m_pStateManager->ChangeState(eState_FadeIn);
 	}
-	TransferManager::Get()->ResetConnect();
 	DEBUG_LOG("Setup End");
 }
 
@@ -273,9 +401,6 @@ void SceneTitle::SceneUpdate() {
 	//DEBUG_LOG("Launcher Call Update");
 
 	m_pStateManager->Update();
-
-	m_pEggImage->SetRotate(0, 0, sinf(DEGTORAD(m_fEggCnt)) * 20.0f);
-	m_fEggCnt += Engine::GetEngine()->GetDeltaTime() * 100.0f;
 }
 
 //------------------------------------------
@@ -326,9 +451,12 @@ void SceneTitle::EntityUpdate(GameMessage message, const void* param)
 
 	if(message != eGameMessage_Setup) {
 		m_pBgImage->Update(message, param);
-		m_pEggImage->Update(message, param);
+		m_pEgg->Update(message, param);
+		m_pChara->Update(message, param);
 		m_pTitleImage->Update(message, param);
-		m_pButtonManager->Update(message, param);
-		m_pPlayerName->Update(message, param);
+		for(auto& it : m_aButtonManager) {
+			it->Update(message, param);
+		}
+		m_pMessageWindow->Update(message, param);
 	}
 }

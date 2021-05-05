@@ -1,14 +1,24 @@
 package com.aoiyume.monsterfriends;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.app.ActionBar;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 
 import com.aoiyume.Game.GameMainFragment;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
     private static MainActivity m_Instance = null;
@@ -22,12 +32,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.main);
         m_Instance = this;
 
-        /*
-        LoginFragment fragment = new LoginFragment();
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.add(R.id.container, fragment);
-        transaction.commit();
-        */
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(@NonNull InitializationStatus initializationStatus) {
+
+            }
+        });
+
         if(savedInstanceState == null) {
             GameMainFragment fragment = new GameMainFragment();
 

@@ -22,7 +22,7 @@ public:
 
 	void Update(GameMessage message, const void* param);
 
-	template<class T = ComponentBase*> T GetComponent(ComponentKind nKind);
+	template<class T = ComponentBase*> T GetComponent(ComponentKind nKind) const;
 
 	void AddChild(EntityBase* pEntity, bool bLinkTransform = true);
 	void ResizeChild(unsigned long num);
@@ -55,7 +55,7 @@ protected:
 };
 
 template<class T>
-inline T EntityBase::GetComponent(ComponentKind nKind)
+inline T EntityBase::GetComponent(ComponentKind nKind) const
 {
 	return reinterpret_cast<T>(m_pComponent[nKind]);
 }

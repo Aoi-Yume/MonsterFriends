@@ -81,7 +81,7 @@ void UseItem::GameEntitySetup(const void* param) {
 			auto pBtnManager = new ButtonManager();
 			const std::pair<const char *, VEC3> btnList[] = {
 					{"image/button_use.png", VEC3(-250.0f, -400.0f, 0)},
-					{"image/button_buyCancel.png", VEC3(250.0f, -400.0f, 0)},
+					{"image/button_useCancel.png", VEC3(250.0f, -400.0f, 0)},
 			};
 			for (int i = 0; i < sizeof(btnList) / sizeof(btnList[0]); ++i) {
 				auto pBtn = pBtnManager->CreateButton(btnList[i].first);

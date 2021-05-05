@@ -29,10 +29,13 @@ public:
 	int	GetState() const;
 	int GetNextState() const;
 	int GetStateCount() const;
+	float GetStateTime() const;
+
 private:
 	int		m_nState;
 	int		m_nNextState;
 	int		m_nStateCnt;
+	float	m_fStateTime;
 };
 
 #endif

@@ -84,7 +84,7 @@ add_library(	game-lib SHARED
 				src/main/cpp/Game/Game/Button/DebugButton.cpp
 				src/main/cpp/Game/Game/Button/SimpleButton.cpp
 				src/main/cpp/Game/Game/Button/SimpleCursor.cpp
-		        src/main/cpp/Game/Game/Button//ButtonManager.cpp
+		        src/main/cpp/Game/Game/Button/ButtonManager.cpp
 				src/main/cpp/Game/Game/MessageWindow/MessageWindow.cpp)
 
 add_library(	app_param-lib SHARED
@@ -95,12 +95,13 @@ add_library(	app_param-lib SHARED
 
 add_library(	app_entity-lib SHARED
 				src/main/cpp/Game/App/Entity/Character.cpp
-				src/main/cpp/Game/App/Entity/InformationPlate.cpp
+				src/main/cpp/Game/App/Entity/Egg.cpp
 				src/main/cpp/Game/App/Entity/Dice.cpp
 				src/main/cpp/Game/App/Entity/Shop.cpp
 				src/main/cpp/Game/App/Entity/Adv.cpp
 				src/main/cpp/Game/App/Entity/ItemListUI.cpp
 				src/main/cpp/Game/App/Entity/UseItem.cpp
+				src/main/cpp/Game/App/Entity/InformationPlate.cpp
 				src/main/cpp/Game/App/Entity/PlayerNotice.cpp)
 
 add_library(	app_scene-lib SHARED

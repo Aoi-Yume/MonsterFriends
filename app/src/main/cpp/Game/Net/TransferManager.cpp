@@ -122,6 +122,16 @@ const TransferManager::ConnectInfo& TransferManager::GetSelfConnect() const
 	return m_SelfInfo;
 }
 
+void TransferManager::SetSelfCharaId(uint8_t uCharaId)
+{
+	m_SelfInfo.uCharaId = uCharaId;
+}
+
+uint8_t TransferManager::GetSelfCharaId() const
+{
+	return m_SelfInfo.uCharaId;
+}
+
 void TransferManager::AddConnect(const ConnectInfo &info)
 {
 	m_aConnectInfo.emplace_back(info);
@@ -156,6 +166,19 @@ void TransferManager::SetConnectHost(const char* id, bool bHost)
 		int nNo = GetConnectNoFromNetId(id);
 		if(nNo >= 0) {
 			m_aConnectInfo[nNo].bHost = bHost;
+		}
+	}
+}
+
+void TransferManager::SetConnectCharaId(const char* id, uint8_t uCharaId)
+{
+	if(IsSelfConnectId(id)) {
+		m_SelfInfo.uCharaId = uCharaId;
+	}
+	else {
+		int nNo = GetConnectNoFromNetId(id);
+		if(nNo >= 0) {
+			m_aConnectInfo[nNo].uCharaId = uCharaId;
 		}
 	}
 }
@@ -240,6 +263,12 @@ int TransferManager::GetPlayerIdFromNetId(const char* id) const
 		}
 	}
 	return -1;
+}
+
+uint8_t TransferManager::GetCharaIdFromPlayerId(int nPlayerId) const
+{
+	const int nNo = GetConnectNoFromPlayerId(nPlayerId);
+	return (nNo >= 0) ? m_aConnectInfo[nNo].uCharaId : m_SelfInfo.uCharaId;
 }
 
 void TransferManager::sendData(const char* id, jbyte* pData, int nSize)

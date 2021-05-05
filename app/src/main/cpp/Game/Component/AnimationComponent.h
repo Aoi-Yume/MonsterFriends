@@ -99,6 +99,7 @@ protected:
 	void update(const float fDeltaTime) override;
 
 private:
+	VEC3 m_BaseScale;
 	float m_fDefaultScale;
 	float m_fOverScale;
 };
