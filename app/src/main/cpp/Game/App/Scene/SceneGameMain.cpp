@@ -299,8 +299,8 @@ void SceneGameMain::SceneSetup() {
 		auto p = (TextImageComponent*)m_pCounter->GetComponent(eComponentKind_Layout);
 		p->SetOrtho(true);
 		m_pCounter->Update(eGameMessage_Setup, nullptr);
-		float x = -Engine::GetEngine()->GetScreenInfo().m_nScreenX * 0.5 + 100;
-		float y = Engine::GetEngine()->GetScreenInfo().m_nScreenY * 0.5f - 100;
+		const float x = -1920.0f * 0.5f + 100;
+		const float y = 1080.0f * 0.5f - 100;
 		m_pCounter->SetPosition(x, y, 0);
 	}
 	{

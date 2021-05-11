@@ -58,7 +58,9 @@ GameMessageResult CameraComponent::Update(GameMessage message, const void* param
 		{
 			const float fScreenX = (float)Engine::GetEngine()->GetScreenInfo().m_nScreenX;
 			const float fScreenY = (float)Engine::GetEngine()->GetScreenInfo().m_nScreenY;
-			m_cam2D.SetScale(1.0f / (fScreenW * 0.5f), 1.0f / (fScreenH * 0.5f), 1.0f);
+			const float fFixDisplaySizeX = 1920.0f / (float)fScreenX;
+			const float fFixDisplaySizeY = 1080.0f / (float)fScreenY;
+			m_cam2D.SetScale(1.0f / (fScreenW * fFixDisplaySizeX * 0.5f), 1.0f / (fScreenH * fFixDisplaySizeY * 0.5f), 1.0f);
 		}
     }
     return eGameMessageResult_Break;

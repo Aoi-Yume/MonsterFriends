@@ -59,8 +59,8 @@ void InformationPlate::GameEntitySetup(const void* param) {
 		pText->SetOrtho(true);
 		AddChild(pEntity);
 	}
-	const float fPosX = (float)-Engine::GetEngine()->GetScreenInfo().m_nScreenX * 0.35f;
-	const float fPosY = (float)Engine::GetEngine()->GetScreenInfo().m_nScreenY * 0.45f;
+	const float fPosX = -1920.0f * 0.35f;
+	const float fPosY = 1080.0f * 0.45f;
 	SetPosition(fPosX, fPosY, 0);
 }
 

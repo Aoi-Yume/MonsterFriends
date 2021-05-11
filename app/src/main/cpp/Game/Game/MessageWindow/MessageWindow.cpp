@@ -47,8 +47,7 @@ void MessageWindow::GameEntitySetup(const void* param)
 		m_pTextComponent[i]->SetOrtho(true);
 		pChild->SetPosition(VEC3(0, i * -40, 0));
 	}
-	const float fScrrenY = Engine::GetEngine()->GetScreenInfo().m_nScreenY;
-	SetPosition(0, fScrrenY * -0.4f, 0.0f);
+	SetPosition(0, 1080.0f * -0.4f, 0.0f);
 }
 
 void MessageWindow::GameEntityUpdate(const void* param)

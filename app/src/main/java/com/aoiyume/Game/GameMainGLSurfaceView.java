@@ -104,7 +104,6 @@ class GameMainRender implements GLSurfaceView.Renderer {
     }
 
     void dispose() throws IOException {
-       // m_EntityMgr.EntityDestroy();
     }
 
     public static float GetWidth(){ return  m_SurfaceWidth; }

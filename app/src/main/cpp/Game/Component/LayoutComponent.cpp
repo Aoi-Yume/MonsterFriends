@@ -87,7 +87,7 @@ static const char* s_vtxShaderSrc =
   		"uniform mat4 uni_viewportInv; \n"
 		"varying vec2 vary_uv; \n"
 		"void main() { \n"
-		"gl_Position =  (uni_viewProj * uni_transform) * (uni_viewportInv * vec4(vPosition, 1.0f)); \n"
+		"gl_Position =  (uni_viewProj * uni_transform) * (uni_viewportInv * vec4(vPosition, 1.0)); \n"
 		"vary_uv = attr_uv; \n"
 		"}";
 
@@ -99,7 +99,7 @@ static const char* s_vtx2DShaderSrc =
 		"uniform mat4 uni_viewProj; \n"
 		"varying vec2 vary_uv; \n"
 		"void main() { \n"
-		"gl_Position =  (uni_viewProj * uni_transform) * vec4(vPosition, 1.0f); \n"
+		"gl_Position =  (uni_viewProj * uni_transform) * vec4(vPosition, 1.0); \n"
 		"vary_uv = attr_uv; \n"
 		"}";
 
@@ -109,9 +109,9 @@ static const char* s_fragShaderSrc =
 		"uniform vec4 uni_simpleColor; \n"
 		"varying vec2 vary_uv; \n"
 		"void main() { \n"
-		"gl_FragColor = texture2D(uni_sampler, vec2(vary_uv.x, 1.0f - vary_uv.y)); \n"
+		"gl_FragColor = texture2D(uni_sampler, vec2(vary_uv.x, 1.0 - vary_uv.y)); \n"
 		"gl_FragColor *= uni_simpleColor; \n"
-		"if(gl_FragColor.w <= 0.1f) { discard; } \n"
+		"if(gl_FragColor.w <= 0.1) { discard; } \n"
 		"}";
 
 static const char* s_fragColorShaderSrc =
@@ -120,7 +120,7 @@ static const char* s_fragColorShaderSrc =
 		"varying vec2 vary_uv; \n"
 		"void main() { \n"
 		"gl_FragColor = uni_simpleColor; \n"
-		"if(gl_FragColor.w <= 0.1f) { discard; } \n"
+		"if(gl_FragColor.w <= 0.1) { discard; } \n"
 		"}";
 #endif
 
@@ -311,8 +311,8 @@ void LayoutComponent::setupShaderParam()
 //------------------------------------------
 void LayoutComponent::setupUniformShaderParam()
 {
-	TransformComponent *pTransform = GetEntityBase()->GetComponent<TransformComponent*>(eComponentKind_Transform);
-	CameraComponent *pCamera = reinterpret_cast<CameraComponent*>(Engine::GetEngine()->GetCameraComponent());
+	auto *pTransform = GetEntityBase()->GetComponent<TransformComponent*>(eComponentKind_Transform);
+	auto *pCamera = reinterpret_cast<CameraComponent*>(Engine::GetEngine()->GetCameraComponent());
 	glUniformMatrix4fv(m_nTransformLocation, 1, GL_FALSE, pTransform->GetWorldMatrix()->Get());
 
 	if( !IsOrtho() ) {

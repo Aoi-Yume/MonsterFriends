@@ -68,6 +68,13 @@ GLuint DrawComponent::loadShader(GLenum type, const GLchar* pShaderCode)
 	GLuint shader = glCreateShader(type);
 	glShaderSource(shader, 1, &pShaderCode, NULL);
 	glCompileShader(shader);
+#if _AOIYUME_DEBUG_
+	char log[4096];
+	glGetShaderInfoLog(shader, sizeof(log), NULL, log);
+	DEBUG_LOG("---- Shader Log ----\n");
+	DEBUG_LOG_A("%s\n", log);
+	DEBUG_LOG("--------------------\n");
+#endif
 	return shader;
 }
 

@@ -94,8 +94,8 @@ void Shop::GameEntitySetup(const void* param) {
 		Entity::CreateLayoutComponent(pEntity, "image/clerk.png");
 		auto pComponent = (LayoutComponent *) pEntity->GetComponent(eComponentKind_Layout);
 		pComponent->SetOrtho(true);
-		const float x = Engine::GetEngine()->GetScreenInfo().m_nScreenX * 0.5f - 100.0f;
-		const float y = Engine::GetEngine()->GetScreenInfo().m_nScreenY * 0.5f - 80.0f;
+		const float x = 1920.0f * 0.5f - 100.0f;
+		const float y = 1080.0f * 0.5f - 80.0f;
 		pEntity->SetPosition(x, -y, 0);
 		AddChild(pEntity);
 	}

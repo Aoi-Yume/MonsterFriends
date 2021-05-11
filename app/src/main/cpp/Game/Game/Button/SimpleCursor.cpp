@@ -50,9 +50,11 @@ void SimpleCursor::EntityUpdate(GameMessage message, const void *param) {
 		const float fTouchY = info.fTouchY;
 		const float fScreenX = Engine::GetEngine()->GetScreenInfo().m_nScreenX;
 		const float fScreenY = Engine::GetEngine()->GetScreenInfo().m_nScreenY;
+		const float fFixDisplaySizeX = 1920.0f / (float)fScreenX;
+		const float fFixDisplaySizeY = 1080.0f / (float)fScreenY;
 		auto pCamera = (CameraComponent *) Engine::GetEngine()->GetCameraComponent();
 		VEC3 projPos = pCamera->ScreentoProjection(fTouchX, fTouchY);
-		VEC3 pos = VEC3(projPos.GetX() * fScreenX * 0.5f, projPos.GetY() * fScreenY * 0.5f, 0.0f);
+		VEC3 pos = VEC3(projPos.GetX() * fFixDisplaySizeX * fScreenX * 0.5f, projPos.GetY() * fFixDisplaySizeX *  fScreenY * 0.5f, 0.0f);
 		SetPosition(pos.GetX(), pos.GetY(), 0.0f);
 	}
 

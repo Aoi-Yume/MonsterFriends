@@ -67,7 +67,7 @@ Java_com_aoiyume_Game_GameMainRender_SurfaceChanged(
 		jint w, jint h
 )
 {
-	DEBUG_LOG("Call GameMain SurfaceChanged");
+	DEBUG_LOG_A("Call GameMain SurfaceChanged(%d, %d)", w, h);
 
 	const float aspect = (float) w / (float)h;
 	glViewport(0, 0, w, h);
