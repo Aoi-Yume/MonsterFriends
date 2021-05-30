@@ -94,6 +94,7 @@ add_library(	app_param-lib SHARED
 				src/main/cpp/Game/App/Param/AppCharaList.cpp)
 
 add_library(	app_entity-lib SHARED
+				src/main/cpp/Game/App/Entity/BackGround.cpp
 				src/main/cpp/Game/App/Entity/Character.cpp
 				src/main/cpp/Game/App/Entity/Egg.cpp
 				src/main/cpp/Game/App/Entity/Dice.cpp

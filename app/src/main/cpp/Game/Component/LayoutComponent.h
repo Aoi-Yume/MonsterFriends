@@ -32,6 +32,7 @@ protected:
 	virtual void setupTexture(float& fSizeW, float& fSizeH) override;
 protected:
 	void setup();
+	void updateAnim();
 	void draw();
 	void destroy();
 

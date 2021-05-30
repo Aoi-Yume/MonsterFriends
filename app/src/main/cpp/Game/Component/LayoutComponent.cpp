@@ -194,6 +194,7 @@ GameMessageResult LayoutComponent::Update(GameMessage message, const void* param
 			break;
 		}
 		case eGameMessage_Draw:{
+			if(IsAnimation()){ updateAnim(); }
 			draw();
 			break;
 		}
@@ -209,78 +210,6 @@ GameMessageResult LayoutComponent::Update(GameMessage message, const void* param
 		}
 	}
 	return eGameMessageResult_Break;
-}
-
-//------------------------------------------
-//------------------------------------------
-void LayoutComponent::setup()
-{
-	setupShader();
-
-	float fSizeW = 100.0f;
-	float fSizeH = 100.0f;
-	glGenTextures(1, &m_nTexId);
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glBindTexture(GL_TEXTURE_2D, m_nTexId);
-
-	setupTexture(fSizeW, fSizeH);
-
-	// 設定しないとテクスチャが表示されないので注意
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	GLuint buffers[2];
-	glGenBuffers(2, buffers);
-	m_nVtxBuffer = buffers[0];
-	m_nIdxBuffer = buffers[1];
-
-	const uint vtxNum = 5 * 4;
-	m_aVtxBuffer.clear();
-	m_aVtxBuffer.resize(vtxNum);
-	getVertex(fSizeW, fSizeH, m_aVtxBuffer.data());
-
-	// 頂点データバインド
-	glBindBuffer(GL_ARRAY_BUFFER, m_nVtxBuffer);
-	glBufferData(GL_ARRAY_BUFFER, vtxNum * sizeof(float), m_aVtxBuffer.data(), GL_STATIC_DRAW);
-
-	// バインド解除
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	// インデックス
-	const uint idxNum = 6;
-	short idx[] = {0, 1, 2, 2, 1, 3};
-	m_aIndexBuffer.clear();
-	m_aIndexBuffer.resize(idxNum);
-	for(int i = 0; i < idxNum; ++i) {
-		m_aIndexBuffer.at(i) = idx[i];
-	}
-
-	// インデックスバインド
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_nIdxBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, idxNum * sizeof(short), m_aIndexBuffer.data(), GL_STATIC_DRAW);
-	// バインド解除
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-#if OPENGL_VERTION >= 3
-	m_nViewportInvLocation = SHADER_UNIFORM_VIEWPORT_INV;
-	m_nTransformLocation = SHADER_UNIFORM_TRANSFORM;
-	m_nViewProjLocation = SHADER_UNIFORM_VIEW_PROJ;
-	m_nSamplerLocation = SHADER_UNIFORM_SAMPLER;
-	m_nAlphaLocation = SHADER_UNIFORM_ALPHA;
-#else
-	m_nTransformLocation = glGetUniformLocation(getShaderProgram(), "uni_transform");
-	m_nViewProjLocation = glGetUniformLocation(getShaderProgram(), "uni_viewProj");
-	m_nViewportInvLocation = glGetUniformLocation(getShaderProgram(), "uni_viewportInv");
-	m_nSamplerLocation = glGetUniformLocation(getShaderProgram(), "uni_sampler");
-	m_nColorLocation = glGetUniformLocation(getShaderProgram(), "uni_simpleColor");
-
-#endif
-
-	m_bCreated = true;
 }
 
 //------------------------------------------
@@ -352,7 +281,98 @@ void LayoutComponent::setupTexture(float &fSizeW, float &fSizeH)
 
 //------------------------------------------
 //------------------------------------------
-void LayoutComponent::draw() {
+void LayoutComponent::setup()
+{
+	setupShader();
+
+	float fSizeW = 100.0f;
+	float fSizeH = 100.0f;
+	glGenTextures(1, &m_nTexId);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glBindTexture(GL_TEXTURE_2D, m_nTexId);
+
+	setupTexture(fSizeW, fSizeH);
+
+	// 設定しないとテクスチャが表示されないので注意
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	GLuint buffers[2];
+	glGenBuffers(2, buffers);
+	m_nVtxBuffer = buffers[0];
+	m_nIdxBuffer = buffers[1];
+
+	const uint vtxNum = 5 * 4;
+	m_aVtxBuffer.clear();
+	m_aVtxBuffer.resize(vtxNum);
+	getVertex(fSizeW, fSizeH, m_aVtxBuffer.data());
+
+	// 頂点データバインド
+	glBindBuffer(GL_ARRAY_BUFFER, m_nVtxBuffer);
+	glBufferData(GL_ARRAY_BUFFER, vtxNum * sizeof(float), m_aVtxBuffer.data(), IsAnimation() ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+
+	// バインド解除
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	// インデックス
+	const uint idxNum = 6;
+	short idx[] = {0, 1, 2, 2, 1, 3};
+	m_aIndexBuffer.clear();
+	m_aIndexBuffer.resize(idxNum);
+	for(int i = 0; i < idxNum; ++i) {
+		m_aIndexBuffer.at(i) = idx[i];
+	}
+
+	// インデックスバインド
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_nIdxBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, idxNum * sizeof(short), m_aIndexBuffer.data(), GL_STATIC_DRAW);
+	// バインド解除
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+#if OPENGL_VERTION >= 3
+	m_nViewportInvLocation = SHADER_UNIFORM_VIEWPORT_INV;
+	m_nTransformLocation = SHADER_UNIFORM_TRANSFORM;
+	m_nViewProjLocation = SHADER_UNIFORM_VIEW_PROJ;
+	m_nSamplerLocation = SHADER_UNIFORM_SAMPLER;
+	m_nAlphaLocation = SHADER_UNIFORM_ALPHA;
+#else
+	m_nTransformLocation = glGetUniformLocation(getShaderProgram(), "uni_transform");
+	m_nViewProjLocation = glGetUniformLocation(getShaderProgram(), "uni_viewProj");
+	m_nViewportInvLocation = glGetUniformLocation(getShaderProgram(), "uni_viewportInv");
+	m_nSamplerLocation = glGetUniformLocation(getShaderProgram(), "uni_sampler");
+	m_nColorLocation = glGetUniformLocation(getShaderProgram(), "uni_simpleColor");
+
+#endif
+
+	m_bCreated = true;
+}
+
+//------------------------------------------
+//------------------------------------------
+void LayoutComponent::updateAnim()
+{
+	const auto& uvOffset = GetUVOffset();
+	m_aVtxBuffer[3] = uvOffset.GetX(); m_aVtxBuffer[4] = 1.0f + uvOffset.GetY();
+	m_aVtxBuffer[8] = uvOffset.GetX(); m_aVtxBuffer[9] = uvOffset.GetY();
+	m_aVtxBuffer[13] = 1.0f + uvOffset.GetX(); m_aVtxBuffer[14] = 1.0f + uvOffset.GetY();
+	m_aVtxBuffer[18] = 1.0f + uvOffset.GetX(); m_aVtxBuffer[19] = uvOffset.GetY();
+
+	const uint vtxNum = 5 * 4;
+	glBindBuffer(GL_ARRAY_BUFFER, m_nVtxBuffer);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, vtxNum * sizeof(float), m_aVtxBuffer.data());
+
+	// バインド解除
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+//------------------------------------------
+//------------------------------------------
+void LayoutComponent::draw()
+{
 	if(!IsVisible()){ return; }
 
 	glUseProgram(getShaderProgram());

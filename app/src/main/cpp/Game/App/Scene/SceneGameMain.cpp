@@ -11,6 +11,7 @@
 #include <Button/SimpleButton.h>
 #include <FadeCtrl.h>
 #include <SceneManager.h>
+#include <BackGround.h>
 #include <Character.h>
 #include <InformationPlate.h>
 #include <MessageWindow/MessageWindow.h>
@@ -258,7 +259,7 @@ namespace {
 SceneGameMain::SceneGameMain()
 : SceneBase("GameMain")
 , m_pCounter(nullptr)
-, m_pBgImage(nullptr)
+, m_pBg(nullptr)
 , m_pChara(nullptr)
 , m_pShop(nullptr)
 , m_pInformationPlate(nullptr)
@@ -274,7 +275,7 @@ SceneGameMain::SceneGameMain()
 SceneGameMain::~SceneGameMain()
 {
 	delete m_pCounter;
-	delete m_pBgImage;
+	delete m_pBg;
 	delete m_pPlayerNotice;
 	delete m_pChara;
 	delete m_pAdv;
@@ -304,11 +305,8 @@ void SceneGameMain::SceneSetup() {
 		m_pCounter->SetPosition(x, y, 0);
 	}
 	{
-		m_pBgImage = new Entity();
-		Entity::CreateLayoutComponent(m_pBgImage, "image/monfri_bg.png");
-		auto pLayoutComponent = (LayoutComponent *) m_pBgImage->GetComponent(eComponentKind_Layout);
-		pLayoutComponent->SetOrtho(true);
-		m_pBgImage->Update(eGameMessage_Setup, nullptr);
+		m_pBg = new BackGround();
+		m_pBg->Update(eGameMessage_Setup, nullptr);
 	}
 	{
 		m_pPlayerNotice = new PlayerNotice(PlayerNotice::eNoticeType_CurrentPlayer, AppParam::Get()->GetNetworkInfo().nCurrentPlayerId);
@@ -459,7 +457,7 @@ void SceneGameMain::EntityUpdate(GameMessage message, const void* param)
 	SceneBase::EntityUpdate(message, param);
 
 	if(message != eGameMessage_Setup) {
-		m_pBgImage->Update(message, param);
+		m_pBg->Update(message, param);
 		m_pChara->Update(message, param);
 		m_pAdv->Update(message, param);
 		m_pShop->Update(message, param);

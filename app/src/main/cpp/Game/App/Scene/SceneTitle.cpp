@@ -16,6 +16,7 @@
 #include <Random.h>
 #include <FadeCtrl.h>
 #include <MessageWindow/MessageWindow.h>
+#include <BackGround.h>
 #include <Egg.h>
 #include <Character.h>
 #include <AppCharaList.h>
@@ -277,7 +278,7 @@ namespace {
 //==========================================
 SceneTitle::SceneTitle()
 : SceneBase("title")
-, m_pBgImage(nullptr)
+, m_pBg(nullptr)
 , m_pEgg(nullptr)
 , m_pChara(nullptr)
 , m_pTitleImage(nullptr)
@@ -299,7 +300,7 @@ SceneTitle::~SceneTitle()
 	delete m_pTitleImage;
 	delete m_pChara;
 	delete m_pEgg;
-	delete m_pBgImage;
+	delete m_pBg;
 	delete m_pStateManager;
 }
 
@@ -310,11 +311,8 @@ void SceneTitle::SceneSetup() {
 	DEBUG_LOG("Title Call Setup");
 	TransferManager::Get()->ResetConnect();
 	{
-		m_pBgImage = new Entity();
-		Entity::CreateLayoutComponent(m_pBgImage, "image/monfri_bg.png");
-		auto pLayoutComponent = (LayoutComponent *) m_pBgImage->GetComponent(eComponentKind_Layout);
-		pLayoutComponent->SetOrtho(true);
-		m_pBgImage->Update(eGameMessage_Setup, nullptr);
+		m_pBg = new BackGround();
+		m_pBg->Update(eGameMessage_Setup, nullptr);
 	}
 	{
 		m_pEgg = new Egg();
@@ -400,6 +398,7 @@ void SceneTitle::SceneUpdate() {
 	Super::SceneUpdate();
 	//DEBUG_LOG("Launcher Call Update");
 
+
 	m_pStateManager->Update();
 }
 
@@ -450,7 +449,7 @@ void SceneTitle::EntityUpdate(GameMessage message, const void* param)
 	}
 
 	if(message != eGameMessage_Setup) {
-		m_pBgImage->Update(message, param);
+		m_pBg->Update(message, param);
 		m_pEgg->Update(message, param);
 		m_pChara->Update(message, param);
 		m_pTitleImage->Update(message, param);

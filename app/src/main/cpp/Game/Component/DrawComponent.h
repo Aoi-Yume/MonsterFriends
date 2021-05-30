@@ -26,8 +26,15 @@ public:
 	void SetUseTex(bool bUseTex);
 	bool IsUseTex() const;
 
+	void SetAnimation(bool bAnimation);
+	bool IsAnimation() const;
+
 	void SetVisible(bool bVisible);
 	bool IsVisible() const;
+
+	void SetUVOffset(const VEC2& offset);
+	const VEC2& GetUVOffset() const;
+	void AddUVOffset(const VEC2& offset);
 
 	void SetColor(const VEC4& color);
 	const VEC4& GetColor() const;
@@ -47,8 +54,10 @@ protected:
 private:
 	bool 		m_bOrtho;
 	bool 		m_bUseTex;
+	bool 		m_bAnimation;
 	bool 		m_bVisible;
 
+	VEC2		m_uvOffset;
 	VEC4		m_Color;
 
 	GLuint		m_nVtxShader;

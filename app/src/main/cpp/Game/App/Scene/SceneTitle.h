@@ -14,6 +14,7 @@
 
 class ComponentBase;
 class StateManager;
+class BackGround;
 class Egg;
 class Character;
 class MessageWindow;
@@ -65,7 +66,7 @@ protected:
 	void EntityUpdate(GameMessage message, const void* param) override;
 
 public:
-	Entity*		m_pBgImage;
+	BackGround*	m_pBg;
 	Egg*		m_pEgg;
 	Character*	m_pChara;
 	Entity*		m_pTitleImage;

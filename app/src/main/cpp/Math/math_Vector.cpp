@@ -7,6 +7,69 @@
 #include "../aoiyume_pch.h"
 #include <math.h>
 
+VEC2::VEC2()
+    : m_fx(0.0f)
+    , m_fy(0.0f)
+{
+}
+
+VEC2::VEC2(float fx, float fy)
+    : m_fx(fx)
+    , m_fy(fy)
+{
+}
+
+VEC2::~VEC2()
+{
+}
+
+VEC2 VEC2::Zero()
+{
+    return VEC2(0.0f, 0.0f);
+}
+
+void VEC2::Set(float fx, float fy)
+{
+    m_fx = fx;
+    m_fy = fy;
+}
+
+void VEC2::SetX(float fx) { m_fx = fx; }
+void VEC2::SetY(float fy) { m_fy = fy; }
+
+float VEC2::GetX() const { return m_fx; }
+float VEC2::GetY() const { return m_fy; }
+
+VEC2 VEC2::operator+(const VEC2& add) const { return VEC2(m_fx + add.m_fx, m_fy + add.m_fy); }
+VEC2 VEC2::operator-(const VEC2& sub) const { return VEC2(m_fx - sub.m_fx, m_fy - sub.m_fy); }
+VEC2 VEC2::operator*(const float multi) const { return VEC2(m_fx * multi, m_fy * multi); }
+VEC2 VEC2::operator/(const float div) const { return VEC2(m_fx / div, m_fy / div); }
+
+void VEC2::operator+=(const VEC2& add) { *this = (*this) + add; }
+void VEC2::operator-=(const VEC2& sub) { *this = (*this) - sub; }
+void VEC2::operator*=(const float multi){ *this = (*this) * multi; }
+void VEC2::operator/=(const float div){ *this = (*this) / div; }
+
+float VEC2::Length() const { return sqrtf(m_fx * m_fx + m_fy * m_fy); }
+float VEC2::SqrtLength() const { return m_fx * m_fx + m_fy * m_fy; }
+
+void VEC2::Normalize()
+{
+    const float length = Length();
+    if(length <= 0.0f){ return; }
+    *this /= length;
+}
+
+VEC2 VEC2::Normalize() const
+{
+    const float length = Length();
+    if(length <= 0.0f){  return Zero(); }
+    return (*this) / length;
+}
+
+float VEC2::Dot(const VEC2& vec) const { return m_fx * vec.m_fx + m_fy * vec.m_fy; }
+float VEC2::Cross(const VEC2& vec) const { return m_fx * vec.m_fy - m_fy * vec.m_fx; }
+
 VEC3::VEC3()
         : m_fx(0.0f)
         , m_fy(0.0f)

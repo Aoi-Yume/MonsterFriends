@@ -15,6 +15,7 @@
 
 class StateManager;
 class ComponentBase;
+class BackGround;
 class Character;
 class InformationPlate;
 class MessageWindow;
@@ -64,7 +65,7 @@ protected:
 
 public:
 	Entity*		m_pCounter;
-	Entity*		m_pBgImage;
+	BackGround*	m_pBg;
 	Character*	m_pChara;
 	Adv*		m_pAdv;
 	Shop*		m_pShop;

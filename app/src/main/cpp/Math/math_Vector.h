@@ -8,6 +8,47 @@
 #include <math.h>
 #include "math_Util.h"
 
+class VEC2 {
+public:
+	VEC2();
+	VEC2(float fx, float fy);
+
+	~VEC2();
+
+	static VEC2 Zero();
+
+	void Set(float fx, float fy);
+
+	void SetX(float fx);
+	void SetY(float fy);
+
+	float GetX() const;
+	float GetY() const;
+
+	VEC2 operator+(const VEC2& add) const;
+	VEC2 operator-(const VEC2& sub) const;
+	VEC2 operator*(const float multi) const;
+	VEC2 operator/(const float div) const;
+
+	void operator+=(const VEC2& add);
+	void operator-=(const VEC2& sub);
+	void operator*=(const float multi);
+	void operator/=(const float div);
+
+	float Length() const;
+	float SqrtLength() const;
+
+	void Normalize();
+
+	VEC2 Normalize() const;
+
+	float Dot(const VEC2& vec) const;
+	float Cross(const VEC2& vec) const;
+private:
+	float m_fx;
+	float m_fy;
+};
+
 class VEC3 {
 public:
     VEC3();

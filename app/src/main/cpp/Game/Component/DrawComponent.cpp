@@ -9,6 +9,7 @@ DrawComponent::DrawComponent(ComponentKind nKind, EntityBase* pEntityBase)
 : Super(nKind, pEntityBase)
 , m_bOrtho(false)
 , m_bUseTex(false)
+, m_bAnimation(false)
 , m_bVisible(true)
 , m_Color(1, 1, 1, 1)
 , m_nVtxShader(0)
@@ -43,6 +44,16 @@ bool DrawComponent::IsUseTex() const
 	return m_bUseTex;
 }
 
+void DrawComponent::SetAnimation(bool bAnimation)
+{
+	m_bAnimation = bAnimation;
+}
+
+bool DrawComponent::IsAnimation() const
+{
+	return m_bAnimation;
+}
+
 void DrawComponent::SetVisible(bool bVisible)
 {
 	m_bVisible = bVisible;
@@ -52,6 +63,22 @@ bool DrawComponent::IsVisible() const
 {
 	return m_bVisible;
 }
+
+void DrawComponent::SetUVOffset(const VEC2& offset)
+{
+	m_uvOffset = offset;
+}
+
+const VEC2& DrawComponent::GetUVOffset() const
+{
+	return m_uvOffset;
+}
+
+void DrawComponent::AddUVOffset(const VEC2& offset)
+{
+	m_uvOffset += offset;
+}
+
 
 void DrawComponent::SetColor(const VEC4& color)
 {
