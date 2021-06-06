@@ -33,7 +33,7 @@ public:
 private:
 	struct Data {
 		uint8_t uKind;
-		DelayInput::DelayTouchInfo info;
+		DelayTouchInfo info;
 	};
 
 	float 	m_lastSendTime;

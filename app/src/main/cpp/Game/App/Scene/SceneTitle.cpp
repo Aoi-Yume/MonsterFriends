@@ -371,6 +371,7 @@ void SceneTitle::SceneSetup() {
 		m_pMessageWindow->Update(eGameMessage_Setup, nullptr);
 		m_pMessageWindow->SetVisible(false);
 		m_pMessageWindow->SetTextScale(1.5f);
+		m_pMessageWindow->SetActive(true);
 	}
 	{
 		m_pStateManager = new StateManager(eState_Max);

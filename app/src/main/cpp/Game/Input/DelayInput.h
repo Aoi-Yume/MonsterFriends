@@ -27,25 +27,24 @@ struct TouchInputInfo{
 	}
 };
 
+struct DelayTouchInfo {
+	float fTime;
+	TouchInputInfo info;
+
+	DelayTouchInfo()
+			: fTime(0.0f)
+			, info()
+	{}
+
+	DelayTouchInfo(float fTime, const TouchInputInfo& info)
+			: fTime(fTime)
+			, info(info)
+	{}
+};
+
 class DelayInput : public Singleton<DelayInput>
 {
 	USE_SINGLETON(DelayInput);
-
-public:
-	struct DelayTouchInfo {
-		float fTime;
-		TouchInputInfo info;
-
-		DelayTouchInfo()
-				: fTime(0.0f)
-				, info()
-		{}
-
-		DelayTouchInfo(float fTime, const TouchInputInfo& info)
-				: fTime(fTime)
-				, info(info)
-		{}
-	};
 
 public:
 	void Initialize(float fDelay);
@@ -54,12 +53,14 @@ public:
 	void StartDelayInput();
 	void StopDelayInput();
 	void ResetDelayInput();
+	bool IsStartDelayInput() { return (m_uState & eSTATE_START) != 0; }
 
 	float GetCurrentTime() const;
 	void AddTouchInfo(const TouchInputInfo& info, int nPlayer = 0);
 	void AddDelayTouchInfo(const DelayTouchInfo& info, int nPlayer = 0);
 	void ClearTouchInfo(int nPlayer= 0);
 	bool FindDelayTouchInfo(TouchInputInfo& info, int nEvent, int nPlayer = 0) const;
+	bool FindDelayTouchInfo(DelayTouchInfo& info, int nEvent, int nPlayer = 0) const;
 	DelayTouchInfo GetNextDelayTouchInfo(int nPlayer = 0) const;
 	bool IsInputEmpty(int nPlayer = 0) const;
 

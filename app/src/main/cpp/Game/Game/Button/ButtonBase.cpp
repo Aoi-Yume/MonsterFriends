@@ -14,6 +14,7 @@ ButtonBase::ButtonBase()
 , m_bEnable(true)
 , m_bGray(false)
 , m_nState(eState_UnSelect)
+, m_uDecideCommand(0U)
 , m_pColl2DRectComponent(nullptr)
 {
 	{

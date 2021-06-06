@@ -121,6 +121,9 @@ void SceneBase::SceneSync()
 			if(!pManager->IsStartTransfer(TransferManager::eTransferKind_TouchInfo)) {
 				pManager->StartTransfer(TransferManager::eTransferKind_TouchInfo);
 			}
+			if(!pManager->IsStartTransfer(TransferManager::eTransferKind_Command)){
+				pManager->StartTransfer(TransferManager::eTransferKind_Command);
+			}
 			DELAY_INPUT()->ResetDelayInput();
 			m_nSyncStep = eSyncStep_UserSync;
 		}
@@ -154,11 +157,16 @@ void SceneBase::SceneFinalize()
 	m_nSceneState = eSceneState_Deactived;
 	auto pManager = TransferManager::Get();
 	if(pManager->IsConnectSucess()) {
-		if(!pManager->IsStartTransfer(TransferManager::eTransferKind_TouchInfo)){ return; }
-		auto pTransfer = pManager->GetTransfer<TransferBase>(TransferManager::eTransferKind_TouchInfo);
-		pTransfer->RequestEnd();
+		if( !pManager->IsStartTransfer(TransferManager::eTransferKind_TouchInfo) &&
+			!pManager->IsStartTransfer(TransferManager::eTransferKind_Command)){
+			return;
+		}
+		auto pTouchTransfer = pManager->GetTransfer<TransferBase>(TransferManager::eTransferKind_TouchInfo);
+		auto pCommandTransfer = pManager->GetTransfer<TransferBase>(TransferManager::eTransferKind_Command);
+		pTouchTransfer->RequestEnd();
+		pCommandTransfer->RequestEnd();
 		// 入力通信の終了待ち
-		while (!pTransfer->IsEnd()) {
+		while (!pTouchTransfer->IsEnd() || !pCommandTransfer->IsEnd()) {
 			std::this_thread::sleep_for(std::chrono::nanoseconds(1));
 		}
 	}

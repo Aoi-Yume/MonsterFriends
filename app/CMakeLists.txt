@@ -51,6 +51,7 @@ add_library(	net-lib SHARED
 				src/main/cpp/Game/Net/TransferPlayerId.cpp
 				src/main/cpp/Game/Net/TransferSyncScene.cpp
 				src/main/cpp/Game/Net/TransferGameInfo.cpp
+				src/main/cpp/Game/Net/TransferCommand.cpp
 				src/main/cpp/Game/Net/TransferTouchInfo.cpp
 				src/main/cpp/Game/Net/TransferSkillInfo.cpp)
 

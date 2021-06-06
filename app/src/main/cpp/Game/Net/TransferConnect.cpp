@@ -28,6 +28,7 @@ void TransferConnect::initialize()
 	m_Data.bHost = TransferManager::Get()->IsHost();
 	m_Data.uCharaId = TransferManager::Get()->GetSelfCharaId();
 	m_Data.uRandomSeed = Random::GetSyncSeed();
+	Random::SetSyncSeed(m_Data.uRandomSeed);
 
 	m_bReceiveSelfConnect = false;
 	m_bReceiveHost = false;

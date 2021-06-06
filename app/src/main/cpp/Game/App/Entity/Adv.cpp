@@ -16,6 +16,7 @@
 #include <AppCharaList.h>
 #include <Button/ButtonManager.h>
 #include <Random.h>
+#include <TransferCommand.h>
 
 //------------------------------------------
 //------------------------------------------
@@ -68,6 +69,7 @@ void Adv::Open()
 		m_pBtnManager->Unlock();
 	}
 	{
+		m_pMessageWindow->SetActive(true);
 		m_pMessageWindow->SetTextScale(1.5f);
 		char message[128];
 		std::snprintf(message, sizeof(message), "敵の%sが現れた！", AppCharaList::Get()->GetCharaInfo(m_pEnemy->GetCharaId()).name.c_str());
@@ -95,6 +97,7 @@ void Adv::Close()
 	m_pBtnManager->Lock();
 	m_pMessageWindow->SetTextScale(1.0f);
 	m_pMessageWindow->SetVisible(false);
+	m_pMessageWindow->SetActive(false);
 }
 
 //------------------------------------------
@@ -133,7 +136,8 @@ void Adv::GameEntitySetup(const void* param) {
 	}
 	{
 		m_pBtnManager = new ButtonManager();
-		m_pBtnManager->CreateButton("image/button_Adv.png");
+		auto pBtn = m_pBtnManager->CreateButton("image/button_Adv.png");
+		pBtn->SetDecideCommand(TransferCommand::eCommand_PushStopDice);
 		m_pBtnManager->SetVisible(false);
 		m_pBtnManager->Lock();
 	}

@@ -20,6 +20,7 @@ public:
 		eTransferKind_Connect,
 		eTransferKind_PlayerId,
 		eTransferKind_SyncScene,
+		eTransferKind_Command,
 		eTransferKind_TouchInfo,
 		eTransferKind_GameInfo,
 		eTransferKind_SkillInfo,

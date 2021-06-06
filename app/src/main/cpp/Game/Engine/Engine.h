@@ -12,6 +12,7 @@
 #include <android/asset_manager_jni.h>
 
 struct TouchInputInfo;
+struct DelayTouchInfo;
 
 struct ScreenInfo{
 	int 	m_nScreenX;
@@ -43,6 +44,7 @@ public:
 
 	void SetTouchInputInfo(int nEvent, float fTouchX, float fTouchY, int nPlayerId = -1);
 	bool FindDelayTouchInfo(TouchInputInfo& info, int nEvent, int nPlayerId = -1) const;
+	bool FindDelayTouchInfo(DelayTouchInfo& info, int nEvent, int nPlayerId = -1) const;
 
 	void SetTimePoint(const TIME_POINT& timePoint);
 	float GetDeltaTime() const;

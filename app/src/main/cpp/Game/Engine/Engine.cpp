@@ -100,6 +100,14 @@ bool Engine::FindDelayTouchInfo(TouchInputInfo& info, int nEvent, int nPlayerId)
 
 //-----------------------------------------
 //-----------------------------------------
+bool Engine::FindDelayTouchInfo(DelayTouchInfo& info, int nEvent, int nPlayerId) const
+{
+	nPlayerId = fixNetPlayerId(nPlayerId);
+	return DELAY_INPUT()->FindDelayTouchInfo(info, nEvent, nPlayerId);
+}
+
+//-----------------------------------------
+//-----------------------------------------
 void Engine::SetTimePoint(const TIME_POINT & timePoint)
 {
 	auto sub = timePoint - m_TimePoint;

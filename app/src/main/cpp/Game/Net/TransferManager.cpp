@@ -8,6 +8,7 @@
 #include "TransferConnect.h"
 #include "TransferPlayerId.h"
 #include "TransferSyncScene.h"
+#include "TransferCommand.h"
 #include "TransferTouchInfo.h"
 #include "TransferGameInfo.h"
 #include "TransferSkillInfo.h"
@@ -37,6 +38,7 @@ void TransferManager::Initialize(bool bHost)
 	SetTransfer(eTransferKind_Connect, new TransferConnect);
 	SetTransfer(eTransferKind_PlayerId, new TransferPlayerId);
 	SetTransfer(eTransferKind_SyncScene, new TransferSyncScene);
+	SetTransfer(eTransferKind_Command, new TransferCommand);
 	SetTransfer(eTransferKind_TouchInfo, new TransferTouchInfo);
 	SetTransfer(eTransferKind_GameInfo, new TransferGameInfo);
 	SetTransfer(eTransferKind_SkillInfo, new TransferSkillInfo);

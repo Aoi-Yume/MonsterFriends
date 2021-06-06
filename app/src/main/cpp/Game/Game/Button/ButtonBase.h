@@ -47,6 +47,9 @@ public:
 	void SetGray(bool bGray);
 	bool IsGray() const;
 
+	void SetDecideCommand(uint8_t uCommand) { m_uDecideCommand = uCommand; }
+	uint8_t  GetDecideCommand() const { return m_uDecideCommand; }
+
 protected:
 	virtual void ChangeColor();
 
@@ -54,6 +57,7 @@ private:
 	bool 	m_bEnable;
 	bool 	m_bGray;
 	int		m_nState;
+	uint8_t  m_uDecideCommand;
 
 	Collision2DRectComponent*		m_pColl2DRectComponent;
 };

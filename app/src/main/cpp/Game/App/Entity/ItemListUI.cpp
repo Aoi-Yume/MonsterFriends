@@ -10,6 +10,7 @@
 #include "CollisionComponent.h"
 #include "ItemListUI.h"
 #include <TransferManager.h>
+#include <TransferCommand.h>
 #include <Button/ButtonManager.h>
 #include <Button/SimpleButton.h>
 #include <AppItemList.h>
@@ -62,10 +63,12 @@ void ItemListUI::GameEntitySetup(const void* param) {
 				const auto &itemInfo = AppItemList::Get()->GetItemInfo(m_aItemNo[i]);
 				auto pBtn = pBtnManager->CreateButton(itemInfo.fileName.c_str());
 				pBtn->SetPosition(btnList[i]);
+				pBtn->SetDecideCommand(TransferCommand::eCommand_PushItem_1 + i);
 			}
 			else{
 				auto pBtn = pBtnManager->CreateButton("image/shop_item_none.png");
 				pBtn->SetPosition(btnList[i]);
+				pBtn->SetDecideCommand(TransferCommand::eCommand_PushItem_1 + i);
 			}
 		}
 		pBtnManager->SetVisible(false);
@@ -76,13 +79,14 @@ void ItemListUI::GameEntitySetup(const void* param) {
 	// ←→ボタン
 	{
 		auto pBtnManager = new ButtonManager();
-		const std::pair<const char *, VEC3> btnList[] = {
-				{ "image/button_left.png", VEC3(-450.0f, 0, 0) },
-				{ "image/button_right.png", VEC3(450.0f, 0, 0) },
+		const std::tuple<const char *, VEC3, uint8_t> btnList[] = {
+				{ "image/button_left.png", VEC3(-450.0f, 0, 0), TransferCommand::eCommand_PushItemLeft },
+				{ "image/button_right.png", VEC3(450.0f, 0, 0), TransferCommand::eCommand_PushItemRight },
 		};
 		for (int i = 0; i < sizeof(btnList) / sizeof(btnList[0]); ++i) {
-			auto pBtn = pBtnManager->CreateButton(btnList[i].first);
-			pBtn->SetPosition(btnList[i].second);
+			auto pBtn = pBtnManager->CreateButton(std::get<0>(btnList[i]));
+			pBtn->SetPosition(std::get<1>(btnList[i]));
+			pBtn->SetDecideCommand(std::get<2>(btnList[i]));
 		}
 		pBtnManager->SetVisible(false);
 		pBtnManager->Lock();

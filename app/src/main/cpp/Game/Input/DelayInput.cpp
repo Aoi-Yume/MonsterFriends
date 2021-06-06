@@ -28,7 +28,7 @@ void DelayInput::Initialize(float fDelay)
 
 void DelayInput::Update(float fDeltaTime)
 {
-	if((m_uState & eSTATE_START) == 0U){ return; }
+	if(!IsStartDelayInput()){ return; }
 	if((m_uState & eSTATE_STOP) != 0U){ return; }
 
 	for(auto& it : m_aTouchInputInfo){
@@ -84,11 +84,21 @@ void DelayInput::ClearTouchInfo(int nPlayer)
 
 bool DelayInput::FindDelayTouchInfo(TouchInputInfo& info, int nEvent, int nPlayer) const
 {
+	DelayTouchInfo temp = {};
+	if(FindDelayTouchInfo(temp, nEvent, nPlayer)) {
+		info = temp.info;
+		return true;
+	}
+	return false;
+}
+
+bool DelayInput::FindDelayTouchInfo(DelayTouchInfo& info, int nEvent, int nPlayer) const
+{
 	if(!m_aTouchInputInfo[nPlayer].empty()) {
 		for(auto& it : m_aTouchInputInfo[nPlayer]){
 			if(it.fTime < m_fCurrentTime){
 				if(it.info.nTouchEvent == nEvent){
-					info = it.info;
+					info = it;
 					return true;
 				}
 			}
@@ -97,7 +107,7 @@ bool DelayInput::FindDelayTouchInfo(TouchInputInfo& info, int nEvent, int nPlaye
 	return false;
 }
 
-DelayInput::DelayTouchInfo DelayInput::GetNextDelayTouchInfo(int nPlayer) const
+DelayTouchInfo DelayInput::GetNextDelayTouchInfo(int nPlayer) const
 {
 	if(!m_aTouchInputInfo[nPlayer].empty()){
 		return m_aTouchInputInfo[nPlayer].front();

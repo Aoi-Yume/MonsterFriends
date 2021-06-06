@@ -18,6 +18,7 @@
 #include <../Net/TransferManager.h>
 #include <../Net/TransferGameInfo.h>
 #include <../Net/TransferTouchInfo.h>
+#include <../Net/TransferCommand.h>
 #include <AppParam.h>
 #include <AppSkillList.h>
 #include <Adv.h>
@@ -300,7 +301,7 @@ void SceneGameMain::SceneSetup() {
 		auto p = (TextImageComponent*)m_pCounter->GetComponent(eComponentKind_Layout);
 		p->SetOrtho(true);
 		m_pCounter->Update(eGameMessage_Setup, nullptr);
-		const float x = -1920.0f * 0.5f + 100;
+		const float x = 0;
 		const float y = 1080.0f * 0.5f - 100;
 		m_pCounter->SetPosition(x, y, 0);
 	}
@@ -328,6 +329,7 @@ void SceneGameMain::SceneSetup() {
 		m_pMessageWindow->SetTextScale(1.5f);
 		m_pMessageWindow->SetDirectMessage("てすと\nててててすと");
 		m_pMessageWindow->SetVisible(false);
+		m_pMessageWindow->SetDecideCommand(TransferCommand::eCommand_GameMainNextMessage);
 	}
 	{
 		m_pAdv = new Adv();
@@ -362,15 +364,16 @@ void SceneGameMain::SceneSetup() {
 		// メインボタン
 		{
 			auto pBtnManager = new ButtonManager();
-			const std::pair<const char *, VEC3> btnList[] = {
-					{"image/button_Adv.png",  VEC3(-230.0f, -400.0f, 0)},
-					{"image/button_next.png", VEC3(0.0f, -400.0f, 0)},
-					{"image/button_item.png", VEC3(230.0f, -400.0f, 0)},
+			std::tuple<const char*, VEC3, uint8_t> btnList[] = {
+					{"image/button_Adv.png",  VEC3(-230.0f, -400.0f, 0), TransferCommand::eCommand_PushAdv },
+					{"image/button_next.png", VEC3(0.0f, -400.0f, 0), TransferCommand::eCommand_PushNext },
+					{"image/button_item.png", VEC3(230.0f, -400.0f, 0), TransferCommand::eCommand_PushItem},
 			};
 			for (int i = 0; i < sizeof(btnList) / sizeof(btnList[0]); ++i) {
-				auto pBtn = pBtnManager->CreateButton(btnList[i].first);
-				pBtn->SetPosition(btnList[i].second);
+				auto pBtn = pBtnManager->CreateButton(std::get<0>(btnList[i]));
+				pBtn->SetPosition(std::get<1>(btnList[i]));
 				pBtn->SetScale(VEC3(0.8f, 0.8f, 0.8f));
+				pBtn->SetDecideCommand(std::get<2>(btnList[i]));
 			}
 			pBtnManager->SetVisible(false);
 			pBtnManager->Lock();
@@ -379,13 +382,14 @@ void SceneGameMain::SceneSetup() {
 		// アイテム使用 or ショップボタン
 		{
 			auto pBtnManager = new ButtonManager();
-			const std::pair<const char *, VEC3> btnList[] = {
-					{"image/button_bag.png",  VEC3(-250.0f, -400.0f, 0)},
-					{"image/button_shop.png", VEC3(250.0f, -400.0f, 0)},
+			const std::tuple<const char *, VEC3, uint8_t> btnList[] = {
+					{"image/button_bag.png",  VEC3(-250.0f, -400.0f, 0), TransferCommand::eCommand_PushBag},
+					{"image/button_shop.png", VEC3(250.0f, -400.0f, 0), TransferCommand::eCommand_PushShop},
 			};
 			for (int i = 0; i < sizeof(btnList) / sizeof(btnList[0]); ++i) {
-				auto pBtn = pBtnManager->CreateButton(btnList[i].first);
-				pBtn->SetPosition(btnList[i].second);
+				auto pBtn = pBtnManager->CreateButton(std::get<0>(btnList[i]));
+				pBtn->SetPosition(std::get<1>(btnList[i]));
+				pBtn->SetDecideCommand(std::get<2>(btnList[i]));
 			}
 			pBtnManager->SetVisible(false);
 			pBtnManager->Lock();
@@ -435,8 +439,8 @@ void SceneGameMain::SceneUpdate()
 	m_pStateManager->Update();
 
 	auto p = (TextImageComponent*)m_pCounter->GetComponent(eComponentKind_Layout);
-	char str[128];
-	std::snprintf(str, sizeof(str), "%.3f", DELAY_INPUT()->GetCurrentTime());
+	char str[4096];
+	std::snprintf(str, sizeof(str), "Time[%.3f]", DELAY_INPUT()->GetCurrentTime());
 	p->SetText(str);
 	//auto pTouchInput = Engine::GetEngine()->GetTouchInputInfoPtr(0);
 	//DEBUG_LOG_A("TouchEvent[%d], X[%.2f], Y[%.2f]\n", pTouchInput->nTouchEvent, pTouchInput->fTouchX, pTouchInput->fTouchY);

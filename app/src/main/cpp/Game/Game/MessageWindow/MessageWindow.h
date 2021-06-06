@@ -35,8 +35,11 @@ public:
 	void EntityUpdate(GameMessage message, const void* param) override;
 
 public:
+	void SetActive(bool bActive){ m_bActive = bActive; }
+	bool IsActive() const { return m_bActive; }
 	void SetVisible(bool bVisible);
 	void SetControlPlayerId(int nPlayerId = -1);
+	void SetDecideCommand(uint8_t uDecideCommand){ m_uDecideCommand = uDecideCommand; }
 
 	void SetTextScale(float fScale);
 	void SetMessage(const char* pLabel);
@@ -50,12 +53,16 @@ private:
 	void updatePosition();
 
 private:
+	bool 			m_bActive;
+	bool 			m_bSetMessage;
 	bool 			m_bNextMessage;
 	int 			m_nNextMessageCnt;
 	int 			m_nCurrentUseLine;
 	int 			m_nControlPlayerId;
 	char 			m_cResPath[64];
 	float 			m_fTextScale;
+	float_t 		m_fLastInputTime;
+	uint8_t 		m_uDecideCommand;
 	LayoutComponent*	m_pLayoutComponent;
 	TextImageComponent*	m_pTextComponent[eLINE_MAX];
 };

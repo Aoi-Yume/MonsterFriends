@@ -19,6 +19,7 @@
 
 #include <TransferManager.h>
 #include <TransferSkillInfo.h>
+#include <TransferCommand.h>
 
 UseItem::UseItem()
 	: GameEntity()
@@ -48,6 +49,7 @@ void UseItem::Open()
 	m_aButtonManager[eBtnManager_Back]->Unlock();
 	m_aButtonManager[eBtnManager_Back]->SetVisible(true);
 	m_aButtonManager[eBtnManager_Back]->Reset();
+	m_pMessageWindow->SetActive(true);
 	m_nStep = eStep_SelectItemWait;
 }
 
@@ -60,6 +62,7 @@ void UseItem::Close()
 	}
 	m_pItemListUI->Close();
 	m_pMessageWindow->SetVisible(false);
+	m_pMessageWindow->SetActive(false);
 }
 
 bool UseItem::IsEnd() const
@@ -79,13 +82,14 @@ void UseItem::GameEntitySetup(const void* param) {
 		// 「つかう」or「やめる」ボタン
 		{
 			auto pBtnManager = new ButtonManager();
-			const std::pair<const char *, VEC3> btnList[] = {
-					{"image/button_use.png", VEC3(-250.0f, -400.0f, 0)},
-					{"image/button_useCancel.png", VEC3(250.0f, -400.0f, 0)},
+			const std::tuple<const char *, VEC3, uint8_t> btnList[] = {
+					{"image/button_use.png", VEC3(-250.0f, -400.0f, 0), TransferCommand::eCommand_Use},
+					{"image/button_useCancel.png", VEC3(250.0f, -400.0f, 0), TransferCommand::eCommand_UseCancel},
 			};
 			for (int i = 0; i < sizeof(btnList) / sizeof(btnList[0]); ++i) {
-				auto pBtn = pBtnManager->CreateButton(btnList[i].first);
-				pBtn->SetPosition(btnList[i].second);
+				auto pBtn = pBtnManager->CreateButton(std::get<0>(btnList[i]));
+				pBtn->SetPosition(std::get<1>(btnList[i]));
+				pBtn->SetDecideCommand(std::get<2>(btnList[i]));
 			}
 			pBtnManager->SetVisible(false);
 			pBtnManager->Lock();
@@ -95,12 +99,13 @@ void UseItem::GameEntitySetup(const void* param) {
 		// 戻るボタン
 		{
 			auto pBtnManager = new ButtonManager();
-			const std::pair<const char *, VEC3> btnList[] = {
-					{"image/button_back.png", VEC3(700.0f, 300.0f, 0)},
+			const std::tuple<const char *, VEC3, uint8_t> btnList[] = {
+					{"image/button_back.png", VEC3(700.0f, 300.0f, 0), TransferCommand::eCommand_Back},
 			};
 			for (int i = 0; i < sizeof(btnList) / sizeof(btnList[0]); ++i) {
-				auto pBtn = pBtnManager->CreateButton(btnList[i].first);
-				pBtn->SetPosition(btnList[i].second);
+				auto pBtn = pBtnManager->CreateButton(std::get<0>(btnList[i]));
+				pBtn->SetPosition(std::get<1>(btnList[i]));
+				pBtn->SetDecideCommand(std::get<2>(btnList[i]));
 			}
 			pBtnManager->SetVisible(false);
 			pBtnManager->Lock();
@@ -115,6 +120,7 @@ void UseItem::GameEntitySetup(const void* param) {
 		m_pMessageWindow->SetControlPlayerId(nCurrentPlayerId);
 		m_pMessageWindow->SetDirectMessage("");
 		m_pMessageWindow->SetVisible(false);
+		m_pMessageWindow->SetDecideCommand(TransferCommand::eCommand_UseItemNextMessage);
 	}
 	SetVisible(false);
 }

@@ -97,10 +97,13 @@ GLuint DrawComponent::loadShader(GLenum type, const GLchar* pShaderCode)
 	glCompileShader(shader);
 #if _AOIYUME_DEBUG_
 	char log[4096];
-	glGetShaderInfoLog(shader, sizeof(log), NULL, log);
-	DEBUG_LOG("---- Shader Log ----\n");
-	DEBUG_LOG_A("%s\n", log);
-	DEBUG_LOG("--------------------\n");
+	GLsizei length = 0;
+	glGetShaderInfoLog(shader, sizeof(log), &length, log);
+	if(length > 0) {
+		DEBUG_LOG("---- Shader Log ----\n");
+		DEBUG_LOG_A("%s\n", log);
+		DEBUG_LOG("--------------------\n");
+	}
 #endif
 	return shader;
 }

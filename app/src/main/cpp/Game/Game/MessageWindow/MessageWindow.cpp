@@ -6,16 +6,22 @@
 #include <LayoutComponent.h>
 #include <sstream>
 #include <DelayInput.h>
+#include <TransferManager.h>
+#include <TransferCommand.h>
 #include "MessageWindow.h"
 
 MessageWindow::MessageWindow(const char* pResName)
 : Super()
+, m_bActive(false)
+, m_bSetMessage(false)
 , m_bNextMessage(false)
 , m_nNextMessageCnt(0)
 , m_nCurrentUseLine(0)
 , m_nControlPlayerId(-1)
 , m_cResPath()
 , m_fTextScale(1.0f)
+, m_fLastInputTime(0.0f)
+, m_uDecideCommand(TransferCommand::eCommand_GameMainNextMessage)
 , m_pLayoutComponent(nullptr)
 , m_pTextComponent()
 {
@@ -52,14 +58,38 @@ void MessageWindow::GameEntitySetup(const void* param)
 
 void MessageWindow::GameEntityUpdate(const void* param)
 {
+	if(!m_bActive){ return; }
 	Super::GameEntityUpdate(param);
+	if(!m_bSetMessage){ return; }
+
+	auto pTransferManager = TransferManager::Get();
 
 	if(!m_bNextMessage){
-		TouchInputInfo info = {};
-		const bool bFind = Engine::GetEngine()->FindDelayTouchInfo(info, eTouchEvent_DOWN, m_nControlPlayerId);
-		if(bFind){
-			m_bNextMessage = true;
-			m_nNextMessageCnt = 0;
+		{
+			DelayTouchInfo info = {};
+			const bool bFind = Engine::GetEngine()->FindDelayTouchInfo(info, eTouchEvent_DOWN, m_nControlPlayerId);
+			if (bFind) {
+				m_fLastInputTime = info.fTime;
+				if (!pTransferManager->IsConnectSucess()) {
+					m_bNextMessage = true;
+					m_nNextMessageCnt = 0;
+				} else if (pTransferManager->GetSelfConnect().nPlayerId == m_nControlPlayerId) {
+					m_bNextMessage = true;
+					m_nNextMessageCnt = 0;
+					pTransferManager->GetTransfer<TransferCommand>(TransferManager::eTransferKind_Command)->SetSendCommand((TransferCommand::CommandKind)m_uDecideCommand);
+				}
+			}
+		}
+		if(pTransferManager->IsConnectSucess()) {
+			auto pCommand = pTransferManager->GetTransfer<TransferCommand>(TransferManager::eTransferKind_Command);
+			if(pCommand->IsCommandEmpty()){ return; }
+
+			const auto& command = pCommand->GetCommand();
+			if(command.nPlayerId == m_nControlPlayerId && command.uCommand == m_uDecideCommand) {
+				m_bNextMessage = true;
+				m_nNextMessageCnt = 0;
+				pCommand->PopFrontCommand();
+			}
 		}
 	}
 	else{
@@ -102,6 +132,7 @@ void MessageWindow::SetMessage(const char *pLabel)
 void MessageWindow::SetDirectMessage(const char *pText)
 {
 	clearText();
+	m_bSetMessage = true;
 	m_nCurrentUseLine = eLINE_MAX;
 
 	std::stringstream ss;
@@ -128,6 +159,7 @@ bool MessageWindow::IsNextMessage() const
 void MessageWindow::clearNextMessageFlag()
 {
 	m_bNextMessage = false;
+	m_bSetMessage = false;
 	m_nNextMessageCnt = 0;
 }
 

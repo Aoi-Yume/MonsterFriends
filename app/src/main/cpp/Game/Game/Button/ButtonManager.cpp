@@ -5,6 +5,8 @@
 
 #include <CollisionComponent.h>
 #include <DelayInput.h>
+#include <TransferManager.h>
+#include <TransferCommand.h>
 #include "SimpleButton.h"
 #include "SimpleCursor.h"
 #include "DebugButton.h"
@@ -156,24 +158,38 @@ void ButtonManager::Update(GameMessage message, const void* param)
 		ButtonBase* pButton = m_aButtons.at(i);
 		if(!pButton->IsEnable()){ continue; }
 
-		auto pBtnCollision = (CollisionComponent*)pButton->GetComponent(eComponentKind_Collision);
+		auto pTransferManager = TransferManager::Get();
+		{
+			auto pBtnCollision = (CollisionComponent*)pButton->GetComponent(eComponentKind_Collision);
+			TouchInputInfo info = {};
+			const bool bFind = Engine::GetEngine()->FindDelayTouchInfo(info, eTouchEvent_DOWN, m_nControlPlayerId);
+			if (pCursorCollision->IsIntersect(pBtnCollision)) {
+				if (bFind) {
+					if(!pTransferManager->IsConnectSucess()) {
+						m_nDecideNo = i;
+						pButton->Select();
+						return;
+					}
+					else if(pTransferManager->GetSelfConnect().nPlayerId == m_nControlPlayerId){
+						m_nDecideNo = i;
+						pButton->Select();
+						pTransferManager->GetTransfer<TransferCommand>(TransferManager::eTransferKind_Command)->SetSendCommand((TransferCommand::CommandKind)pButton->GetDecideCommand());
+						return;
+					}
+				}
+			}
+		}
+		{
+			if(!pTransferManager->IsConnectSucess()) { continue; }
+			auto pCommand = pTransferManager->GetTransfer<TransferCommand>(TransferManager::eTransferKind_Command);;
+			if(pCommand->IsCommandEmpty()){ continue; }
 
-		TouchInputInfo info = {};
-		const bool bFind = Engine::GetEngine()->FindDelayTouchInfo(info, eTouchEvent_DOWN, m_nControlPlayerId);
-		if(pCursorCollision->IsIntersect(pBtnCollision)) {
-			if (bFind) {
-				if (m_nSelectNo == i || true) {
-					m_nDecideNo = i;
-					pButton->Select();
-					return;
-				}
-#if 0
-				else{
-					m_nSelectNo = i;
-					pButton->Select();
-					break;
-				}
-#endif
+			const auto& command = pCommand->GetCommand();
+			if(command.nPlayerId == m_nControlPlayerId && command.uCommand == pButton->GetDecideCommand()) {
+				m_nDecideNo = i;
+				pButton->Select();
+				pCommand->PopFrontCommand();
+				return;
 			}
 		}
 	}
