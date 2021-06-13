@@ -58,13 +58,14 @@ void CheckEnvThrow();
 
 END_EXTERN_C
 //---------- end extern "c" ------------
-
 //---------- extern "c++" ------------
 EXTERN_CXX
 
 #include <string>
 #include <vector>
 #include <array>
+#include <chrono>
+#include <ctime>
 
 using SYSTEM_CLOCK = std::chrono::system_clock;
 using DURATION = std::chrono::milliseconds;

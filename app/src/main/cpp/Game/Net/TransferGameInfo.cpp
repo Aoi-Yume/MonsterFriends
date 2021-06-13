@@ -22,6 +22,7 @@ TransferGameInfo::~TransferGameInfo()
 
 void TransferGameInfo::initialize()
 {
+	DEBUG_LOG_A("【Net】%s\n", __PRETTY_FUNCTION__ );
 	m_Data.uKind = TransferManager::eTransferKind_GameInfo;
 	m_Data.bReqEnd = false;
 	for(int i = 0; i < NET_CONNECT_MAX; ++i){
@@ -40,13 +41,14 @@ bool TransferGameInfo::updateTransfer()
 		memcpy(&data[2], m_Data.pData, m_nSize);
 		pManager->BroadCast((jbyte *) data, m_nSize + 2);
 		if(m_Data.bReqEnd){
+			DEBUG_LOG("【Net】GameInfo Send ReqEnd\n");
 			RequestEnd();
 		}
 		return true;
 	}
 	else if(getReceiveCnt() >= 1 && getSendCnt() == 0){
 		pManager->SendHost((jbyte*)&m_Data, sizeof(m_Data));
-		DEBUG_LOG("SendReceive\n");
+		DEBUG_LOG("【Net】GameInfo SendReceive\n");
 		return true;
 	}
 	return false;
@@ -80,6 +82,7 @@ void TransferGameInfo::updateReceive(const char* Id, void* pData)
 			m_pReceiveCallBack(&((jbyte*)pData)[2]);
 		}
 		if(pReceiveData->bReqEnd){
+			DEBUG_LOG("【Net】Receive Req End\n");
 			RequestEnd();
 		}
 	}

@@ -15,7 +15,6 @@ MessageWindow::MessageWindow(const char* pResName)
 , m_bActive(false)
 , m_bSetMessage(false)
 , m_bNextMessage(false)
-, m_nNextMessageCnt(0)
 , m_nCurrentUseLine(0)
 , m_nControlPlayerId(-1)
 , m_cResPath()
@@ -72,10 +71,8 @@ void MessageWindow::GameEntityUpdate(const void* param)
 				m_fLastInputTime = info.fTime;
 				if (!pTransferManager->IsConnectSucess()) {
 					m_bNextMessage = true;
-					m_nNextMessageCnt = 0;
 				} else if (pTransferManager->GetSelfConnect().nPlayerId == m_nControlPlayerId) {
 					m_bNextMessage = true;
-					m_nNextMessageCnt = 0;
 					pTransferManager->GetTransfer<TransferCommand>(TransferManager::eTransferKind_Command)->SetSendCommand((TransferCommand::CommandKind)m_uDecideCommand);
 				}
 			}
@@ -87,14 +84,14 @@ void MessageWindow::GameEntityUpdate(const void* param)
 			const auto& command = pCommand->GetCommand();
 			if(command.nPlayerId == m_nControlPlayerId && command.uCommand == m_uDecideCommand) {
 				m_bNextMessage = true;
-				m_nNextMessageCnt = 0;
 				pCommand->PopFrontCommand();
 			}
 		}
 	}
 	else{
-		m_nNextMessageCnt++;
-		if(m_nNextMessageCnt >= 10){
+		DelayTouchInfo info = {};
+		const bool bFind = Engine::GetEngine()->FindDelayTouchInfo(info, eTouchEvent_UP, m_nControlPlayerId);
+		if(bFind){
 			clearNextMessageFlag();
 		}
 	}
@@ -160,7 +157,6 @@ void MessageWindow::clearNextMessageFlag()
 {
 	m_bNextMessage = false;
 	m_bSetMessage = false;
-	m_nNextMessageCnt = 0;
 }
 
 void MessageWindow::clearText()

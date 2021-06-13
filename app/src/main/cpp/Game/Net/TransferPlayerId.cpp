@@ -19,6 +19,7 @@ TransferPlayerId::~TransferPlayerId()
 
 void TransferPlayerId::initialize()
 {
+	DEBUG_LOG_A("【Net】%s\n", __PRETTY_FUNCTION__ );
 	m_Data.uKind = TransferManager::eTransferKind_PlayerId;
 	m_Data.bReqEnd = false;
 

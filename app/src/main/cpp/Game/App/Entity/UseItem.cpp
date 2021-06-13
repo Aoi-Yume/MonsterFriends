@@ -100,7 +100,7 @@ void UseItem::GameEntitySetup(const void* param) {
 		{
 			auto pBtnManager = new ButtonManager();
 			const std::tuple<const char *, VEC3, uint8_t> btnList[] = {
-					{"image/button_back.png", VEC3(700.0f, 300.0f, 0), TransferCommand::eCommand_Back},
+					{"image/button_back.png", VEC3(700.0f, 300.0f, 0), TransferCommand::eCommand_UseBack},
 			};
 			for (int i = 0; i < sizeof(btnList) / sizeof(btnList[0]); ++i) {
 				auto pBtn = pBtnManager->CreateButton(std::get<0>(btnList[i]));

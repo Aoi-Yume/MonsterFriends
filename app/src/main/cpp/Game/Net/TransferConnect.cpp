@@ -22,6 +22,7 @@ TransferConnect::~TransferConnect()
 
 void TransferConnect::initialize()
 {
+	DEBUG_LOG_A("【Net】%s\n", __PRETTY_FUNCTION__ );
 	memset(&m_Data, 0, sizeof(m_Data));
 	auto pManager = TransferManager::Get();
 	m_Data.uKind = TransferManager::eTransferKind_Connect;

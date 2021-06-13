@@ -21,6 +21,7 @@ TransferTouchInfo::~TransferTouchInfo()
 
 void TransferTouchInfo::initialize()
 {
+	DEBUG_LOG_A("【Net】%s\n", __PRETTY_FUNCTION__ );
 	m_Data.uKind = TransferManager::eTransferKind_TouchInfo;
 	m_lastSendTime = 0.0f;
 }

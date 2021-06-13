@@ -32,9 +32,10 @@ public:
 		eCommand_PushItemRight,
 		eCommand_Buy,
 		eCommand_BuyCancel,
-		eCommand_Back,
+		eCommand_ShopBack,
 		eCommand_Use,
 		eCommand_UseCancel,
+		eCommand_UseBack,
 		eCommand_GameMainNextMessage,
 		eCommand_ShopNextMessage,
 		eCommand_UseItemNextMessage,
@@ -55,10 +56,13 @@ protected:
 	void updateReceive(const char* Id, void* pData) override;
 
 public:
-	void SetSendCommand(CommandKind uCommand){ m_SendData.command.uCommand = uCommand; }
+	void SetSendCommand(CommandKind uCommand);
 	bool IsCommandEmpty() const { return m_CommandQue.empty(); }
-	const Command& GetCommand() const { return m_CommandQue.front(); }
-	void PopFrontCommand() { m_CommandQue.pop_front(); }
+	const Command GetCommand() const { return m_CommandQue.front(); }
+	void PopFrontCommand() {
+		std::lock_guard<std::mutex> lock(m_Mutex);
+		m_CommandQue.pop_front();
+	}
 
 	void Dump() override;
 
@@ -68,7 +72,8 @@ private:
 		uint8_t  	uKind;
 		Command		command;
 	};
-	Data m_SendData;
+	std::mutex	m_Mutex;
+	std::vector<Data> m_aSendData;
 	std::list<Command>	m_CommandQue;
 };
 

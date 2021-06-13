@@ -56,7 +56,6 @@ private:
 	bool 			m_bActive;
 	bool 			m_bSetMessage;
 	bool 			m_bNextMessage;
-	int 			m_nNextMessageCnt;
 	int 			m_nCurrentUseLine;
 	int 			m_nControlPlayerId;
 	char 			m_cResPath[64];

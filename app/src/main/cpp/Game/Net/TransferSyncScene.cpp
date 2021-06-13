@@ -19,6 +19,7 @@ TransferSyncScene::~TransferSyncScene()
 
 void TransferSyncScene::initialize()
 {
+	DEBUG_LOG_A("【Net】%s\n", __PRETTY_FUNCTION__ );
 	m_Data.uKind = TransferManager::eTransferKind_SyncScene;
 	m_Data.bReqEnd = false;
 	for(int i = 0; i < NET_CONNECT_MAX; ++i){
