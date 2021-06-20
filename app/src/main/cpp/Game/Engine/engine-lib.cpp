@@ -34,7 +34,7 @@ Java_com_aoiyume_Game_Engine_ReceiveNearbyData(JNIEnv *env, jclass clazz, jstrin
 	jsize size = env->GetArrayLength(data);
 	jbyte* pData = env->GetByteArrayElements(data, nullptr);
 	const char* pEndPoint = env->GetStringUTFChars(end_point, nullptr);
-	TransferManager::Get()->ReceiveData(pEndPoint, pData, size);
+	TransferManager::Get()->AddReceiveData(pEndPoint, pData, size);
 	env->ReleaseStringUTFChars(end_point, pEndPoint);
 	env->ReleaseByteArrayElements(data, pData, 0);
 }

@@ -37,6 +37,8 @@ void TransferConnect::initialize()
 
 bool TransferConnect::updateTransfer()
 {
+	if(!isSendPossible()){ return false; }
+
 	const int nConnectNum = TransferManager::Get()->GetConnectNum();
 	for(int i = 0; i < nConnectNum; ++i){
 		const auto& info = TransferManager::Get()->GetConnect(i);
@@ -46,10 +48,10 @@ bool TransferConnect::updateTransfer()
 	TransferManager::Get()->BroadCast((jbyte*)&m_Data, sizeof(m_Data));
 	return true;
 }
-void TransferConnect::updateReceive(const char* Id, void* pData)
+bool TransferConnect::updateReceive(const char* Id, void* pData, size_t size)
 {
-	if(IsEnd()){ return; }
-	TransferBase::updateReceive(Id, pData);
+	if(IsEnd()){ return false; }
+	if(size != sizeof(Data)){ return false; }
 
 	auto pManager = TransferManager::Get();
 	Data* pReceiveData = (Data*)pData;
@@ -84,6 +86,7 @@ void TransferConnect::updateReceive(const char* Id, void* pData)
 	if(m_bReceiveSelfConnect && (m_bReceiveHost || m_Data.bHost)){
 		RequestEnd();
 	}
+	return true;
 }
 
 void TransferConnect::Dump()

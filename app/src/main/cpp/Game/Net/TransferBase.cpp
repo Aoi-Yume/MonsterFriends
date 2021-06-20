@@ -12,6 +12,7 @@ TransferBase::TransferBase(int nKind, int nSleepNanoSec)
 , m_nReceiveCnt()
 , m_nSleepNanoSec(nSleepNanoSec)
 , m_thread()
+, m_Mutex()
 {
 }
 
@@ -62,11 +63,21 @@ int TransferBase::getReceiveCnt() const
 	return m_nReceiveCnt;
 }
 
-void TransferBase::updateReceive(const char *Id, void *pData)
+bool TransferBase::updateReceive(const char *Id, void *pData, size_t size)
 {
 	(void)(Id);
 	(void)(pData);
-	m_nReceiveCnt++;
+	return false;
+}
+
+bool TransferBase::checkReceive()
+{
+	std::lock_guard<std::mutex> guard(m_Mutex);
+	if(m_aReceiveQue.empty()){ return false; }
+	const ReceiveData& data = m_aReceiveQue.front();
+	const bool bRet = updateReceive(data.Id, (void*)data.data, data.size);
+	m_aReceiveQue.pop_front();
+	return bRet;
 }
 
 void TransferBase::onThread()
@@ -77,6 +88,9 @@ void TransferBase::onThread()
 		if((m_uReqest & eRequest_Stop) != 0U){
 			if((m_uReqest & eRequest_End) != 0U){ break; }
 			continue;
+		}
+		if(checkReceive()){
+			m_nReceiveCnt++;
 		}
 		if(updateTransfer()) {
 			m_nSendCnt++;

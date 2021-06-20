@@ -216,11 +216,11 @@ void TransferManager::BroadCast(jbyte *pData, int nSize)
 	}
 }
 
-void TransferManager::ReceiveData(const char *id, jbyte* pData, int nSize)
+void TransferManager::AddReceiveData(const char* id, const jbyte* pData, int nSize)
 {
 	uint8_t uKind = *pData;
 	if(uKind >= 0 && uKind < eTransferKind_Max){
-		m_aTransfer[uKind]->updateReceive(id, pData);
+		m_aTransfer[uKind]->AddReceive(id, pData, nSize);
 	}
 }
 

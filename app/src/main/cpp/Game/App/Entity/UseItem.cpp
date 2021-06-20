@@ -49,7 +49,6 @@ void UseItem::Open()
 	m_aButtonManager[eBtnManager_Back]->Unlock();
 	m_aButtonManager[eBtnManager_Back]->SetVisible(true);
 	m_aButtonManager[eBtnManager_Back]->Reset();
-	m_pMessageWindow->SetActive(true);
 	m_nStep = eStep_SelectItemWait;
 }
 
@@ -143,6 +142,7 @@ void UseItem::GameEntityUpdate(const void* param)
 		str[sizeof(str) - 1] = '\0';
 		m_pMessageWindow->SetDirectMessage(str);
 		m_pMessageWindow->SetVisible(true);
+		m_pMessageWindow->SetActive(true);
 		m_pItemListUI->Lock();
 		m_nStep = eStep_MessageWait;
 	}
@@ -162,6 +162,7 @@ void UseItem::GameEntityUpdate(const void* param)
 	else if(m_nStep == eStep_MessageWait2){
 		if(m_pMessageWindow->IsNextMessage()){
 			m_pMessageWindow->SetVisible(false);
+			m_pMessageWindow->SetActive(false);
 			m_aButtonManager[eBtnManager_UseOrCancel]->SetVisible(true);
 			m_aButtonManager[eBtnManager_UseOrCancel]->Unlock();
 			m_nStep = eStep_UseOrCancel;
@@ -191,10 +192,10 @@ void UseItem::GameEntityUpdate(const void* param)
 	}
 	else if(m_nStep == eStep_UseWait){
 		if(SKILL_LIST()->IsEndItemSkill()){
-			const auto pManager = TransferManager::Get();
+			auto pManager = TransferManager::Get();
 			if(pManager->IsConnectSucess()) {
-				pManager->GetTransfer<TransferSkillInfo>(
-						TransferManager::eTransferKind_SkillInfo)->Dump();
+				auto pTransfer = pManager->GetTransfer<TransferSkillInfo>(TransferManager::eTransferKind_SkillInfo);
+				pTransfer->Dump();
 			}
 			const int nPlayer = AppParam::Get()->GetNetworkInfo().nCurrentPlayerId;
 			// スキル使用更新
@@ -205,11 +206,13 @@ void UseItem::GameEntityUpdate(const void* param)
 	else if(m_nStep == eStep_UseImPossible){
 		m_pMessageWindow->SetDirectMessage("このアイテムは使えない！");
 		m_pMessageWindow->SetVisible(true);
+		m_pMessageWindow->SetActive(true);
 		m_nStep = eStep_UseImPossibleWait;
 	}
 	else if(m_nStep == eStep_UseImPossibleWait){
 		if(m_pMessageWindow->IsNextMessage()) {
 			m_pMessageWindow->SetVisible(false);
+			m_pMessageWindow->SetActive(false);
 			m_nStep = eStep_Reset;
 		}
 	}
@@ -235,6 +238,7 @@ void UseItem::GameEntityUpdate(const void* param)
 		m_aButtonManager[eBtnManager_Back]->Unlock();
 		m_aButtonManager[eBtnManager_Back]->SetVisible(true);
 		m_pMessageWindow->SetVisible(false);
+		m_pMessageWindow->SetActive(false);
 		m_nStep = eStep_SelectItemWait;
 	}
 

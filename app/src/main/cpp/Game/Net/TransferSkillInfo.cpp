@@ -4,6 +4,8 @@
 
 
 #include "TransferSkillInfo.h"
+
+#include <utility>
 #include "TransferManager.h"
 
 TransferSkillInfo::TransferSkillInfo()
@@ -33,35 +35,40 @@ void TransferSkillInfo::initialize()
 
 bool TransferSkillInfo::updateTransfer()
 {
+	DEBUG_LOG_A("Recv[%d], Send[%d]\n", getReceiveCnt(), getSendCnt());
+	if(!isSendPossible()){ return false; }
+
 	const auto pManager = TransferManager::Get();
 	if(pManager->GetSelfConnect().nPlayerId == m_nSendPlayer) {
 		jbyte data[512];
 		ASSERT(m_nSize + 2 < sizeof(data));
+		ASSERT(m_Data.pData);
 		data[0] = m_Data.uKind;
 		data[1] = m_Data.bReqEnd;
-		memcpy(&data[2], m_Data.pData, m_nSize);
+		memcpy(&data[2], (void*)m_Data.pData, m_nSize);
 		pManager->BroadCast((jbyte *) data, m_nSize + 2);
 		if(m_Data.bReqEnd){
 			RequestEnd();
 		}
 		return true;
 	}
-	else if(getReceiveCnt() >= 1 && getSendCnt() == 0){
+	else if(getReceiveCnt() >= 1){
 		pManager->SendPlayer(m_nSendPlayer, (jbyte*)&m_Data, sizeof(m_Data));
 		return true;
 	}
 	return false;
 }
-void TransferSkillInfo::updateReceive(const char* Id, void* pData)
+bool TransferSkillInfo::updateReceive(const char* Id, void* pData, size_t size)
 {
-	if(IsEnd()){ return; }
-	TransferBase::updateReceive(Id, pData);
+	if(IsEnd()){ return false; }
 
 	Data* pReceiveData = (Data*)pData;
 	const int nConnectNum = TransferManager::Get()->GetConnectNum();
 
 	auto pManager = TransferManager::Get();
 	if(pManager->GetSelfConnect().nPlayerId == m_nSendPlayer){
+		if(size != sizeof(Data)){ return false; }
+
 		// 送り開始側での接続Noに対応させて全員分の返答を待つ
 		const int nNo = pManager->GetConnectNoFromNetId(Id);
 		if(nNo >= 0){
@@ -77,18 +84,21 @@ void TransferSkillInfo::updateReceive(const char* Id, void* pData)
 		}
 	}
 	else{
+		if(size != m_nSize + 2){ return false; }
+
 		if (m_pReceiveCallBack) {
-			m_pReceiveCallBack(&((jbyte *) pData)[2]);
+			m_pReceiveCallBack(&((jbyte*)pData)[2]);
 		}
 		if(pReceiveData->bReqEnd){
 			RequestEnd();
 		}
 	}
+	return true;
 }
 
 void TransferSkillInfo::SetSkillInfoData(void* pData, int nSize, int nSendPlayer)
 {
-	m_Data.pData = pData;
+	m_Data.pData = (int64_t)pData;
 	m_nSize = nSize;
 	m_nSendPlayer = nSendPlayer;
 }

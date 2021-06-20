@@ -22,7 +22,7 @@ public:
 protected:
 	void initialize() override ;
 	bool updateTransfer() override;
-	void updateReceive(const char* Id, void* pData) override;
+	bool updateReceive(const char* Id, void* pData, size_t size) override;
 
 public:
 	void Dump() override;

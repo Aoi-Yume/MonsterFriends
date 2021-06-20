@@ -61,6 +61,8 @@ void AppSkillList::InitializeSkillTransfer()
 	auto p = pManager->GetTransfer<TransferSkillInfo>(TransferManager::eTransferKind_SkillInfo);
 	p->SetReceiveCallBack([this](void* pData){
 		const auto data = (AppParam::SkillNetworkInfo*)(pData);
+		ASSERT_MSG_A(data->SkillNo >= 0 && data->SkillNo < AppSkillList::eSkillList_Max, "data->SkillNo=[%d]", data->SkillNo);
+
 		const auto skill = m_aSkillInfo[data->SkillNo];
 
 		auto& netSkillInfo = AppParam::Get()->GetSkillInfo();

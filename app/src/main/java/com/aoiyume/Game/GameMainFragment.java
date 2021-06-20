@@ -14,6 +14,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.aoiyume.monsterfriends.MainActivity;
 import com.aoiyume.monsterfriends.R;
@@ -41,6 +42,7 @@ public class GameMainFragment extends Fragment {
     static final int m_InputTextMax = 2;
     static NearbyClient m_NearbyClient = null;
     static InterstitialAd m_InterstitialAd = null;
+    static boolean m_LoadFailedAd = false;
 
     static Runnable ShowSoftKeyborad = new Runnable() {
         @Override
@@ -168,6 +170,7 @@ public class GameMainFragment extends Fragment {
 
     public static void LoadAds()
     {
+        m_LoadFailedAd = false;
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
@@ -196,6 +199,8 @@ public class GameMainFragment extends Fragment {
 
                             @Override
                             public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                                m_LoadFailedAd = true;
+                                Toast.makeText(MainActivity.GetContext(), "Failed Load Ad", Toast.LENGTH_SHORT).show();
                                 super.onAdFailedToLoad(loadAdError);
                             }
                         });
@@ -207,6 +212,7 @@ public class GameMainFragment extends Fragment {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
+                if(m_LoadFailedAd){ return; }
                 m_InterstitialAd.show(MainActivity.GetContext());
             }
         });

@@ -181,7 +181,6 @@ namespace {
 			if(bRet){
 				pBtnMgr->Lock();
 				pBtnMgr->SetVisible(false);
-				TransferManager::Get()->StartTransfer(TransferManager::eTransferKind_Connect);
 				ChangeState(SceneTitle::eState_WaitNearbyConnect);
 			}
 		}
@@ -193,6 +192,7 @@ namespace {
 		void Begin(void *pUserPtr) override {
 			auto p = reinterpret_cast<SceneTitle *>(pUserPtr);
 			m_fTime = 0.0f;
+			m_bConnectStart = false;
 			p->m_pMessageWindow->SetVisible(true);
 			p->m_pMessageWindow->SetDirectMessage("接続中・");
 		}
@@ -210,17 +210,26 @@ namespace {
 			}
 			m_fTime += Engine::GetEngine()->GetDeltaTime();
 
-			// 通信接続完了
-			auto pTransfer = TransferManager::Get()->GetTransfer<TransferBase>(TransferManager::eTransferKind_Connect);
-			if (pTransfer->IsEnd()) {
-				pTransfer->Dump();
-				Engine::GetEngine()->StopNearbyAdvertising();
-				Engine::GetEngine()->StopNearbyDiscovery();
-				TransferManager::Get()->StartTransfer(TransferManager::eTransferKind_PlayerId);
-				ChangeState(SceneTitle::eState_WaitNearbyTransferPlayerId);
+
+			if(TransferManager::Get()->GetConnectNum() > 0) {
+				auto pTransfer = TransferManager::Get()->GetTransfer<TransferBase>(TransferManager::eTransferKind_Connect);
+				// 通信開始
+				if (!m_bConnectStart) {
+					TransferManager::Get()->StartTransfer(TransferManager::eTransferKind_Connect);
+					m_bConnectStart = true;
+				}
+				// 通信接続完了
+				else if (pTransfer->IsEnd()) {
+					pTransfer->Dump();
+					Engine::GetEngine()->StopNearbyAdvertising();
+					Engine::GetEngine()->StopNearbyDiscovery();
+					TransferManager::Get()->StartTransfer(TransferManager::eTransferKind_PlayerId);
+					ChangeState(SceneTitle::eState_WaitNearbyTransferPlayerId);
+				}
 			}
 		}
 
+		bool m_bConnectStart;
 		float m_fTime;
 	};
 

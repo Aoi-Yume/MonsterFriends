@@ -8,6 +8,7 @@
 
 #include "../Engine/Engine.h"
 #include <thread>
+#include <deque>
 
 class TransferManager;
 
@@ -22,18 +23,25 @@ public:
 	bool IsStart() const;
 	bool IsEnd() const;
 
+	void AddReceive(const char* pId, const jbyte* pData, size_t size) {
+		std::lock_guard<std::mutex> guard(m_Mutex);
+		m_aReceiveQue.emplace_back(pId, pData, size);
+	}
+
 protected:
 	void startTransfer();
 	void stopTransfer();
 
 	int getSendCnt() const;
 	int getReceiveCnt() const;
+	bool isSendPossible() const{ return (m_nReceiveCnt >= m_nSendCnt); }
 
 	virtual void initialize() = 0;
 	virtual bool updateTransfer() = 0;
-	virtual void updateReceive(const char* Id, void* pData);
+	virtual bool updateReceive(const char* Id, void* pData, size_t size);
 	
 private:
+	bool checkReceive();
 	void onThread();
 
 public:
@@ -47,13 +55,26 @@ private:
 		eRequest_Complete = (1 << 2),
 	};
 
+	struct ReceiveData{
+		ReceiveData(const char* pId, const jbyte* pData, size_t size){
+			ASSERT_MSG_A(size < sizeof(data), "%d < %d", size, sizeof(data));
+			std::snprintf(Id, sizeof(Id), "%s", pId);
+			memcpy(data, pData, size);
+			this->size = size;
+		}
+		char 	Id[16];
+		jbyte	data[1024];
+		size_t	size;
+	};
+
 	uint 		m_uReqest;
 	int 		m_nKind;
 	int 		m_nSendCnt;
 	int 		m_nReceiveCnt;
 	int			m_nSleepNanoSec;
 	std::thread	m_thread;
-	std::mutex 	m_mutex;
+	std::deque<ReceiveData>	m_aReceiveQue;
+	std::mutex m_Mutex;
 };
 
 #endif

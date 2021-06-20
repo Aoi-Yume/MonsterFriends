@@ -32,13 +32,15 @@ void TransferGameInfo::initialize()
 
 bool TransferGameInfo::updateTransfer()
 {
+	if(!isSendPossible()){ return false; }
+
 	const auto pManager = TransferManager::Get();
 	if(pManager->IsHost()) {
 		jbyte data[1024];
 		ASSERT(m_nSize + 2 < sizeof(data));
 		data[0] = m_Data.uKind;
 		data[1] = m_Data.bReqEnd;
-		memcpy(&data[2], m_Data.pData, m_nSize);
+		memcpy(&data[2], (void*)m_Data.pData, m_nSize);
 		pManager->BroadCast((jbyte *) data, m_nSize + 2);
 		if(m_Data.bReqEnd){
 			DEBUG_LOG("【Net】GameInfo Send ReqEnd\n");
@@ -46,23 +48,24 @@ bool TransferGameInfo::updateTransfer()
 		}
 		return true;
 	}
-	else if(getReceiveCnt() >= 1 && getSendCnt() == 0){
+	else if(getReceiveCnt() >= 1){
 		pManager->SendHost((jbyte*)&m_Data, sizeof(m_Data));
 		DEBUG_LOG("【Net】GameInfo SendReceive\n");
 		return true;
 	}
 	return false;
 }
-void TransferGameInfo::updateReceive(const char* Id, void* pData)
+bool TransferGameInfo::updateReceive(const char* Id, void* pData, size_t size)
 {
-	if(IsEnd()){ return; }
-	TransferBase::updateReceive(Id, pData);
+	if(IsEnd()){ return false; }
 
 	Data* pReceiveData = (Data*)pData;
 	const int nConnectNum = TransferManager::Get()->GetConnectNum();
 
 	auto pManager = TransferManager::Get();
 	if(pManager->IsHost()){
+		if(size != sizeof(Data)){ return false; }
+
 		// ホスト側での接続Noに対応させて全員分の返答を待つ
 		const int nNo = pManager->GetConnectNoFromNetId(Id);
 		if(nNo >= 0){
@@ -78,6 +81,8 @@ void TransferGameInfo::updateReceive(const char* Id, void* pData)
 		}
 	}
 	else{
+		if(size != m_nSize + 2){ return false; }
+
 		if(m_pReceiveCallBack){
 			m_pReceiveCallBack(&((jbyte*)pData)[2]);
 		}
@@ -86,11 +91,12 @@ void TransferGameInfo::updateReceive(const char* Id, void* pData)
 			RequestEnd();
 		}
 	}
+	return true;
 }
 
 void TransferGameInfo::SetGameInfoData(void* pData, int nSize)
 {
-	m_Data.pData = pData;
+	m_Data.pData = (int64_t)pData;
 	m_nSize = nSize;
 }
 

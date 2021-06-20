@@ -1,6 +1,8 @@
 package com.aoiyume.Game;
 
+import android.os.Debug;
 import android.util.Log;
+import android.util.Pair;
 import android.widget.Toast;
 
 import com.aoiyume.monsterfriends.MainActivity;
@@ -17,6 +19,10 @@ import com.google.android.gms.nearby.connection.Payload;
 import com.google.android.gms.nearby.connection.PayloadCallback;
 import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
 import com.google.android.gms.nearby.connection.Strategy;
+
+import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.HashMap;
 
 import androidx.annotation.NonNull;
 
@@ -38,6 +44,7 @@ public class NearbyClient {
     private String m_ConnectName;
 
     private  ReceiveCallBack m_ReceiveCallback;
+    private final HashMap<String, String> m_EndPointList = new HashMap<>();
 
     // Callbacks for finding other devices
     private final EndpointDiscoveryCallback endpointDiscoveryCallback =
@@ -58,6 +65,7 @@ public class NearbyClient {
                 @Override
                 public void onPayloadReceived(@NonNull String endPointId, @NonNull Payload payload) {
                     if(payload.getType() != Payload.Type.BYTES){ return; }
+                    Log.d(TAG, "【Net】ReceiveCallBack:" + payload.getId());
                     m_ReceiveCallback.receive(endPointId, payload.asBytes());
                 }
 
@@ -75,7 +83,7 @@ public class NearbyClient {
                     Toast.makeText(MainActivity.GetContext(), "onConnectionInitiated: accepting connection", Toast.LENGTH_SHORT).show();
                     Log.i(TAG, "onConnectionInitiated: accepting connection");
                     m_ConnectionsClient.acceptConnection(endpointId, payloadCallback);
-                    m_ReceiveCallback.accept(endpointId, connectionInfo.getEndpointName());
+                    m_EndPointList.put(endpointId, connectionInfo.getEndpointName());
                 }
 
                 @Override
@@ -83,6 +91,8 @@ public class NearbyClient {
                     if (result.getStatus().isSuccess()) {
                         Toast.makeText(MainActivity.GetContext(), "onConnectionResult: connection successful", Toast.LENGTH_SHORT).show();
                         Log.i(TAG, "onConnectionResult: connection successful");
+                        String name = m_EndPointList.get(endpointId);
+                        m_ReceiveCallback.accept(endpointId, name);
                     } else {
                         Toast.makeText(MainActivity.GetContext(), "onConnectionResult: connection failed", Toast.LENGTH_SHORT).show();
                     }

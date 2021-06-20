@@ -44,7 +44,6 @@ void Shop::Open()
 	m_aButtonManager[eBtnManager_Back]->Unlock();
 	m_aButtonManager[eBtnManager_Back]->SetVisible(true);
 	m_pItemListUI->Open();
-	m_pMessageWindow->SetActive(true);
 	m_nStep = eStep_SelectItemWait;
 }
 
@@ -167,6 +166,7 @@ void Shop::GameEntityUpdate(const void* param)
 		str[sizeof(str) - 1] = '\0';
 		m_pMessageWindow->SetDirectMessage(str);
 		m_pMessageWindow->SetVisible(true);
+		m_pMessageWindow->SetActive(true);
 		m_pItemListUI->Lock();
 		m_nStep = eStep_MessageWait;
 	}
@@ -185,6 +185,7 @@ void Shop::GameEntityUpdate(const void* param)
 	}
 	else if(m_nStep == eStep_MessageWait2){
 		if(m_pMessageWindow->IsNextMessage()){
+			m_pMessageWindow->SetActive(false);
 			m_pMessageWindow->SetVisible(false);
 			m_aButtonManager[eBtnManager_BuyOrCancel]->SetVisible(true);
 			m_aButtonManager[eBtnManager_BuyOrCancel]->Unlock();
@@ -208,12 +209,14 @@ void Shop::GameEntityUpdate(const void* param)
 		if(nPlayerKizuna >= itemInfo.nCost){
 			AppParam::Get()->SubKizunaPoint(nPlayerId, itemInfo.nCost);
 			AppParam::Get()->AddItem(nPlayerId, nSelectItemNo, 1);
+			m_pMessageWindow->SetActive(true);
 			m_pMessageWindow->SetDirectMessage("まいどありにゃ");
 
 			// TODO 直度系のアイテムスキルは使い忘れることが多いので買ったら即反映にしたいけど
 			// TODO 通信が関わってくるので少々面倒か…。
 		}
 		else{
+			m_pMessageWindow->SetActive(true);
 			m_pMessageWindow->SetDirectMessage("キズナが足りないにゃ");
 		}
 		m_pMessageWindow->SetVisible(true);
@@ -262,9 +265,11 @@ void Shop::GameEntityUpdate(const void* param)
 		m_aButtonManager[eBtnManager_Back]->Unlock();
 		m_aButtonManager[eBtnManager_Back]->SetVisible(true);
 		m_pMessageWindow->SetVisible(false);
+		m_pMessageWindow->SetActive(false);
 		m_nStep = (AppParam::Get()->IsClear() ? eStep_End : eStep_SelectItemWait);
 	}
 	else if(m_nStep == eStep_BackMessage){
+		m_pMessageWindow->SetActive(true);
 		m_pMessageWindow->SetDirectMessage("バイバイにゃ");
 		m_pMessageWindow->SetVisible(true);
 		m_nStep = eStep_BackMessage_Wait;

@@ -160,7 +160,7 @@ bool AppParam::IsClear() const {
 
 void AppParam::SetUseSkillInfo(int nNo, int nDuration, int nParam, int nSendPlayer, int nTargetPlayer)
 {
-	ASSERT(nNo >= 0 && nNo < AppSkillList::eSkillList_Max);
+	ASSERT_MSG_A(nNo >= 0 && nNo < AppSkillList::eSkillList_Max, "nNo=[%d]", nNo);
 
 	// 接続完了している時は通信用情報を更新
 	auto pManager = TransferManager::Get();

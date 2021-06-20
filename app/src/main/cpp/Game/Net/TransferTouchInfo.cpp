@@ -39,13 +39,14 @@ bool TransferTouchInfo::updateTransfer()
 	pManager->BroadCast((jbyte *)&m_Data, sizeof(m_Data));
 	return true;
 }
-void TransferTouchInfo::updateReceive(const char* Id, void* pData)
+bool TransferTouchInfo::updateReceive(const char* Id, void* pData, size_t size)
 {
-	if(IsEnd()){ return; }
-	TransferBase::updateReceive(Id, pData);
+	if(IsEnd()){ return false; }
+	if(size != sizeof(Data)){ return false; }
 
 	Data* pReceiveData = (Data*)pData;
 	DELAY_INPUT()->AddDelayTouchInfo(pReceiveData->info, TransferManager::Get()->GetPlayerIdFromNetId(Id));
+	return true;
 }
 
 void TransferTouchInfo::SetReceiveCallBack(std::function<void(void*, int)> pCallBack)

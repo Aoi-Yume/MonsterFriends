@@ -42,11 +42,12 @@ bool TransferCommand::updateTransfer()
 
 	return true;
 }
-void TransferCommand::updateReceive(const char* Id, void* pData)
+bool TransferCommand::updateReceive(const char* Id, void* pData, size_t  size)
 {
-	if(IsEnd()){ return; }
+	if(IsEnd()){ return false; }
+	if(size != sizeof(Data)){ return false; }
+
 	std::lock_guard<std::mutex> lock(m_Mutex);
-	TransferBase::updateReceive(Id, pData);
 
 	Data* pReceiveData = (Data*)pData;
 	m_CommandQue.emplace_back(pReceiveData->command);
@@ -56,6 +57,8 @@ void TransferCommand::updateReceive(const char* Id, void* pData)
 		DEBUG_LOG_A("[%d]\n", it.uCommand);
 	}
 	DEBUG_LOG("----------------------------\n");
+
+	return true;
 }
 
 void TransferCommand::SetSendCommand(CommandKind uCommand)

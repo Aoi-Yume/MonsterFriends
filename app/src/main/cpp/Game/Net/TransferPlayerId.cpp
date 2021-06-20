@@ -49,6 +49,8 @@ void TransferPlayerId::initialize()
 
 bool TransferPlayerId::updateTransfer()
 {
+	if(!isSendPossible()){ return false; }
+
 	const auto pManager = TransferManager::Get();
 	if(pManager->IsHost()) {
 		pManager->BroadCast((jbyte *) &m_Data, sizeof(m_Data));
@@ -57,17 +59,17 @@ bool TransferPlayerId::updateTransfer()
 		}
 		return true;
 	}
-	else if(getReceiveCnt() >= 1 && getSendCnt() == 0){
+	else if(getReceiveCnt() >= 1){
 		pManager->SendHost((jbyte*)&m_Data, sizeof(m_Data));
 		DEBUG_LOG("SendReceive\n");
 		return true;
 	}
 	return false;
 }
-void TransferPlayerId::updateReceive(const char* Id, void* pData)
+bool TransferPlayerId::updateReceive(const char* Id, void* pData, size_t size)
 {
-	if(IsEnd()){ return; }
-	TransferBase::updateReceive(Id, pData);
+	if(IsEnd()){ return false; }
+	if(size != sizeof(Data)){ return false; }
 
 	Data* pReceiveData = (Data*)pData;
 	const int nConnectNum = TransferManager::Get()->GetConnectNum();
@@ -98,6 +100,7 @@ void TransferPlayerId::updateReceive(const char* Id, void* pData)
 			RequestEnd();
 		}
 	}
+	return true;
 }
 
 void TransferPlayerId::Dump()

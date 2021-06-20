@@ -22,7 +22,7 @@ public:
 protected:
 	void initialize() override ;
 	bool updateTransfer() override;
-	void updateReceive(const char* Id, void* pData) override;
+	bool updateReceive(const char* Id, void* pData, size_t size) override;
 
 public:
 	void SetSkillInfoData(void* pData, int nSize, int nSendPlayer);
@@ -34,7 +34,7 @@ private:
 	struct Data {
 		uint8_t uKind;
 		bool 	bReqEnd;
-		void*	pData;
+		int64_t pData;
 	};
 
 	bool 	m_bReceive[NET_CONNECT_MAX];

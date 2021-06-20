@@ -90,7 +90,7 @@ public:
 	void SendHost(jbyte* pData, int nSize);
 	void SendPlayer(int nPlayerId, jbyte* pData, int nSize);
 	void BroadCast(jbyte* pData, int nSize);
-	void ReceiveData(const char* id, jbyte* pData, int nSize);
+	void AddReceiveData(const char* id, const jbyte* pData, int nSize);
 
 	bool IsSelfConnectId(const char* id) const;
 	int GetConnectNoFromNetId(const char* id) const;
