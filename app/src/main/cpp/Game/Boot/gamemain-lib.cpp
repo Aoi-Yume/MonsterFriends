@@ -34,6 +34,11 @@ Java_com_aoiyume_Game_GameMainRender_SurfaceCreate(
 		s_EntityMgr->AttachEntity(pCamera);
 	}
 	{
+		auto pSoundManager = Engine::GetEngine()->GetSoundManager();
+		pSoundManager->LoadSE("sound/se/decide.ogg");
+		pSoundManager->LoadSE("sound/se/cancel.ogg");
+	}
+	{
 		SceneManager::CreateSceneMaanger(new SceneLauncher());
 		SCENE_MANAGER()->Update(eGameMessage_Setup, nullptr);
 		s_EntityMgr->AttachEntity(SCENE_MANAGER());

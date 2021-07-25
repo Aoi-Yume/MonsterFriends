@@ -9,6 +9,7 @@
 #include <android/log.h>
 
 #define CLASS_NAME_SYSTEM			"com/aoiyume/Game/GameMainFragment"
+#define CLASS_NAME_SOUND			"com/aoiyume/Game/SoundManager"
 #define CLASS_NAME_UTILITY			"com/aoiyume/Game/Utility"
 
 #ifdef _AOIYUME_DEBUG_

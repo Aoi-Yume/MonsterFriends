@@ -10,9 +10,11 @@
 #include "engine_define.h"
 #include <GLES2/gl2.h>
 #include <android/asset_manager_jni.h>
+#include <SoundManager.h>
 
 struct TouchInputInfo;
 struct DelayTouchInfo;
+class SoundManager;
 
 struct ScreenInfo{
 	int 	m_nScreenX;
@@ -56,6 +58,10 @@ public:
 	void DeleteAssetManager();
 	void LoadAsset(const char* pFileName, void** pBuffer, long *pSize, bool bAllocate);
 
+	void CreateSoundManager();
+	void DestroySoundManager();
+	SoundManager* GetSoundManager() const;
+
 	void ShowSoftwareKeyboard();
 	bool IsShowSoftwareKeyboard() const;
 	void GetInputText(char* pText, int nSize) const;
@@ -87,6 +93,7 @@ private:
 
 	jobject 		m_AssetManagerObjRef;
 	AAssetManager*	m_pAssetMaanger;
+	SoundManager*	m_pSoundManager;
 
 	TIME_POINT 		m_TimePoint;
 	DURATION 		m_DeltaTime;

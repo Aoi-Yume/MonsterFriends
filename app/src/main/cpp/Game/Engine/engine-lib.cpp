@@ -5,6 +5,7 @@
 
 #include "Engine.h"
 #include "../Net/TransferManager.h"
+#include <SoundManager.h>
 
 EXTERN_C
 
@@ -38,4 +39,11 @@ Java_com_aoiyume_Game_Engine_ReceiveNearbyData(JNIEnv *env, jclass clazz, jstrin
 	env->ReleaseStringUTFChars(end_point, pEndPoint);
 	env->ReleaseByteArrayElements(data, pData, 0);
 }
+
+JNIEXPORT void JNICALL
+Java_com_aoiyume_Game_SoundManager_LoadCompleteCallBack(JNIEnv *env, jobject thiz, jint handle, jint status) {
+	auto pSoundManager = Engine::GetEngine()->GetSoundManager();
+	pSoundManager->LoadCompleteCallBack(handle, status);
+}
+
 END_EXTERN_C

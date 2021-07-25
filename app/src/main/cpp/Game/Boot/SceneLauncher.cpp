@@ -94,6 +94,12 @@ void SceneLauncher::SceneUpdate()
 //------------------------------------------
 void SceneLauncher::SceneFinalize()
 {
+	const char* pPath = m_pSimpleBtnMgr->GetDecide() >= 0 ? "sound/se/decide.ogg" : "sound/se/cancel.ogg";
+	auto pSoundManager = Engine::GetEngine()->GetSoundManager();
+	SoundHandle nHandle = pSoundManager->LoadSE(pPath);
+	DEBUG_LOG_A("SE IsLoad:%d", (int)pSoundManager->IsLoadSE(nHandle));
+	pSoundManager->PlaySE(nHandle, 1.0f, 1.0f, false);
+
 	Super::SceneFinalize();
 	DEBUG_LOG("Launcher Call Finalize");
 }

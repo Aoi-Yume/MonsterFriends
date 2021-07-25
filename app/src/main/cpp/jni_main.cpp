@@ -25,12 +25,17 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 	jmethodID methodId =  ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_UTILITY, "GetAssetManager");
 	Engine::GetEngine()->SetAssetManager(GetEnv()->CallStaticObjectMethod(classId, methodId));
 
+	Engine::GetEngine()->CreateSoundManager();
+
 	return JNI_VERSION_1_6;
 }
 
 void JNI_OnUnload(JavaVM *vm, void *reserved)
 {
 	DEBUG_LOG("Call JNI_OnUnLoad");
+
+	Engine::GetEngine()->DestroySoundManager();
+
 	Engine::GetEngine()->DeleteAssetManager();
 	ObjectLoader::Destroy();
 	Engine::Destroy();

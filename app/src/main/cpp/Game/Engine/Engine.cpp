@@ -181,6 +181,32 @@ void Engine::LoadAsset(const char *pFileName, void **pBuffer, long *pSize, bool 
 
 //-----------------------------------------
 //-----------------------------------------
+void Engine::CreateSoundManager()
+{
+	ASSERT(!m_pSoundManager);
+	m_pSoundManager = new SoundManager;
+	m_pSoundManager->Initialize();
+}
+
+//-----------------------------------------
+//-----------------------------------------
+void Engine::DestroySoundManager()
+{
+	if(m_pSoundManager){
+		m_pSoundManager->Finalize();
+		delete m_pSoundManager;
+	}
+}
+
+//-----------------------------------------
+//-----------------------------------------
+SoundManager* Engine::GetSoundManager() const
+{
+	return m_pSoundManager;
+}
+
+//-----------------------------------------
+//-----------------------------------------
 void Engine::ShowSoftwareKeyboard()
 {
 	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SYSTEM);

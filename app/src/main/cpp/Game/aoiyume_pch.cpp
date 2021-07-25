@@ -169,34 +169,44 @@ jmethodID ObjectLoader::GetMethodID(const char *className, const char *methodNam
 
 void ObjectLoader::SetDefaultLoad() {
     DEBUG_LOG("/////////////////////////////////////////");
-    DEBUG_LOG("Beging Load Default Object");
+    DEBUG_LOG("Begin Load Default Object");
 	{
 		DEBUG_LOG("\tLoad System");
-		const char* pClassName = CLASS_NAME_SYSTEM;
-		s_ObjectLoader->SetClassID(pClassName);
-		s_ObjectLoader->SetMethodID(pClassName, "ShowSoftwareKeyboard", "()V", true);
-		s_ObjectLoader->SetMethodID(pClassName, "IsShowSoftwareKeyboard", "()Z", true);
-		s_ObjectLoader->SetMethodID(pClassName, "GetInputText", "()Ljava/lang/String;", true);
-		s_ObjectLoader->SetMethodID(pClassName, "StartNearbyAdvertising", "(Ljava/lang/String;)V", true);
-		s_ObjectLoader->SetMethodID(pClassName,"StopNearbyAdvertising", "()V", true);
-		s_ObjectLoader->SetMethodID(pClassName, "StartNearbyDiscovery", "(Ljava/lang/String;)V", true);
-		s_ObjectLoader->SetMethodID(pClassName,"StopNearbyDiscovery", "()V", true);
-		s_ObjectLoader->SetMethodID(pClassName,"DisconnectNearbyAllEndPoint", "()V", true);
-		s_ObjectLoader->SetMethodID(pClassName,"SendData", "(Ljava/lang/String;[B)V", true);
-		s_ObjectLoader->SetMethodID(pClassName, "LoadAds", "()V", true);
-		s_ObjectLoader->SetMethodID(pClassName, "ShowAds", "()V", true);
-		s_ObjectLoader->SetMethodID(pClassName, "IsShowAds", "()Z", true);
+		s_ObjectLoader->SetClassID(CLASS_NAME_SYSTEM);
+		s_ObjectLoader->SetMethodID(CLASS_NAME_SYSTEM, "ShowSoftwareKeyboard", "()V", true);
+		s_ObjectLoader->SetMethodID(CLASS_NAME_SYSTEM, "IsShowSoftwareKeyboard", "()Z", true);
+		s_ObjectLoader->SetMethodID(CLASS_NAME_SYSTEM, "GetInputText", "()Ljava/lang/String;", true);
+		s_ObjectLoader->SetMethodID(CLASS_NAME_SYSTEM, "StartNearbyAdvertising", "(Ljava/lang/String;)V", true);
+		s_ObjectLoader->SetMethodID(CLASS_NAME_SYSTEM,"StopNearbyAdvertising", "()V", true);
+		s_ObjectLoader->SetMethodID(CLASS_NAME_SYSTEM, "StartNearbyDiscovery", "(Ljava/lang/String;)V", true);
+		s_ObjectLoader->SetMethodID(CLASS_NAME_SYSTEM,"StopNearbyDiscovery", "()V", true);
+		s_ObjectLoader->SetMethodID(CLASS_NAME_SYSTEM,"DisconnectNearbyAllEndPoint", "()V", true);
+		s_ObjectLoader->SetMethodID(CLASS_NAME_SYSTEM,"SendData", "(Ljava/lang/String;[B)V", true);
+		s_ObjectLoader->SetMethodID(CLASS_NAME_SYSTEM, "LoadAds", "()V", true);
+		s_ObjectLoader->SetMethodID(CLASS_NAME_SYSTEM, "ShowAds", "()V", true);
+		s_ObjectLoader->SetMethodID(CLASS_NAME_SYSTEM, "IsShowAds", "()Z", true);
+	}
+	// Class SoundManager
+	{
+		DEBUG_LOG("\tLoad SoundManager");
+		s_ObjectLoader->SetClassID(CLASS_NAME_SOUND);
+		s_ObjectLoader->SetMethodID(CLASS_NAME_SOUND, "Initialize", "()V", true);
+		s_ObjectLoader->SetMethodID(CLASS_NAME_SOUND, "Finalize", "()V", true);
+		s_ObjectLoader->SetMethodID(CLASS_NAME_SOUND, "LoadSE", "(Ljava/lang/String;)I", true);
+		s_ObjectLoader->SetMethodID(CLASS_NAME_SOUND, "UnLoadSE", "(I)V", true);
+		s_ObjectLoader->SetMethodID(CLASS_NAME_SOUND, "IsLoadSE", "(I)Z", true);
+		s_ObjectLoader->SetMethodID(CLASS_NAME_SOUND, "PlaySE", "(IFFZ)V", true);
+		s_ObjectLoader->SetMethodID(CLASS_NAME_SOUND, "StopSE", "(I)V", true);
 	}
     // Class Utility
     {
         DEBUG_LOG("\tLoad Utility");
-        const char* pClassName = CLASS_NAME_UTILITY;
-        s_ObjectLoader->SetClassID(pClassName);
-		s_ObjectLoader->SetMethodID(pClassName, "GetAssetManager", "()Ljava/lang/Object;", true);
-        s_ObjectLoader->SetMethodID(pClassName, "LoadImage", "(Ljava/lang/String;)Ljava/lang/Object;", true);
-        s_ObjectLoader->SetMethodID(pClassName, "GetImageSize", "(Ljava/lang/String;)[I", true);
-        s_ObjectLoader->SetMethodID(pClassName, "GetTextImageSize", "(Ljava/lang/String;I)[F", true);
-        s_ObjectLoader->SetMethodID(pClassName, "CreateFontImage", "(Ljava/lang/String;I)Ljava/lang/Object;", true);
+        s_ObjectLoader->SetClassID(CLASS_NAME_UTILITY);
+		s_ObjectLoader->SetMethodID(CLASS_NAME_UTILITY, "GetAssetManager", "()Ljava/lang/Object;", true);
+        s_ObjectLoader->SetMethodID(CLASS_NAME_UTILITY, "LoadImage", "(Ljava/lang/String;)Ljava/lang/Object;", true);
+        s_ObjectLoader->SetMethodID(CLASS_NAME_UTILITY, "GetImageSize", "(Ljava/lang/String;)[I", true);
+        s_ObjectLoader->SetMethodID(CLASS_NAME_UTILITY, "GetTextImageSize", "(Ljava/lang/String;I)[F", true);
+        s_ObjectLoader->SetMethodID(CLASS_NAME_UTILITY, "CreateFontImage", "(Ljava/lang/String;I)Ljava/lang/Object;", true);
     }
 
     DEBUG_LOG("End Load Default Object");

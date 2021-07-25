@@ -44,6 +44,9 @@ add_library(	algorithm-lib SHARED
 add_library(    input-lib SHARED
 				src/main/cpp/Game/Input/DelayInput.cpp)
 
+add_library(	sound-lib SHARED
+				src/main/cpp/Game/Base/SoundManager.cpp)
+
 add_library(	net-lib SHARED
 				src/main/cpp/Game/Net/TransferBase.cpp
 				src/main/cpp/Game/Net/TransferManager.cpp
@@ -63,7 +66,7 @@ add_library(	base-lib SHARED
 				src/main/cpp/Game/Base/ComponentBase.cpp
                 src/main/cpp/Game/Base/EntityBase.cpp
                 src/main/cpp/Game/Base/SceneBase.cpp
-                src/main/cpp/Game/Base/SceneManager.cpp )
+                src/main/cpp/Game/Base/SceneManager.cpp)
 
 add_library(	component-lib SHARED
 				src/main/cpp/Game/Component/DrawComponent.cpp
@@ -148,7 +151,8 @@ target_link_libraries( aoiyume_pch-lib ${log-lib} ${android-lib} )
 target_link_libraries( math-lib aoiyume_pch-lib )
 target_link_libraries( algorithm-lib aoiyume_pch-lib math-lib)
 target_link_libraries( input-lib algorithm-lib)
-target_link_libraries( net-lib input-lib)
+target_link_libraries( sound-lib input-lib)
+target_link_libraries( net-lib sound-lib)
 target_link_libraries( aoiyume_engine-lib net-lib ${opengl-lib} )
 target_link_libraries( jni_main-lib aoiyume_engine-lib )
 
