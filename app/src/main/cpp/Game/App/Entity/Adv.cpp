@@ -31,6 +31,7 @@ Adv::Adv()
 	, m_pEnemy(nullptr)
 	, m_pBtnManager(nullptr)
 	, m_pMessageWindow(nullptr)
+	, m_diceLoopSE(SoundInvalidHandle)
 {
 	DEBUG_LOG("Adv Constructor");
 }
@@ -224,6 +225,9 @@ void Adv::updateBattleStep()
 		m_pEnemy->SetUseDice(nEnemyDice);
 		m_pEnemy->ResetStopDice();
 		m_pEnemy->BeginComDice();
+		auto pSoundManager = Engine::GetEngine()->GetSoundManager();
+		const SoundResourceLabel label = pSoundManager->LoadSE("sound/se/dice_loop.ogg");
+		m_diceLoopSE = pSoundManager->PlaySE(label, 1.0f, 1.0f, true);
 		m_nSubStep = 1;
 	}
 	else if(m_nSubStep == 1){
@@ -247,23 +251,27 @@ void Adv::updateBattleStep()
 		}
 	}
 	else if(m_nSubStep == 3){
-		if(m_nSubStepCnt >= 60 && m_pEnemy->IsEndDice()){
-			const int nCharaDice = m_pChara->GetDiceSumVal();
-			const int nEnemyDice = m_pEnemy->GetDiceSumVal();
-			char cText[256];
-			if(nCharaDice > nEnemyDice) {
-				snprintf(cText, sizeof(cText), "%d対%dできみの勝ち！", nCharaDice, nEnemyDice);
+		if(m_pEnemy->IsEndDice()){
+			auto pSoundManager = Engine::GetEngine()->GetSoundManager();
+			pSoundManager->StopSE(m_diceLoopSE);
+			if(m_nSubStepCnt >= 60){
+				const int nCharaDice = m_pChara->GetDiceSumVal();
+				const int nEnemyDice = m_pEnemy->GetDiceSumVal();
+				char cText[256];
+				if(nCharaDice > nEnemyDice) {
+					snprintf(cText, sizeof(cText), "%d対%dできみの勝ち！", nCharaDice, nEnemyDice);
+				}
+				else if(nCharaDice < nEnemyDice){
+					snprintf(cText, sizeof(cText), "%d対%dできみの負け！", nCharaDice, nEnemyDice);
+				}
+				else {
+					snprintf(cText, sizeof(cText), "%d対%dで引き分け！　もう一度勝負！", nCharaDice, nEnemyDice);
+				}
+				cText[sizeof(cText) - 1] = '\0';
+				m_pMessageWindow->SetDirectMessage(cText);
+				m_pMessageWindow->SetVisible(true);
+				m_nSubStep = 4;
 			}
-			else if(nCharaDice < nEnemyDice){
-				snprintf(cText, sizeof(cText), "%d対%dできみの負け！", nCharaDice, nEnemyDice);
-			}
-			else {
-				snprintf(cText, sizeof(cText), "%d対%dで引き分け！　もう一度勝負！", nCharaDice, nEnemyDice);
-			}
-			cText[sizeof(cText) - 1] = '\0';
-			m_pMessageWindow->SetDirectMessage(cText);
-			m_pMessageWindow->SetVisible(true);
-			m_nSubStep = 4;
 		}
 	}
 	else if(m_nSubStep == 4){

@@ -43,57 +43,57 @@ void SoundManager::Finalize()
 
 //-----------------------------------------
 //-----------------------------------------
-SoundHandle SoundManager::LoadSE(const char *pPath)
+SoundResourceLabel SoundManager::LoadSE(const char *pPath)
 {
 	const auto& hit = m_SoundMap.find(pPath);
-	if(hit != m_SoundMap.end()){ return hit->second.Handle; }
+	if(hit != m_SoundMap.end()){ return hit->second.label; }
 
 	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SOUND);
 	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SOUND, "LoadSE");
 	jstring path = GetEnv()->NewStringUTF(pPath);
-	SoundHandle handle = GetEnv()->CallStaticIntMethod(classID, methodID_1, path);
-	if(handle >= 0){
+	SoundResourceLabel label = GetEnv()->CallStaticIntMethod(classID, methodID_1, path);
+	if(label >= 0){
 		m_SoundMap[pPath].bLoad = false;
-		m_SoundMap[pPath].Handle = handle;
+		m_SoundMap[pPath].label = label;
 	}
-	return handle;
+	return label;
 }
 
 //-----------------------------------------
 //-----------------------------------------
-void SoundManager::UnLoadSE(SoundHandle handle)
+void SoundManager::UnLoadSE(SoundResourceLabel label)
 {
 	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SOUND);
 	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SOUND, "UnLoadSE");
-	GetEnv()->CallStaticVoidMethod(classID, methodID_1, handle);
+	GetEnv()->CallStaticVoidMethod(classID, methodID_1, label);
 
 	const std::string* pPath = nullptr;
-	if(getSoundPathFromHandle(handle, &pPath)){
+	if(getSoundPathFromLabel(label, &pPath)){
 		m_SoundMap.erase(*pPath);
 	}
 }
 
 //-----------------------------------------
 //-----------------------------------------
-bool SoundManager::IsLoadSE(SoundHandle handle) const
+bool SoundManager::IsLoadSE(SoundResourceLabel label) const
 {
 	SoundInfo info = {};
-	const bool bRet = getSoundInfoFromHandle(handle, &info);
+	const bool bRet = getSoundInfoFromLabel(label, &info);
 	return bRet && info.bLoad;
 }
 
 //-----------------------------------------
 //-----------------------------------------
-void SoundManager::PlaySE(SoundHandle handle, float fLeftVol, float fRightVol, bool bLoop)
+SoundStreamHandle SoundManager::PlaySE(SoundResourceLabel label, float fLeftVol, float fRightVol, bool bLoop)
 {
 	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SOUND);
 	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SOUND, "PlaySE");
-	GetEnv()->CallStaticVoidMethod(classID, methodID_1, handle, fLeftVol, fRightVol, bLoop);
+	return GetEnv()->CallStaticIntMethod(classID, methodID_1, label, fLeftVol, fRightVol, bLoop);
 }
 
 //-----------------------------------------
 //-----------------------------------------
-void SoundManager::StopSE(SoundHandle handle)
+void SoundManager::StopSE(SoundStreamHandle handle)
 {
 	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SOUND);
 	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SOUND, "StopSE");
@@ -102,10 +102,10 @@ void SoundManager::StopSE(SoundHandle handle)
 
 //-----------------------------------------
 //-----------------------------------------
-void SoundManager::LoadCompleteCallBack(SoundHandle handle, int nStatus)
+void SoundManager::LoadCompleteCallBack(SoundResourceLabel label, int nStatus)
 {
 	const std::string* pPath = nullptr;
-	if(!getSoundPathFromHandle(handle, &pPath)){ return; }
+	if(!getSoundPathFromLabel(label, &pPath)){ return; }
 	if(nStatus == 0) {
 		m_SoundMap[*pPath].bLoad = true;
 	}
@@ -116,11 +116,11 @@ void SoundManager::LoadCompleteCallBack(SoundHandle handle, int nStatus)
 
 //-----------------------------------------
 //-----------------------------------------
-bool SoundManager::getSoundInfoFromHandle(SoundHandle handle, SoundManager::SoundInfo* pInfo) const
+bool SoundManager::getSoundInfoFromLabel(SoundResourceLabel label, SoundManager::SoundInfo* pInfo) const
 {
 	const SoundInfo* pHitInfo = nullptr;
 	for(auto& it : m_SoundMap) {
-		if(it.second.Handle == handle){
+		if(it.second.label == label){
 			pHitInfo = &it.second;
 			break;
 		}
@@ -135,11 +135,11 @@ bool SoundManager::getSoundInfoFromHandle(SoundHandle handle, SoundManager::Soun
 
 //-----------------------------------------
 //-----------------------------------------
-bool SoundManager::getSoundPathFromHandle(SoundHandle handle, const std::string** pPath) const
+bool SoundManager::getSoundPathFromLabel(SoundResourceLabel label, const std::string** pPath) const
 {
 	const std::string* pHitPath = nullptr;
 	for(auto& it : m_SoundMap) {
-		if(it.second.Handle == handle){
+		if(it.second.label == label){
 			pHitPath = &it.first;
 			break;
 		}

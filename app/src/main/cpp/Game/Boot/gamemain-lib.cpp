@@ -37,6 +37,7 @@ Java_com_aoiyume_Game_GameMainRender_SurfaceCreate(
 		auto pSoundManager = Engine::GetEngine()->GetSoundManager();
 		pSoundManager->LoadSE("sound/se/decide.ogg");
 		pSoundManager->LoadSE("sound/se/cancel.ogg");
+		pSoundManager->LoadSE("sound/se/dice_loop.ogg");
 	}
 	{
 		SceneManager::CreateSceneMaanger(new SceneLauncher());

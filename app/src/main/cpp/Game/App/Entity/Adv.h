@@ -60,6 +60,8 @@ private:
 
 	ButtonManager*	m_pBtnManager;
 	MessageWindow* m_pMessageWindow;
+
+	SoundStreamHandle m_diceLoopSE;
 };
 
 #endif

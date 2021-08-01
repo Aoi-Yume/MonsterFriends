@@ -59,9 +59,9 @@ public class SoundManager
         m_SEPool.unload(nHandle);
     }
 
-    public static void PlaySE(int nHandle, float leftVol, float rightVol, boolean bLoop)
+    public static int PlaySE(int nHandle, float leftVol, float rightVol, boolean bLoop)
     {
-        m_SEPool.play(nHandle, leftVol, rightVol, 0, bLoop ? -1 : 0, 1.0f);
+        return m_SEPool.play(nHandle, leftVol, rightVol, 0, bLoop ? -1 : 0, 1.0f);
     }
 
     public static void StopSE(int nHandle)

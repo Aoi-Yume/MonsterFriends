@@ -195,7 +195,7 @@ void ObjectLoader::SetDefaultLoad() {
 		s_ObjectLoader->SetMethodID(CLASS_NAME_SOUND, "LoadSE", "(Ljava/lang/String;)I", true);
 		s_ObjectLoader->SetMethodID(CLASS_NAME_SOUND, "UnLoadSE", "(I)V", true);
 		s_ObjectLoader->SetMethodID(CLASS_NAME_SOUND, "IsLoadSE", "(I)Z", true);
-		s_ObjectLoader->SetMethodID(CLASS_NAME_SOUND, "PlaySE", "(IFFZ)V", true);
+		s_ObjectLoader->SetMethodID(CLASS_NAME_SOUND, "PlaySE", "(IFFZ)I", true);
 		s_ObjectLoader->SetMethodID(CLASS_NAME_SOUND, "StopSE", "(I)V", true);
 	}
     // Class Utility
