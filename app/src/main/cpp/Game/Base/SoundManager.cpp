@@ -84,11 +84,40 @@ bool SoundManager::IsLoadSE(SoundResourceLabel label) const
 
 //-----------------------------------------
 //-----------------------------------------
+void SoundManager::PlayBGM(const char* pPath, bool bLoop)
+{
+	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SOUND);
+	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SOUND, "PlayBGM");
+	jstring path = GetEnv()->NewStringUTF(pPath);
+	GetEnv()->CallStaticVoidMethod(classID, methodID_1, path, bLoop);
+}
+
+//-----------------------------------------
+//-----------------------------------------
+void SoundManager::StopBGM()
+{
+	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SOUND);
+	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SOUND, "StopBGM");
+	GetEnv()->CallStaticVoidMethod(classID, methodID_1);
+}
+
+//-----------------------------------------
+//-----------------------------------------
+bool SoundManager::IsPlayBGM() const
+{
+	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SOUND);
+	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SOUND, "IsPlayBGM");
+	return GetEnv()->CallStaticBooleanMethod(classID, methodID_1);
+}
+
+//-----------------------------------------
+//-----------------------------------------
 SoundStreamHandle SoundManager::PlaySE(SoundResourceLabel label, float fLeftVol, float fRightVol, bool bLoop)
 {
 	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SOUND);
 	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SOUND, "PlaySE");
-	return GetEnv()->CallStaticIntMethod(classID, methodID_1, label, fLeftVol, fRightVol, bLoop);
+	SoundStreamHandle handle = GetEnv()->CallStaticIntMethod(classID, methodID_1, label, fLeftVol, fRightVol, bLoop);
+	return handle;
 }
 
 //-----------------------------------------
@@ -98,6 +127,24 @@ void SoundManager::StopSE(SoundStreamHandle handle)
 	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SOUND);
 	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SOUND, "StopSE");
 	GetEnv()->CallStaticVoidMethod(classID, methodID_1, handle);
+}
+
+//-----------------------------------------
+//-----------------------------------------
+void SoundManager::PauseAll() const
+{
+	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SOUND);
+	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SOUND, "PauseAll");
+	GetEnv()->CallStaticVoidMethod(classID, methodID_1);
+}
+
+//-----------------------------------------
+//-----------------------------------------
+void SoundManager::ResumeAll() const
+{
+	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SOUND);
+	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SOUND, "ResumeAll");
+	GetEnv()->CallStaticVoidMethod(classID, methodID_1);
 }
 
 //-----------------------------------------

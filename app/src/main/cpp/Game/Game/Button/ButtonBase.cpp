@@ -16,6 +16,7 @@ ButtonBase::ButtonBase()
 , m_nState(eState_UnSelect)
 , m_uDecideCommand(0U)
 , m_pColl2DRectComponent(nullptr)
+, m_selectSELabel(SoundInvalidLabel)
 {
 	{
 		Entity::CreateTransformComponent(this);
@@ -62,6 +63,9 @@ void ButtonBase::SetVisible(bool bVisible)
 void ButtonBase::Select()
 {
 	m_nState = (m_nState == eState_Select) ? eState_Selected : eState_Select;
+	if(m_selectSELabel != SoundInvalidLabel){
+		Engine::GetEngine()->GetSoundManager()->PlaySE(m_selectSELabel, 1.0f, 1.0f, false);
+	}
 	ChangeColor();
 }
 
@@ -90,6 +94,16 @@ void ButtonBase::SetGray(bool bGray)
 bool ButtonBase::IsGray() const
 {
 	return m_bGray;
+}
+
+void ButtonBase::SetSelectSELabel(const char* pLabel)
+{
+	if(pLabel) {
+		m_selectSELabel = Engine::GetEngine()->GetSoundManager()->LoadSE(pLabel);
+	}
+	else{
+		m_selectSELabel = SoundInvalidLabel;
+	}
 }
 
 bool ButtonBase::IsUnSelect() const

@@ -90,6 +90,9 @@ void Dice::StopDice()
 	for(int i = 0; i < eDICE_MAX; ++i){
 		SetVisible(i, (i + 1) == m_nStopDiceNo);
 	}
+	auto pSoundManager = Engine::GetEngine()->GetSoundManager();
+	pSoundManager->PlaySE(pSoundManager->LoadSE(SE_LABEL_DICE_STOP), 1.0f, 1.0f, false);
+
 	m_nCurrentDiceNo = m_nStopDiceNo;
 }
 

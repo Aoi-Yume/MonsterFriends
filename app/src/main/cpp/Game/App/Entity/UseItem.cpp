@@ -105,6 +105,7 @@ void UseItem::GameEntitySetup(const void* param) {
 				auto pBtn = pBtnManager->CreateButton(std::get<0>(btnList[i]));
 				pBtn->SetPosition(std::get<1>(btnList[i]));
 				pBtn->SetDecideCommand(std::get<2>(btnList[i]));
+				pBtn->SetSelectSELabel(SE_LABEL_CANCEL);
 			}
 			pBtnManager->SetVisible(false);
 			pBtnManager->Lock();
@@ -120,6 +121,7 @@ void UseItem::GameEntitySetup(const void* param) {
 		m_pMessageWindow->SetDirectMessage("");
 		m_pMessageWindow->SetVisible(false);
 		m_pMessageWindow->SetDecideCommand(TransferCommand::eCommand_UseItemNextMessage);
+		m_pMessageWindow->SetDecideSELabel(SE_LABEL_DECIDE);
 	}
 	SetVisible(false);
 }

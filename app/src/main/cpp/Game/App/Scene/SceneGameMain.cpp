@@ -330,6 +330,7 @@ void SceneGameMain::SceneSetup() {
 		m_pMessageWindow->SetDirectMessage("てすと\nててててすと");
 		m_pMessageWindow->SetVisible(false);
 		m_pMessageWindow->SetDecideCommand(TransferCommand::eCommand_GameMainNextMessage);
+		m_pMessageWindow->SetDecideSELabel(SE_LABEL_DECIDE);
 	}
 	{
 		m_pAdv = new Adv();
@@ -374,6 +375,7 @@ void SceneGameMain::SceneSetup() {
 				pBtn->SetPosition(std::get<1>(btnList[i]));
 				pBtn->SetScale(VEC3(0.8f, 0.8f, 0.8f));
 				pBtn->SetDecideCommand(std::get<2>(btnList[i]));
+				pBtn->SetSelectSELabel(SE_LABEL_DECIDE);
 			}
 			pBtnManager->SetVisible(false);
 			pBtnManager->Lock();
@@ -390,6 +392,7 @@ void SceneGameMain::SceneSetup() {
 				auto pBtn = pBtnManager->CreateButton(std::get<0>(btnList[i]));
 				pBtn->SetPosition(std::get<1>(btnList[i]));
 				pBtn->SetDecideCommand(std::get<2>(btnList[i]));
+				pBtn->SetSelectSELabel(SE_LABEL_DECIDE);
 			}
 			pBtnManager->SetVisible(false);
 			pBtnManager->Lock();
@@ -397,6 +400,12 @@ void SceneGameMain::SceneSetup() {
 		}
 	}
 	SKILL_LIST()->InitializeSkillTransfer();
+
+#ifdef _AOIYUME_DEBUG_
+	if(auto pSoundManager = Engine::GetEngine()->GetSoundManager(); !pSoundManager->IsPlayBGM()){
+		pSoundManager->PlayBGM("sound/bgm/bgm_maoudamashii_acoustic37_loop.ogg", true);
+	}
+#endif
 
 	DEBUG_LOG("Setup End");
 }

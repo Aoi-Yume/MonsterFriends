@@ -7,6 +7,7 @@
 
 #include <unordered_map>
 #include <string>
+#include <list>
 
 typedef int SoundResourceLabel;
 typedef int SoundStreamHandle;
@@ -34,8 +35,13 @@ public:
 	void UnLoadSE(SoundResourceLabel label);
 	bool IsLoadSE(SoundResourceLabel label) const;
 
+	void PlayBGM(const char* pPath, bool bLoop);
+	void StopBGM();
+	bool IsPlayBGM() const;
 	SoundStreamHandle PlaySE(SoundResourceLabel label, float fLeftVol, float fRightVol, bool bLoop);
 	void StopSE(SoundStreamHandle handle);
+	void PauseAll() const;
+	void ResumeAll() const;
 
 public:
 	void LoadCompleteCallBack(SoundResourceLabel label, int nStatus);

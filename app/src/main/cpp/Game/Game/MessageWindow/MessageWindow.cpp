@@ -23,6 +23,7 @@ MessageWindow::MessageWindow(const char* pResName)
 , m_uDecideCommand(TransferCommand::eCommand_GameMainNextMessage)
 , m_pLayoutComponent(nullptr)
 , m_pTextComponent()
+, m_decideSELabel(SoundInvalidLabel)
 {
 	snprintf(m_cResPath, sizeof(m_cResPath), "%s", pResName);
 	m_cResPath[sizeof(m_cResPath) - 1] = '\0';
@@ -86,6 +87,9 @@ void MessageWindow::GameEntityUpdate(const void* param)
 				m_bNextMessage = true;
 				pCommand->PopFrontCommand();
 			}
+		}
+		if(m_bNextMessage && m_decideSELabel != SoundInvalidLabel){
+			Engine::GetEngine()->GetSoundManager()->PlaySE(m_decideSELabel, 1.0f, 1.0f, false);
 		}
 	}
 	else{
@@ -151,6 +155,16 @@ void MessageWindow::SetDirectMessage(const char *pText)
 bool MessageWindow::IsNextMessage() const
 {
 	return m_bNextMessage;
+}
+
+void MessageWindow::SetDecideSELabel(const char *pLabel)
+{
+	if(pLabel) {
+		m_decideSELabel = Engine::GetEngine()->GetSoundManager()->LoadSE(pLabel);
+	}
+	else{
+		m_decideSELabel = SoundInvalidLabel;
+	}
 }
 
 void MessageWindow::clearNextMessageFlag()

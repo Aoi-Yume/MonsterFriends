@@ -41,6 +41,18 @@ Java_com_aoiyume_Game_Engine_ReceiveNearbyData(JNIEnv *env, jclass clazz, jstrin
 }
 
 JNIEXPORT void JNICALL
+Java_com_aoiyume_Game_Engine_ActivityStop(JNIEnv *env, jclass clazz) {
+	auto pSoundManager = Engine::GetEngine()->GetSoundManager();
+	pSoundManager->PauseAll();
+}
+
+JNIEXPORT void JNICALL
+Java_com_aoiyume_Game_Engine_ActivityResume(JNIEnv *env, jclass clazz) {
+	auto pSoundManager = Engine::GetEngine()->GetSoundManager();
+	pSoundManager->ResumeAll();
+}
+
+JNIEXPORT void JNICALL
 Java_com_aoiyume_Game_SoundManager_LoadCompleteCallBack(JNIEnv *env, jobject thiz, jint handle, jint status) {
 	auto pSoundManager = Engine::GetEngine()->GetSoundManager();
 	pSoundManager->LoadCompleteCallBack(handle, status);

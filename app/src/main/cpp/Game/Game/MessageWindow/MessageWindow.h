@@ -47,6 +47,8 @@ public:
 
 	bool IsNextMessage() const;
 
+	void SetDecideSELabel(const char* pLabel);
+
 private:
 	void clearNextMessageFlag();
 	void clearText();
@@ -64,6 +66,7 @@ private:
 	uint8_t 		m_uDecideCommand;
 	LayoutComponent*	m_pLayoutComponent;
 	TextImageComponent*	m_pTextComponent[eLINE_MAX];
+	SoundResourceLabel m_decideSELabel;
 };
 
 #endif

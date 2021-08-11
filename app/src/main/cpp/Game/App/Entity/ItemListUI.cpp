@@ -64,11 +64,13 @@ void ItemListUI::GameEntitySetup(const void* param) {
 				auto pBtn = pBtnManager->CreateButton(itemInfo.fileName.c_str());
 				pBtn->SetPosition(btnList[i]);
 				pBtn->SetDecideCommand(TransferCommand::eCommand_PushItem_1 + i);
+				pBtn->SetSelectSELabel(SE_LABEL_DECIDE);
 			}
 			else{
 				auto pBtn = pBtnManager->CreateButton("image/shop_item_none.png");
 				pBtn->SetPosition(btnList[i]);
 				pBtn->SetDecideCommand(TransferCommand::eCommand_PushItem_1 + i);
+				pBtn->SetSelectSELabel(nullptr);
 			}
 		}
 		pBtnManager->SetVisible(false);
@@ -261,8 +263,10 @@ void ItemListUI::updateItemIcon()
 		if (m_aItemNo[nStart] >= 0) {
 			const auto &itemInfo = AppItemList::Get()->GetItemInfo(m_aItemNo[nStart]);
 			p->ChangeTexture(itemInfo.fileName.c_str());
+			pBtn->SetSelectSELabel(SE_LABEL_DECIDE);
 		} else {
 			p->ChangeTexture("image/shop_item_none.png");
+			pBtn->SetSelectSELabel(nullptr);
 		}
 		nStart = (nStart + 1) % nListSize;
 	}

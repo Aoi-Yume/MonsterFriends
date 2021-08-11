@@ -355,6 +355,7 @@ void SceneTitle::SceneSetup() {
 			for (int i = 0; i < sizeof(btnList) / sizeof(btnList[0]); ++i) {
 				auto btn = pButtonManager->CreateButton(btnList[i].first);
 				btn->SetPosition(btnList[i].second);
+				btn->SetSelectSELabel(SE_LABEL_DECIDE);
 			}
 			pButtonManager->SetVisible(false);
 			pButtonManager->Lock();
@@ -369,6 +370,7 @@ void SceneTitle::SceneSetup() {
 			for (int i = 0; i < sizeof(btnList) / sizeof(btnList[0]); ++i) {
 				auto btn = pButtonManager->CreateButton(btnList[i].first);
 				btn->SetPosition(btnList[i].second);
+				btn->SetSelectSELabel(SE_LABEL_DECIDE);
 			}
 			pButtonManager->SetVisible(false);
 			pButtonManager->Lock();
@@ -380,6 +382,7 @@ void SceneTitle::SceneSetup() {
 		m_pMessageWindow->Update(eGameMessage_Setup, nullptr);
 		m_pMessageWindow->SetVisible(false);
 		m_pMessageWindow->SetTextScale(1.5f);
+		m_pMessageWindow->SetDecideSELabel(SE_LABEL_DECIDE);
 		m_pMessageWindow->SetActive(true);
 	}
 	{
@@ -399,6 +402,7 @@ void SceneTitle::SceneSetup() {
 		m_pStateManager->CreateState<StateFadeOut>();
 		m_pStateManager->ChangeState(eState_FadeIn);
 	}
+	Engine::GetEngine()->GetSoundManager()->PlayBGM("sound/bgm/bgm_maoudamashii_acoustic37_loop.ogg", true);
 	DEBUG_LOG("Setup End");
 }
 

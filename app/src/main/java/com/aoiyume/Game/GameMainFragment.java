@@ -1,5 +1,8 @@
 package com.aoiyume.Game;
 
+import android.content.res.AssetFileDescriptor;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -22,6 +25,9 @@ import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
+
+import java.io.IOException;
+import java.net.URI;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -119,6 +125,18 @@ public class GameMainFragment extends Fragment {
                 Engine.ReceiveNearbyData(endPointId, data);
             }
         });
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Engine.ActivityStop();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Engine.ActivityResume();
     }
 
     public static void ShowSoftwareKeyboard()

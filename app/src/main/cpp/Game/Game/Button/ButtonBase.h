@@ -47,6 +47,8 @@ public:
 	void SetGray(bool bGray);
 	bool IsGray() const;
 
+	void SetSelectSELabel(const char* pLabel);
+
 	void SetDecideCommand(uint8_t uCommand) { m_uDecideCommand = uCommand; }
 	uint8_t  GetDecideCommand() const { return m_uDecideCommand; }
 
@@ -60,6 +62,7 @@ private:
 	uint8_t  m_uDecideCommand;
 
 	Collision2DRectComponent*		m_pColl2DRectComponent;
+	SoundResourceLabel m_selectSELabel;
 };
 
 #endif

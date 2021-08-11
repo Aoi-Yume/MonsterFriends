@@ -105,14 +105,15 @@ void Shop::GameEntitySetup(const void* param) {
 		// 「かう」or「かわない」ボタン
 		{
 			auto pBtnManager = new ButtonManager();
-			const std::tuple<const char *, VEC3, uint8_t> btnList[] = {
-					{"image/button_buy.png", VEC3(-250.0f, -400.0f, 0), TransferCommand::eCommand_Buy},
-					{"image/button_buyCancel.png", VEC3(250.0f, -400.0f, 0), TransferCommand::eCommand_BuyCancel},
+			const std::tuple<const char *, VEC3, uint8_t, const char*> btnList[] = {
+					{"image/button_buy.png", VEC3(-250.0f, -400.0f, 0), TransferCommand::eCommand_Buy, SE_LABEL_SHOP_BUY},
+					{"image/button_buyCancel.png", VEC3(250.0f, -400.0f, 0), TransferCommand::eCommand_BuyCancel, SE_LABEL_CANCEL},
 			};
 			for (int i = 0; i < sizeof(btnList) / sizeof(btnList[0]); ++i) {
 				auto pBtn = pBtnManager->CreateButton(std::get<0>(btnList[i]));
 				pBtn->SetPosition(std::get<1>(btnList[i]));
 				pBtn->SetDecideCommand(std::get<2>(btnList[i]));
+				pBtn->SetSelectSELabel(std::get<3>(btnList[i]));
 			}
 			pBtnManager->SetVisible(false);
 			pBtnManager->Lock();
@@ -129,6 +130,7 @@ void Shop::GameEntitySetup(const void* param) {
 				auto pBtn = pBtnManager->CreateButton(std::get<0>(btnList[i]));
 				pBtn->SetPosition(std::get<1>(btnList[i]));
 				pBtn->SetDecideCommand(std::get<2>(btnList[i]));
+				pBtn->SetSelectSELabel(SE_LABEL_CANCEL);
 			}
 			pBtnManager->SetVisible(false);
 			pBtnManager->Lock();
@@ -144,6 +146,7 @@ void Shop::GameEntitySetup(const void* param) {
 		m_pMessageWindow->SetDirectMessage("");
 		m_pMessageWindow->SetVisible(false);
 		m_pMessageWindow->SetDecideCommand(TransferCommand::eCommand_ShopNextMessage);
+		m_pMessageWindow->SetDecideSELabel(SE_LABEL_DECIDE);
 	}
 	SetVisible(false);
 }

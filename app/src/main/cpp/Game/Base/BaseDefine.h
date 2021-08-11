@@ -6,6 +6,7 @@
 #ifndef AOIYUME_BASE_DEFINE_H
 #define AOIYUME_BASE_DEFINE_H
 
+#include "SoundDefine.h"
 
 enum ComponentKind {
     eComponentKind_Transform,
@@ -29,10 +30,10 @@ enum GameMessage {
     eGameMessage_Max
 };
 
-	enum GameMessageResult {
-    eGameMessageResult_Break,
-    eGameMessageResult_Continue,
-    eGameMessageResult_Max
+enum GameMessageResult {
+	eGameMessageResult_Break,
+	eGameMessageResult_Continue,
+	eGameMessageResult_Max
 };
 
 
