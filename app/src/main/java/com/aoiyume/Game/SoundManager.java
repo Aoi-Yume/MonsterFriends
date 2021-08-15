@@ -75,6 +75,12 @@ public class SoundManager
 
     public static void PlayBGM(String path, boolean bLoop)
     {
+        if(m_CurrentMediaPlayer.isPlaying()) {
+            m_CurrentMediaPlayer.stop();
+            m_CurrentMediaPlayer.release();
+            m_CurrentMediaPlayer = createMediaPlayer();
+        }
+
         new Thread(new Runnable() {
             @Override
             public void run() {

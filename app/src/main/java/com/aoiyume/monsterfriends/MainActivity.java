@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.app.ActionBar;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
@@ -14,6 +15,7 @@ import com.aoiyume.Game.GameMainFragment;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -45,6 +47,11 @@ public class MainActivity extends AppCompatActivity {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.container, fragment);
             transaction.commit();
+            /*
+            Intent intent = new Intent(this, OssLicensesMenuActivity.class);
+            intent.putExtra("title", "おーぷんそーすらいせんす");
+            startActivity(intent);
+            */
         }
     }
 

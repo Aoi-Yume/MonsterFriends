@@ -68,6 +68,10 @@ void Egg::actBorneState()
 	const int nStateCount = GetStateCount();
 	const int nOneCount = 40;
 	const int nIdx = std::min(nStateCount / nOneCount, (int)eEGG_BORNE_KIND_MAX - 1);
+	if(nIdx < eEGG_BORNE_KIND_MAX - 1 && nStateCount % nOneCount == nOneCount - 1){
+		auto pSoundManager = Engine::GetEngine()->GetSoundManager();
+		pSoundManager->PlaySE(pSoundManager->LoadSE(SE_LABEL_EGG_CRACK), 1.0f, 1.0f, false);
+	}
 	for(int i = 0; i < eEGG_BORNE_KIND_MAX; ++i){
 		GetChild(i)->SetVisible(i == nIdx);
 	}

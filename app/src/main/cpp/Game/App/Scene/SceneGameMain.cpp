@@ -403,7 +403,7 @@ void SceneGameMain::SceneSetup() {
 
 #ifdef _AOIYUME_DEBUG_
 	if(auto pSoundManager = Engine::GetEngine()->GetSoundManager(); !pSoundManager->IsPlayBGM()){
-		pSoundManager->PlayBGM("sound/bgm/bgm_maoudamashii_acoustic37_loop.ogg", true);
+		pSoundManager->PlayBGM(BGM_LABEL_MAIN, true);
 	}
 #endif
 

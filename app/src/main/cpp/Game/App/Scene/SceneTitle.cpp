@@ -144,8 +144,13 @@ namespace {
 			if (!Engine::GetEngine()->IsShowSoftwareKeyboard()) {
 				char charName[64];
 				Engine::GetEngine()->GetInputText(charName, sizeof(charName));
-				AppParam::Get()->SetCharaName(charName);
-				ChangeState(SceneTitle::eState_StartNearby);
+				if(strlen(charName) <= 0){
+					ChangeState(SceneTitle::eState_WaitKeyboardEnable);
+				}
+				else {
+					AppParam::Get()->SetCharaName(charName);
+					ChangeState(SceneTitle::eState_StartNearby);
+				}
 			}
 		}
 	};
@@ -402,7 +407,7 @@ void SceneTitle::SceneSetup() {
 		m_pStateManager->CreateState<StateFadeOut>();
 		m_pStateManager->ChangeState(eState_FadeIn);
 	}
-	Engine::GetEngine()->GetSoundManager()->PlayBGM("sound/bgm/bgm_maoudamashii_acoustic37_loop.ogg", true);
+	Engine::GetEngine()->GetSoundManager()->PlayBGM(BGM_LABEL_MAIN, true);
 	DEBUG_LOG("Setup End");
 }
 

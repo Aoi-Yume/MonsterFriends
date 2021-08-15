@@ -1,13 +1,22 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.android.gms.oss-licenses-plugin'
 
 android {
+    signingConfigs {
+        release {
+            storeFile file('D:\\AndroidProject\\GooglePlayKeyStore\\MonsterFriends\\upload-keystore.jks')
+            storePassword 'ZR9mgL0X'
+            keyAlias 'upload'
+            keyPassword 'ZR9mgL0X'
+        }
+    }
     compileSdkVersion 30
     defaultConfig {
         applicationId "com.aoiyume.monsterfriends"
         minSdkVersion 17
         targetSdkVersion 30
         buildToolsVersion "31.0.0 rc3"
-        versionCode 1
+        versionCode 2
         versionName "1.0"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         externalNativeBuild {
@@ -16,10 +25,12 @@ android {
             }
         }
     }
+
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
         debug {
             debuggable true
@@ -45,4 +56,5 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'com.google.android.gms:play-services-nearby:18.0.0'
     implementation 'com.google.android.gms:play-services-ads:20.2.0'
+    implementation 'com.google.android.gms:play-services-oss-licenses:17.0.0'
 }

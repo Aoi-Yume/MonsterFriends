@@ -37,6 +37,7 @@ Java_com_aoiyume_Game_GameMainRender_SurfaceCreate(
 		auto pSoundManager = Engine::GetEngine()->GetSoundManager();
 		pSoundManager->LoadSE(SE_LABEL_DECIDE);
 		pSoundManager->LoadSE(SE_LABEL_CANCEL);
+		pSoundManager->LoadSE(SE_LABEL_EGG_CRACK);
 		pSoundManager->LoadSE(SE_LABEL_DICE_LOOP);
 		pSoundManager->LoadSE(SE_LABEL_DICE_STOP);
 	}
