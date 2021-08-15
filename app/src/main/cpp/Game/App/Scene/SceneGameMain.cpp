@@ -14,7 +14,7 @@
 #include <BackGround.h>
 #include <Character.h>
 #include <InformationPlate.h>
-#include <MessageWindow/MessageWindow.h>
+#include <Window/MessageWindow.h>
 #include <../Net/TransferManager.h>
 #include <../Net/TransferGameInfo.h>
 #include <../Net/TransferTouchInfo.h>
@@ -402,8 +402,11 @@ void SceneGameMain::SceneSetup() {
 	SKILL_LIST()->InitializeSkillTransfer();
 
 #ifdef _AOIYUME_DEBUG_
-	if(auto pSoundManager = Engine::GetEngine()->GetSoundManager(); !pSoundManager->IsPlayBGM()){
-		pSoundManager->PlayBGM(BGM_LABEL_MAIN, true);
+	{
+		auto pSoundManager = Engine::GetEngine()->GetSoundManager();
+		if (!pSoundManager->IsPlayBGM()) {
+			pSoundManager->PlayBGM(BGM_LABEL_MAIN, true);
+		}
 	}
 #endif
 

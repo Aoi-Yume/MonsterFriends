@@ -9,7 +9,7 @@
 #include "Button/SimpleButton.h"
 #include <Character.h>
 #include <InformationPlate.h>
-#include <MessageWindow/MessageWindow.h>
+#include <Window/MessageWindow.h>
 #include <Dice.h>
 #include <SceneManager.h>
 #include <AppParam.h>

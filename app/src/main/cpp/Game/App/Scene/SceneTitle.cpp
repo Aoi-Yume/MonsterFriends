@@ -15,7 +15,7 @@
 #include <State.h>
 #include <Random.h>
 #include <FadeCtrl.h>
-#include <MessageWindow/MessageWindow.h>
+#include <Window/MessageWindow.h>
 #include <BackGround.h>
 #include <Egg.h>
 #include <Character.h>
@@ -354,7 +354,7 @@ void SceneTitle::SceneSetup() {
 		{
 			ButtonManager *pButtonManager = new ButtonManager();
 			std::pair<const char *, VEC3> btnList[] = {
-					{"image/button_local.png",    VEC3(0.0f, -400.0f, 0)},
+					{"image/playStyle_2.png",    VEC3(0.0f, -400.0f, 0)},
 					{"image/button_tutorial.png", VEC3(900.0f, 400.0f, 0)},
 			};
 			for (int i = 0; i < sizeof(btnList) / sizeof(btnList[0]); ++i) {
@@ -444,25 +444,13 @@ void SceneTitle::EntityUpdate(GameMessage message, const void* param)
 			SceneUpdate();
 			break;
 		}
-		case eGameMessage_PostUpdate:
-		{
-			break;
-		}
-		case eGameMessage_ChangeCamera:
-		{
-			break;
-		}
-		case eGameMessage_Draw:
-		{
-			break;
-		}
-		case eGameMessage_Pause:
-		{
-			break;
-		}
 		case eGameMessage_Destroy:
 		{
 			SceneFinalize();
+			break;
+		}
+		default:
+		{
 			break;
 		}
 	}

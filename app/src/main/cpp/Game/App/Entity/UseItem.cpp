@@ -13,7 +13,7 @@
 #include "UseItem.h"
 #include <Button/ButtonManager.h>
 #include <Button/SimpleButton.h>
-#include <MessageWindow/MessageWindow.h>
+#include <Window/MessageWindow.h>
 #include <InformationPlate.h>
 #include <ItemListUI.h>
 

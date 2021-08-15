@@ -89,7 +89,7 @@ add_library(	game-lib SHARED
 				src/main/cpp/Game/Game/Button/SimpleButton.cpp
 				src/main/cpp/Game/Game/Button/SimpleCursor.cpp
 		        src/main/cpp/Game/Game/Button/ButtonManager.cpp
-				src/main/cpp/Game/Game/MessageWindow/MessageWindow.cpp)
+				src/main/cpp/Game/Game/Window/MessageWindow.cpp)
 
 add_library(	app_param-lib SHARED
 				src/main/cpp/Game/App/Param/AppParam.cpp
