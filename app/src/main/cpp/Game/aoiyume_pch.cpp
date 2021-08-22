@@ -185,6 +185,8 @@ void ObjectLoader::SetDefaultLoad() {
 		s_ObjectLoader->SetMethodID(CLASS_NAME_SYSTEM, "LoadAds", "()V", true);
 		s_ObjectLoader->SetMethodID(CLASS_NAME_SYSTEM, "ShowAds", "()V", true);
 		s_ObjectLoader->SetMethodID(CLASS_NAME_SYSTEM, "IsShowAds", "()Z", true);
+		s_ObjectLoader->SetMethodID(CLASS_NAME_SYSTEM, "ShowLicense", "()V", true);
+		s_ObjectLoader->SetMethodID(CLASS_NAME_SYSTEM, "IsShowLicense", "()Z", true);
 	}
 	// Class SoundManager
 	{

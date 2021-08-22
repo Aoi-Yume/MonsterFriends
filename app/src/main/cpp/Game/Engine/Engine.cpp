@@ -327,6 +327,24 @@ bool Engine::IsShowAds() const
 
 //-----------------------------------------
 //-----------------------------------------
+void Engine::ShowLicense()
+{
+	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SYSTEM);
+	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SYSTEM, "ShowLicense");
+	GetEnv()->CallStaticVoidMethod(classID, methodID_1);
+}
+
+//-----------------------------------------
+//-----------------------------------------
+bool Engine::IsShowLicense() const
+{
+	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SYSTEM);
+	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SYSTEM, "IsShowLicense");
+	return GetEnv()->CallStaticBooleanMethod(classID, methodID_1);
+}
+
+//-----------------------------------------
+//-----------------------------------------
 void Engine::Create()
 {
 	if( !s_AoYumeEngine ){

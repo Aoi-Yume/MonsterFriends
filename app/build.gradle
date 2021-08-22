@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.google.android.gms.oss-licenses-plugin'
+apply plugin: 'com.cookpad.android.plugin.license-tools'
 
 android {
     signingConfigs {
@@ -52,8 +52,8 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.4.0-alpha02'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.appcompat:appcompat:1.4.0-alpha03'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
     implementation 'com.google.android.gms:play-services-nearby:18.0.0'
     implementation 'com.google.android.gms:play-services-ads:20.2.0'
     implementation 'com.google.android.gms:play-services-oss-licenses:17.0.0'

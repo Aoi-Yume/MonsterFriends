@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.aoiyume.License.LicenseFragment;
 import com.aoiyume.monsterfriends.MainActivity;
 import com.aoiyume.monsterfriends.R;
 import com.google.android.gms.ads.AdError;
@@ -32,6 +33,7 @@ import java.net.URI;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 /**
  * Created by 葵ユメ on 2018/08/13.
@@ -235,5 +237,17 @@ public class GameMainFragment extends Fragment {
     public static boolean IsShowAds()
     {
         return m_InterstitialAd != null;
+    }
+
+    public static void ShowLicense() {
+        LicenseFragment fragment = new LicenseFragment();
+        FragmentTransaction transaction = MainActivity.GetContext().getSupportFragmentManager().beginTransaction();
+        transaction.add(R.id.container, fragment, "License");
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+    public static boolean IsShowLicense() {
+        return MainActivity.GetContext().getSupportFragmentManager().findFragmentByTag("License") != null;
     }
 }

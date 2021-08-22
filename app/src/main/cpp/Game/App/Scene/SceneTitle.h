@@ -36,6 +36,7 @@ public:
 		eState_StartNearby,
 		eState_WaitNearbyConnect,
 		eState_WaitNearbyTransferPlayerId,
+		eState_ShowLicense,
 		eState_FadeOut,
 		eState_Max
 	};

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MonsterFriends</string>
+    <string name="app_back">Back Button</string>
 </resources>

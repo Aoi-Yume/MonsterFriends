@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.WindowManager;
 
 import com.aoiyume.Game.GameMainFragment;
+import com.aoiyume.License.LicenseFragment;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
@@ -42,16 +43,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
         if(savedInstanceState == null) {
-            GameMainFragment fragment = new GameMainFragment();
-
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.container, fragment);
-            transaction.commit();
-            /*
-            Intent intent = new Intent(this, OssLicensesMenuActivity.class);
-            intent.putExtra("title", "おーぷんそーすらいせんす");
-            startActivity(intent);
-            */
+            {
+                GameMainFragment fragment = new GameMainFragment();
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.add(R.id.container, fragment);
+                transaction.commit();
+            }
         }
     }
 

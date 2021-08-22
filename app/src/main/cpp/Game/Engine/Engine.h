@@ -77,6 +77,9 @@ public:
 	void ShowAds();
 	bool IsShowAds() const;
 
+	void ShowLicense();
+	bool IsShowLicense() const;
+
 public:
 	static void Create();
 	static void Destroy();

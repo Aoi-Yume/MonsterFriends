@@ -48,13 +48,19 @@ namespace {
 			auto p = reinterpret_cast<SceneTitle *>(pUserPtr);
 			p->m_aButtonManager[SceneTitle::eBTN_MANAGER_TITLE]->SetVisible(true);
 			p->m_aButtonManager[SceneTitle::eBTN_MANAGER_TITLE]->Unlock();
+			p->m_aButtonManager[SceneTitle::eBTN_MANAGER_TITLE]->Reset();
 		}
 		void Update(void *pUserPtr) override {
 			auto p = reinterpret_cast<SceneTitle *>(pUserPtr);
-			if (p->m_aButtonManager[SceneTitle::eBTN_MANAGER_TITLE]->GetDecide() == SceneTitle::eBTN_LOCAL) {
+			const int nDecide = p->m_aButtonManager[SceneTitle::eBTN_MANAGER_TITLE]->GetDecide();
+			if (nDecide == SceneTitle::eBTN_LOCAL) {
 				p->m_aButtonManager[SceneTitle::eBTN_MANAGER_TITLE]->Lock();
 				p->m_aButtonManager[SceneTitle::eBTN_MANAGER_TITLE]->SetVisible(false);
 				ChangeState(SceneTitle::eState_BorneStartMonster);
+			}
+			else if(nDecide == SceneTitle::eBTN_TUTORIAL){
+				p->m_aButtonManager[SceneTitle::eBTN_MANAGER_TITLE]->Lock();
+				ChangeState(SceneTitle::eState_ShowLicense);
 			}
 		}
 	};
@@ -275,6 +281,20 @@ namespace {
 
 	//==========================================
 	//==========================================
+	class StateShowLicense : public StateBase {
+		void Begin(void* pUserPtr) override {
+			Engine::GetEngine()->ShowLicense();
+		}
+
+		void Update(void* pUserPtr) override {
+			if(!Engine::GetEngine()->IsShowLicense()){
+				ChangeState(SceneTitle::eState_WaitPressButton);
+			}
+		}
+	};
+
+	//==========================================
+	//==========================================
 	class StateFadeOut : public StateBase {
 		void Begin(void *pUserPtr) override {
 			FADE()->Out();
@@ -404,6 +424,7 @@ void SceneTitle::SceneSetup() {
 		m_pStateManager->CreateState<StateStartNearby>();
 		m_pStateManager->CreateState<StateWaitNearbyConnect>();
 		m_pStateManager->CreateState<StateWaitNearbyTransferPlayerId>();
+		m_pStateManager->CreateState<StateShowLicense>();
 		m_pStateManager->CreateState<StateFadeOut>();
 		m_pStateManager->ChangeState(eState_FadeIn);
 	}
