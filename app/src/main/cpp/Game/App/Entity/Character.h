@@ -18,6 +18,7 @@ public:
 	enum State{
 		eState_None,
 		eState_Wait,
+		eState_Attention,
 		eState_ComBattleStandby,
 		eState_StopDice,
 		eState_CheckEndDice,
@@ -43,6 +44,8 @@ public:
 	void SetUseDice(int nUseDice) { m_nUseDice = CLAMP(nUseDice, 1, (int)eDice_Max); }
 	void ResetStopDice();
 
+	void BeginAttention();
+
 	void BeginDice();
 	void StopDice();
 	int GetDiceSumVal() const;
@@ -54,9 +57,12 @@ public:
 	bool IsEndDice() const { return GetState() == eState_EndDice; }
 
 private:
+	void actAttention();
 	void actComBattleStandbyState();
 	void actStopDiceState();
 	void actCheckEndDiceState();
+
+	void jump(int nFrame, int nFrameMax, float fJumpPow);
 
 private:
 	bool 	m_bCom;

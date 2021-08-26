@@ -72,7 +72,7 @@ bool UseItem::IsEnd() const
 void UseItem::GameEntitySetup(const void* param) {
 	Super::GameEntitySetup(param);
 
-	const int nCurrentPlayerId = AppParam::Get()->GetNetworkInfo().nCurrentPlayerId;
+	const int nCurrentPlayerId = AppParam::Get()->GetUIControlPlayerNo();
 	{
 		m_pItemListUI = new ItemListUI();
 		AddChild(m_pItemListUI);

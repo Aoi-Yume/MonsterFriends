@@ -18,6 +18,16 @@ public:
 		eItemKind_Max = 10
 	};
 
+	enum PlayMode {
+		eSingleDevice,
+		eMultiDevice,
+	};
+
+	struct GameInfo {
+		int 		playNum = 1;
+		PlayMode 	playMode = eSingleDevice;
+	};
+
 	struct UseSkillInfo {
 		bool bEnable;
 		int Duration;
@@ -55,9 +65,17 @@ public:
 	};
 
 public:
+	void SetPlayNum(int nPlayNum);
+	int GetPlayNum() const;
+
+	void SetPlayMode(PlayMode playMode);
+	PlayMode GetPlayMode() const;
+
 	void SetCharaName(const char* pName);
 	const char* GetCharaName() const;
 	const char* GetCharaName(int nPlayerId) const;
+
+	int GetUIControlPlayerNo() const;
 
 	void AddKizunaPoint(int nPlayerId, int nAdd);
 	void SubKizunaPoint(int nPlayerId, int nSub);
@@ -83,6 +101,7 @@ public:
 	SkillNetworkInfo& GetSkillInfo();
 	void DumpNetworkSkillInfo();
 private:
+	GameInfo			m_GameInfo;
 	CharacterInfo 		m_CharaInfo;
 	GameNetworkInfo		m_NetworkGameInfo;
 	SkillNetworkInfo	m_NetworkSkillInfo;

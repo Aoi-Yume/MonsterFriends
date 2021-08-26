@@ -42,4 +42,11 @@ namespace Util {
 			}
 		}
 	}
+
+	float Centering(float fWidth, int nNum, int nIdx, float fOffset)
+	{
+		const float fStart = -fWidth * 0.5f;
+		const float fAdd = fWidth / (float)(nNum + 1);
+		return fStart + fAdd * (float)(nIdx + 1) + fOffset;
+	}
 }

@@ -31,6 +31,7 @@ public:
 		eState_BorneFadeOut,
 		eState_BorneFadeIn,
 		eState_BorneMessage,
+		eState_CharaAttention,
 		eState_WaitKeyboardEnable,
 		eState_WaitInput,
 		eState_StartNearby,
@@ -47,7 +48,8 @@ public:
 	};
 
 	enum {
-		eBTN_LOCAL = 0,
+		eBTN_SINGLE = 0,
+		eBTN_MULTI,
 		eBTN_TUTORIAL,
 
 		eBTN_MAKE_ROOM = 0,
@@ -67,10 +69,11 @@ protected:
 	void EntityUpdate(GameMessage message, const void* param) override;
 
 public:
+	int 		m_nCurrentCharaIdx;
 	BackGround*	m_pBg;
 	Egg*		m_pEgg;
-	Character*	m_pChara;
 	Entity*		m_pTitleImage;
+	std::vector<Character*>	m_aChara;
 	std::vector<ButtonManager*>	m_aButtonManager;
 	MessageWindow*	m_pMessageWindow;
 

@@ -1,4 +1,11 @@
 # Libraries not listed in licenses.yml:
+
+- name: 音楽：魔王魂
+  copyrightHolder: 魔王魂
+  license: Free Public
+  licenseUrl: https://maou.audio/rule/
+  url: https://maou.audio/
+  forceGenerate: true
 - artifact: androidx.activity:activity:+
   name: activity
   copyrightHolder: Google Inc.

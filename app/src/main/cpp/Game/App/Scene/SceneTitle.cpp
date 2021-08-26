@@ -20,6 +20,7 @@
 #include <Egg.h>
 #include <Character.h>
 #include <AppCharaList.h>
+#include <Util.h>
 
 SceneBase* SceneTitle::CreateScene()
 {
@@ -53,10 +54,20 @@ namespace {
 		void Update(void *pUserPtr) override {
 			auto p = reinterpret_cast<SceneTitle *>(pUserPtr);
 			const int nDecide = p->m_aButtonManager[SceneTitle::eBTN_MANAGER_TITLE]->GetDecide();
-			if (nDecide == SceneTitle::eBTN_LOCAL) {
+			if(nDecide == SceneTitle::eBTN_SINGLE) {
+				AppParam::Get()->SetPlayMode(AppParam::eSingleDevice);
+				AppParam::Get()->SetPlayNum(2);
 				p->m_aButtonManager[SceneTitle::eBTN_MANAGER_TITLE]->Lock();
 				p->m_aButtonManager[SceneTitle::eBTN_MANAGER_TITLE]->SetVisible(false);
 				ChangeState(SceneTitle::eState_BorneStartMonster);
+			}
+			else if (nDecide == SceneTitle::eBTN_MULTI) {
+				AppParam::Get()->SetPlayMode(AppParam::eMultiDevice);
+				AppParam::Get()->SetPlayNum(1);
+				p->m_aButtonManager[SceneTitle::eBTN_MANAGER_TITLE]->Lock();
+				p->m_aButtonManager[SceneTitle::eBTN_MANAGER_TITLE]->SetVisible(false);
+				ChangeState(SceneTitle::eState_BorneStartMonster);
+				TransferManager::Get()->SetSelfCharaId(p->m_aChara[0]->GetCharaId());	// 自分のキャラとしてひとまず設定
 			}
 			else if(nDecide == SceneTitle::eBTN_TUTORIAL){
 				p->m_aButtonManager[SceneTitle::eBTN_MANAGER_TITLE]->Lock();
@@ -89,8 +100,15 @@ namespace {
 			if (FADE()->IsFadeOutEnd()) {
 				auto p = reinterpret_cast<SceneTitle*>(pUserPtr);
 				p->m_pEgg->SetVisible(false);
-				p->m_pChara->SetVisible(true);
-				p->m_pChara->InVisibleDice();
+
+				const int nPlayNum = AppParam::Get()->GetPlayNum();
+				for(int i = 0; i < nPlayNum; ++i) {
+					const float fScrrenX = (float)Engine::GetEngine()->GetScreenInfo().m_nScreenX;
+					const float x = Util::Centering(fScrrenX, nPlayNum, i);
+					p->m_aChara[i]->SetPosition(x, -150.0f, 0);
+					p->m_aChara[i]->SetVisible(true);
+					p->m_aChara[i]->InVisibleDice();
+				}
 				ChangeState(SceneTitle::eState_BorneFadeIn);
 			}
 		}
@@ -116,13 +134,35 @@ namespace {
 		void Begin(void* pUserPtr) override {
 			auto p = reinterpret_cast<SceneTitle*>(pUserPtr);
 			p->m_pMessageWindow->SetVisible(true);
-			p->m_pMessageWindow->SetDirectMessage("モンスターがうまれたね。\n名前をつけてあげよう！");
+			if(p->m_nCurrentCharaIdx == 0) {
+				p->m_pMessageWindow->SetDirectMessage("モンスターがうまれたね。\n名前をつけてあげよう！");
+			}
+			else {
+				p->m_pMessageWindow->SetDirectMessage("次のモンスターにも名前をつけてあげよう！");
+			}
 		}
 
 		void Update(void* pUserPtr) override{
 			auto p = reinterpret_cast<SceneTitle*>(pUserPtr);
 			if(p->m_pMessageWindow->IsNextMessage()){
 				p->m_pMessageWindow->SetVisible(false);
+				ChangeState(SceneTitle::eState_CharaAttention);
+			}
+		}
+	};
+
+	//==========================================
+	//==========================================
+	class StateCharaAttention : public StateBase {
+		void Begin(void* pUserPtr) override {
+			auto p = reinterpret_cast<SceneTitle*>(pUserPtr);
+			const int nIdx = p->m_nCurrentCharaIdx;
+			p->m_aChara[nIdx]->BeginAttention();
+		}
+
+		void Update(void* pUserPtr) override {
+			auto p = reinterpret_cast<SceneTitle*>(pUserPtr);
+			if(p->m_pStateManager->GetStateCount() >= 60) {
 				ChangeState(SceneTitle::eState_WaitKeyboardEnable);
 			}
 		}
@@ -154,8 +194,37 @@ namespace {
 					ChangeState(SceneTitle::eState_WaitKeyboardEnable);
 				}
 				else {
-					AppParam::Get()->SetCharaName(charName);
-					ChangeState(SceneTitle::eState_StartNearby);
+					auto p = reinterpret_cast<SceneTitle*>(pUserPtr);
+					auto pParam = AppParam::Get();
+					const auto playMode = pParam->GetPlayMode();
+					const int nPlayNum = pParam->GetPlayNum();
+					if(p->m_nCurrentCharaIdx == 0) {
+						pParam->SetCharaName(charName);
+					}
+					else{
+						TransferManager::ConnectInfo info = {};
+						char playerIdStr[64] = {};
+						std::snprintf(playerIdStr, sizeof(playerIdStr), "Player:%d", p->m_nCurrentCharaIdx);
+						info.Id = playerIdStr;
+						info.uCharaId = p->m_aChara[p->m_nCurrentCharaIdx]->GetCharaId();
+						info.Name = charName;
+						info.bHost = false;
+						info.nPlayerId = p->m_nCurrentCharaIdx;
+						TransferManager::Get()->AddConnect(info);
+					}
+					p->m_nCurrentCharaIdx++;
+					// 複数台で遊ぶ
+					if(playMode == AppParam::eMultiDevice) {
+						ChangeState(SceneTitle::eState_StartNearby);
+					}
+					// 1台で遊ぶ全員名前入力
+					else if(p->m_nCurrentCharaIdx >= nPlayNum) {
+						ChangeState(SceneTitle::eState_FadeOut);
+					}
+					// 1台で遊ぶ次の名前入力
+					else{
+						ChangeState(SceneTitle::eState_BorneMessage);
+					}
 				}
 			}
 		}
@@ -312,10 +381,11 @@ namespace {
 //==========================================
 SceneTitle::SceneTitle()
 : SceneBase("title")
+, m_nCurrentCharaIdx(0)
 , m_pBg(nullptr)
 , m_pEgg(nullptr)
-, m_pChara(nullptr)
 , m_pTitleImage(nullptr)
+, m_aChara()
 , m_aButtonManager()
 , m_pMessageWindow(nullptr)
 , m_pStateManager(nullptr)
@@ -330,9 +400,11 @@ SceneTitle::~SceneTitle()
 	for(auto& it : m_aButtonManager){
 		delete it;
 	}
+	for(auto& it : m_aChara){
+		delete it;
+	}
 	delete m_pMessageWindow;
 	delete m_pTitleImage;
-	delete m_pChara;
 	delete m_pEgg;
 	delete m_pBg;
 	delete m_pStateManager;
@@ -354,12 +426,18 @@ void SceneTitle::SceneSetup() {
 		m_pEgg->SetPosition(0, -80, 0);
 	}
 	{
-		const int nCharaNo = Random::GetInt(0, AppCharaList::Get()->GetCharaListSize() - 1);
-		m_pChara = new Character(nCharaNo);
-		m_pChara->Update(eGameMessage_Setup, nullptr);
-		m_pChara->SetVisible(false);
-		m_pChara->SetPosition(0, -150.0f, 0);
-		TransferManager::Get()->SetSelfCharaId(nCharaNo);	// 自分のキャラとしてひとまず設定
+		const int nListSize = AppCharaList::Get()->GetCharaListSize();
+		std::vector<int> aCharaNo;
+		aCharaNo.resize(nListSize);
+		for(int i = 0; i < nListSize; ++i){ aCharaNo[i] = i; }
+		Util::Shuffle(aCharaNo, nListSize);
+
+		for(int i = 0; i < NET_CONNECT_MAX; ++i) {
+			Character* pChara = new Character(aCharaNo[std::min(i, nListSize - 1)]);
+			pChara->Update(eGameMessage_Setup, nullptr);
+			pChara->SetVisible(false);
+			m_aChara.emplace_back(pChara);
+		}
 	}
 	{
 		m_pTitleImage = new Entity();
@@ -374,8 +452,9 @@ void SceneTitle::SceneSetup() {
 		{
 			ButtonManager *pButtonManager = new ButtonManager();
 			std::pair<const char *, VEC3> btnList[] = {
-					{"image/playStyle_2.png",    VEC3(0.0f, -400.0f, 0)},
-					{"image/button_tutorial.png", VEC3(900.0f, 400.0f, 0)},
+					{"image/playStyle_1.png",VEC3(-450.0f, -400.0f, 0)},
+					{"image/playStyle_2.png",VEC3(450.0f, -400.0f, 0)},
+					{"image/button_tutorial.png",VEC3(900.0f, 400.0f, 0)},
 			};
 			for (int i = 0; i < sizeof(btnList) / sizeof(btnList[0]); ++i) {
 				auto btn = pButtonManager->CreateButton(btnList[i].first);
@@ -419,6 +498,7 @@ void SceneTitle::SceneSetup() {
 		m_pStateManager->CreateState<StateBorneFadeOut>();
 		m_pStateManager->CreateState<StateBorneFadeIn>();
 		m_pStateManager->CreateState<StateBorneMessage>();
+		m_pStateManager->CreateState<StateCharaAttention>();
 		m_pStateManager->CreateState<StateWaitKeyboardEnable>();
 		m_pStateManager->CreateState<StateWaitInput>();
 		m_pStateManager->CreateState<StateStartNearby>();
@@ -479,7 +559,9 @@ void SceneTitle::EntityUpdate(GameMessage message, const void* param)
 	if(message != eGameMessage_Setup) {
 		m_pBg->Update(message, param);
 		m_pEgg->Update(message, param);
-		m_pChara->Update(message, param);
+		for(auto& it : m_aChara) {
+			it->Update(message, param);
+		}
 		m_pTitleImage->Update(message, param);
 		for(auto& it : m_aButtonManager) {
 			it->Update(message, param);

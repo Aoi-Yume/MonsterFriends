@@ -103,12 +103,14 @@ void AppSkillList::BeginItemSkill(int nPlayer, int nSkillNo)
 
 	int nTargetPlayer = -1;
 	const int nParam = getSkillParam(nSkillNo, nPlayer);
-	if(pManager->IsConnectSucess()) {
+	if(pManager->IsConnectSucess() || AppParam::Get()->GetPlayNum() > 1) {
 		const int nNum = pManager->GetConnectNum();
 		do {
 			nTargetPlayer = Random::GetInt(0, nNum);
 		} while(nTargetPlayer == nPlayer);
+	}
 
+	if(pManager->IsConnectSucess()) {
 		if(pManager->GetSelfConnect().nPlayerId == nPlayer){
 			AppParam::Get()->SetUseSkillInfo(nSkillNo, skill.Duration, nParam, nPlayer, nTargetPlayer);
 		}

@@ -43,6 +43,7 @@ void Character::GameEntityUpdate(const void* param)
 	switch(GetState()){
 		case eState_None:{ break; }
 		case eState_Wait:{ break; }
+		case eState_Attention:{ actAttention(); break; }
 		case eState_ComBattleStandby:{ actComBattleStandbyState(); break; }
 		case eState_StopDice:{ actStopDiceState(); break; }
 		case eState_CheckEndDice:{ actCheckEndDiceState(); break; }
@@ -64,6 +65,11 @@ void Character::ResetStopDice()
 	}
 }
 
+void Character::BeginAttention()
+{
+	SetNextState(eState_Attention);
+}
+
 void Character::BeginDice()
 {
 	const float fWidth = 750.0f;
@@ -78,8 +84,6 @@ void Character::BeginDice()
 		pos.SetY(pos.GetY() + fOffset);
 		pDice->SetPosition(pos);
 	}
-
-	m_fJumpStartY = GetPosition().GetY();
 }
 
 void Character::StopDice()
@@ -108,6 +112,20 @@ void Character::InVisibleDice()
 	}
 }
 
+void Character::actAttention()
+{
+	const int nStateCount = GetStateCount();
+	const int nJumpFrameMax = 20;
+	const int nJumpCount = nStateCount % (nJumpFrameMax + 1);
+	const float fJumpPow = 25.0f;
+
+	jump(nJumpCount, nJumpFrameMax, fJumpPow);
+
+	if(nStateCount >= nJumpFrameMax * 2) {
+		SetState(eState_Wait);
+	}
+}
+
 void Character::actComBattleStandbyState()
 {
 	const int nStateCnt = GetStateCount();
@@ -123,19 +141,14 @@ void Character::actStopDiceState()
 {
 	const int nStateCnt = GetStateCount();
 	const int nJumpFrameMaxHalf = 10;
-	const float fJumpFrameMax = (float)nJumpFrameMaxHalf * 2.0f;
-	const float fRatio = std::min((float)nStateCnt / fJumpFrameMax, 1.0f);
-	const float fJumpRatio = cosf(DEGTORAD(189.0f * fRatio));
-	const float fJumpPow = 25.0f;
+	const int nJumpFrameMax = nJumpFrameMaxHalf * 2;
 
-	VEC3 pos = GetPosition();
-	pos.SetY(m_fJumpStartY + fJumpPow * fJumpRatio);
-	SetPosition(pos);
+	jump(nStateCnt, nJumpFrameMax, 25.0f);
 
 	if(nStateCnt == nJumpFrameMaxHalf){
 		GetChild<Dice*>(m_nStopDice)->StopDice();
 	}
-	else if(nStateCnt >= (int)fJumpFrameMax){
+	else if(nStateCnt >= nJumpFrameMax){
 		SetNextState(eState_CheckEndDice);
 	}
 }
@@ -154,4 +167,19 @@ void Character::actCheckEndDiceState()
 	else{
 		SetNextState(eState_EndDice);
 	}
+}
+
+void Character::jump(int nFrame, int nFrameMax, float fJumpPow)
+{
+	const float fJumpFrameMax = (float)nFrameMax;
+	const float fRatio = std::min((float)nFrame / fJumpFrameMax, 1.0f);
+	const float fJumpRatio = CLAMP(cosf(DEGTORAD(180.0f * fRatio)), 0.0f, 1.0f);
+
+	if(nFrame == 0) {
+		m_fJumpStartY = GetPosition().GetY();
+	}
+
+	VEC3 pos = GetPosition();
+	pos.SetY(m_fJumpStartY + fJumpPow * fJumpRatio);
+	SetPosition(pos);
 }

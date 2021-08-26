@@ -9,6 +9,7 @@ USE_SINGLETON_VARIABLE(AppParam);
 
 AppParam::AppParam()
 : Singleton<AppParam>()
+, m_GameInfo()
 , m_CharaInfo()
 , m_NetworkGameInfo()
 , m_NetworkSkillInfo()
@@ -23,6 +24,24 @@ AppParam::AppParam()
 AppParam::~AppParam()
 {
 	DEBUG_LOG("Destroy AppParam");
+}
+
+void AppParam::SetPlayNum(int nPlayNum)
+{
+	m_GameInfo.playNum = nPlayNum;
+}
+int AppParam::GetPlayNum() const
+{
+	return m_GameInfo.playNum;
+}
+
+void AppParam::SetPlayMode(PlayMode playMode)
+{
+	m_GameInfo.playMode = playMode;
+}
+AppParam::PlayMode AppParam::GetPlayMode() const
+{
+	return m_GameInfo.playMode;
 }
 
 void AppParam::SetCharaName(const char *pName)
@@ -45,11 +64,19 @@ const char* AppParam::GetCharaName(int nPlayerId) const
 	return TransferManager::Get()->GetConnect(nNo).Name.c_str();
 }
 
+int AppParam::GetUIControlPlayerNo() const
+{
+	if(TransferManager::Get()->IsConnectSucess()){
+		return m_NetworkGameInfo.nCurrentPlayerId;
+	}
+	return 0;
+}
+
 void AppParam::AddKizunaPoint(int nPlayerId, int nAdd)
 {
 	// 接続完了している時は通信用情報を更新
 	auto pManager = TransferManager::Get();
-	if(pManager->IsConnectSucess()){
+	if(pManager->IsConnectSucess() || m_GameInfo.playNum > 1){
 		auto& nKizuna = m_NetworkGameInfo.CharaInfo[nPlayerId].nKizunaPoint;
 		nKizuna = std::min(nKizuna + nAdd, 9999);
 
@@ -70,7 +97,7 @@ void AppParam::SubKizunaPoint(int nPlayerId, int nSub)
 {
 	// 接続完了している時は通信用情報を更新
 	auto pManager = TransferManager::Get();
-	if(pManager->IsConnectSucess()){
+	if(pManager->IsConnectSucess() || m_GameInfo.playNum > 1){
 		auto& nKizuna = m_NetworkGameInfo.CharaInfo[nPlayerId].nKizunaPoint;
 		nKizuna = std::max(nKizuna - nSub, 0);
 
@@ -98,7 +125,7 @@ void AppParam::AddItem(int nPlayerId, int nItemNo, int nNum)
 
 	// 接続完了している時は通信用情報を更新
 	auto pManager = TransferManager::Get();
-	if(pManager->IsConnectSucess()) {
+	if(pManager->IsConnectSucess() || m_GameInfo.playNum > 1) {
 		auto& uItemNum = m_NetworkGameInfo.CharaInfo[nPlayerId].uItemNum[nItemNo];
 		uItemNum = std::min((int)uItemNum + nNum, UINT8_MAX);
 
@@ -120,7 +147,7 @@ void AppParam::SubItem(int nPlayerId, int nItemNo, int nNum)
 
 	// 接続完了している時は通信用情報を更新
 	auto pManager = TransferManager::Get();
-	if(pManager->IsConnectSucess()) {
+	if(pManager->IsConnectSucess() || m_GameInfo.playNum > 1) {
 		auto& uItemNum = m_NetworkGameInfo.CharaInfo[nPlayerId].uItemNum[nItemNo];
 		uItemNum = std::max((int)uItemNum - nNum, 0);
 
@@ -143,7 +170,7 @@ int AppParam::GetItemNum(int nPlayerId, int nItemNo) const
 
 	// 接続完了している時は通信用情報から取得
 	auto pManager = TransferManager::Get();
-	if(pManager->IsConnectSucess()) {
+	if(pManager->IsConnectSucess() || m_GameInfo.playNum > 1) {
 		return m_NetworkGameInfo.CharaInfo[nPlayerId].uItemNum[nItemNo];
 	}
 	// 接続できていない時は自身の情報から取得
@@ -164,7 +191,7 @@ void AppParam::SetUseSkillInfo(int nNo, int nDuration, int nParam, int nSendPlay
 
 	// 接続完了している時は通信用情報を更新
 	auto pManager = TransferManager::Get();
-	if(pManager->IsConnectSucess()) {
+	if(pManager->IsConnectSucess() || m_GameInfo.playNum > 1) {
 		auto &skillInfo = m_NetworkGameInfo.CharaInfo[nSendPlayer].useSkill[nNo];
 		skillInfo.bEnable = true;
 		skillInfo.Duration = nDuration;
@@ -193,7 +220,7 @@ const AppParam::UseSkillInfo* AppParam::GetUseSkillInfo(int nPlayerId) const
 {
 	// 接続完了している時は通信用情報から取得
 	auto pManager = TransferManager::Get();
-	if(pManager->IsConnectSucess()) {
+	if(pManager->IsConnectSucess() || m_GameInfo.playNum > 1) {
 		return m_NetworkGameInfo.CharaInfo[nPlayerId].useSkill;
 	}
 	// 接続できていない時は自身の情報から取得
@@ -204,7 +231,7 @@ void AppParam::UpdateSkillDuration(int nNo, int nPlayerId)
 {
 	// 接続完了している時は通信用情報を更新
 	auto pManager = TransferManager::Get();
-	if(pManager->IsConnectSucess()) {
+	if(pManager->IsConnectSucess() || m_GameInfo.playNum > 1) {
 		auto& skillInfo = m_NetworkGameInfo.CharaInfo[nPlayerId].useSkill[nNo];
 		if(skillInfo.Duration < 0){ return; }	// 無限継続
 		skillInfo.Duration--;

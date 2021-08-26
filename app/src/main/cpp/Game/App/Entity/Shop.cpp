@@ -83,7 +83,7 @@ void Shop::SetVisible(bool bVisible)
 void Shop::GameEntitySetup(const void* param) {
 	Super::GameEntitySetup(param);
 
-	const int nCurrentPlayerId = AppParam::Get()->GetNetworkInfo().nCurrentPlayerId;
+	const int nCurrentPlayerId = AppParam::Get()->GetUIControlPlayerNo();
 	{
 		m_pItemListUI = new ItemListUI();
 		setNewItem(0);

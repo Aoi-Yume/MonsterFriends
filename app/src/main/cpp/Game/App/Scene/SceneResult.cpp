@@ -19,6 +19,7 @@
 #include <../Net/TransferTouchInfo.h>
 #include <AppParam.h>
 #include <AppItemList.h>
+#include <Util.h>
 
 SceneBase* SceneResult::CreateScene()
 {
@@ -203,8 +204,7 @@ void SceneResult::SceneSetup() {
 	}
 	{
 		const float fScreenX = (float)Engine::GetEngine()->GetScreenInfo().m_nScreenX;
-		const float fAddX = fScreenX / (TransferManager::Get()->GetConnectNum() + 2);
-		const float fStartX = -fScreenX * 0.5f;
+		const int nPlayerNum = (TransferManager::Get()->GetConnectNum() + 1);
 		for(int i = 0; i < NET_CONNECT_MAX; ++i) {
 			const bool bVisible = (i < TransferManager::Get()->GetConnectNum() + 1);
 			auto pChara = m_CharaInfo[i].pChara = new Character(TransferManager::Get()->GetCharaIdFromPlayerId(i));
@@ -237,16 +237,16 @@ void SceneResult::SceneSetup() {
 				m_CharaInfo[i].nCristalNum = AppParam::Get()->GetItemNum(i, nItemNo);
 
 				const float fWidth = (128.0f + 8.0f) * 3.0f;
-				const float fIconStartX = -fWidth * 0.5f;
-				const float fIconAddX = fWidth / (float)(m_CharaInfo[i].nCristalNum + 1.0f);
 				for(int j = 0; j < 3; ++j) {
 					auto pIcon = pChara->GetChild(pChara->GetChildSize() - 1)->GetChild(j);
-					pIcon->SetPosition(fIconStartX + (float)(j + 1) * fIconAddX, 128, 0);
+					const float fIconX = Util::Centering(fWidth, m_CharaInfo[i].nCristalNum, j);
+					pIcon->SetPosition(fIconX, 128, 0);
 					pIcon->SetVisible(false);
 				}
 			}
 			pEntity->SetPosition(0, 128, 0);
-			pChara->SetPosition(fStartX + (float)(i + 1) * fAddX, -200.0f, 0);
+			const float fCharaX = Util::Centering(fScreenX, nPlayerNum, i);
+			pChara->SetPosition(fCharaX, -200.0f, 0);
 		}
 	}
 	{

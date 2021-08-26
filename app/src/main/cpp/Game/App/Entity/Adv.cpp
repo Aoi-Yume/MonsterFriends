@@ -65,7 +65,7 @@ void Adv::Open()
 		pBtn->Disable();
 		pBtn->SetVisible(false);
 		pBtn->SetPosition(VEC3(0, -400.0f, 0));
-		m_pBtnManager->SetControlPlayerId(AppParam::Get()->GetNetworkInfo().nCurrentPlayerId);
+		m_pBtnManager->SetControlPlayerId(AppParam::Get()->GetUIControlPlayerNo());
 		m_pBtnManager->Reset();
 		m_pBtnManager->Unlock();
 	}
@@ -76,7 +76,7 @@ void Adv::Open()
 		std::snprintf(message, sizeof(message), "敵の%sが現れた！", AppCharaList::Get()->GetCharaInfo(m_pEnemy->GetCharaId()).name.c_str());
 		m_pMessageWindow->SetDirectMessage(message);
 		m_pMessageWindow->SetVisible(true);
-		m_pMessageWindow->SetControlPlayerId(AppParam::Get()->GetNetworkInfo().nCurrentPlayerId);
+		m_pMessageWindow->SetControlPlayerId(AppParam::Get()->GetUIControlPlayerNo());
 	}
 	m_nStep = eSTEP_APPEAR_ENEMY;
 	m_nNextStep = eSTEP_APPEAR_ENEMY;

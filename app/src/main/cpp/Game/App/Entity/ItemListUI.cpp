@@ -34,7 +34,7 @@ ItemListUI::~ItemListUI()
 
 void ItemListUI::GameEntitySetup(const void* param) {
 	Super::GameEntitySetup(param);
-	const int nCurrentPlayerId = AppParam::Get()->GetNetworkInfo().nCurrentPlayerId;
+	const int nCurrentPlayerId = AppParam::Get()->GetUIControlPlayerNo();
 
 	// 表示分までは無効領域を詰めておく
 	while(m_aItemNo.size() < eButtonVisibleNum){

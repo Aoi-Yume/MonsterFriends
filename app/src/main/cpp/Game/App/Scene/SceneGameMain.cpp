@@ -66,7 +66,7 @@ namespace {
 		void Begin(void *pUserPtr) override {
 			auto p = reinterpret_cast<SceneGameMain *>(pUserPtr);
 			auto pBtn = p->m_aBtnManager[SceneGameMain::eBtnKind_Main];
-			pBtn->SetControlPlayerId(AppParam::Get()->GetNetworkInfo().nCurrentPlayerId);
+			pBtn->SetControlPlayerId(AppParam::Get()->GetUIControlPlayerNo());
 			pBtn->Unlock();
 			pBtn->SetVisible(true);
 			// プレイヤーIDが更新されていなかった。名前が更新するため呼び出す
@@ -143,7 +143,7 @@ namespace {
 		void Begin(void *pUserPtr) override {
 			auto p = reinterpret_cast<SceneGameMain *>(pUserPtr);
 			auto pBtn = p->m_aBtnManager[SceneGameMain::eBtnKind_ItemOrShop];
-			pBtn->SetControlPlayerId(AppParam::Get()->GetNetworkInfo().nCurrentPlayerId);
+			pBtn->SetControlPlayerId(AppParam::Get()->GetUIControlPlayerNo());
 			pBtn->Unlock();
 			pBtn->SetVisible(true);
 		}
@@ -451,7 +451,7 @@ void SceneGameMain::SceneUpdate()
 	m_pStateManager->Update();
 
 	auto p = (TextImageComponent*)m_pCounter->GetComponent(eComponentKind_Layout);
-	char str[4096];
+	char str[256];
 	std::snprintf(str, sizeof(str), "Time[%.3f]", DELAY_INPUT()->GetCurrentTime());
 	p->SetText(str);
 	//auto pTouchInput = Engine::GetEngine()->GetTouchInputInfoPtr(0);

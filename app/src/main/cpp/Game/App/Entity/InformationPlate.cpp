@@ -34,7 +34,7 @@ void InformationPlate::GameEntitySetup(const void* param) {
 		Entity::CreateTextImageComponent(pEntity, "", 32);
 		auto pText = (TextImageComponent *) pEntity->GetComponent(eComponentKind_Layout);
 		const char* pName = nullptr;
-		if(TransferManager::Get()->IsConnectSucess()) {
+		if(TransferManager::Get()->IsConnectSucess() || AppParam::Get()->GetPlayMode() == AppParam::eSingleDevice) {
 			pName = AppParam::Get()->GetCharaName(nCurrentPlayerId);
 		}
 		else{
@@ -81,7 +81,7 @@ void InformationPlate::UpdatePlate()
 		Entity* pChild = GetChild(eChild_Name);
 		auto pText = (TextImageComponent *) pChild->GetComponent(eComponentKind_Layout);
 		const char* pName = nullptr;
-		if(TransferManager::Get()->IsConnectSucess()) {
+		if(TransferManager::Get()->IsConnectSucess() || AppParam::Get()->GetPlayMode() == AppParam::eSingleDevice) {
 			pName = AppParam::Get()->GetCharaName(nCurrentPlayerId);
 		}
 		else{
