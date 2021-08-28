@@ -3,8 +3,6 @@
 //
 
 
-#include <LayoutComponent.h>
-#include <TransformComponent.h>
 #include <SceneManager.h>
 #include <AppParam.h>
 #include "SceneTitle.h"
@@ -16,11 +14,14 @@
 #include <Random.h>
 #include <FadeCtrl.h>
 #include <Window/MessageWindow.h>
+#include <Window/PermissionExplain.h>
 #include <BackGround.h>
 #include <Egg.h>
 #include <Character.h>
 #include <AppCharaList.h>
 #include <Util.h>
+
+#define REQUEST_PERMISSION ("android.permission.ACCESS_FINE_LOCATION")
 
 SceneBase* SceneTitle::CreateScene()
 {
@@ -66,12 +67,61 @@ namespace {
 				AppParam::Get()->SetPlayNum(1);
 				p->m_aButtonManager[SceneTitle::eBTN_MANAGER_TITLE]->Lock();
 				p->m_aButtonManager[SceneTitle::eBTN_MANAGER_TITLE]->SetVisible(false);
-				ChangeState(SceneTitle::eState_BorneStartMonster);
+				ChangeState(SceneTitle::eState_ExplainPermission);
 				TransferManager::Get()->SetSelfCharaId(p->m_aChara[0]->GetCharaId());	// 自分のキャラとしてひとまず設定
 			}
 			else if(nDecide == SceneTitle::eBTN_TUTORIAL){
 				p->m_aButtonManager[SceneTitle::eBTN_MANAGER_TITLE]->Lock();
 				ChangeState(SceneTitle::eState_ShowLicense);
+			}
+		}
+	};
+
+	//==========================================
+	//==========================================
+	class StateExplainPermission : public StateBase {
+		void Begin(void* pUserPtr) override {
+			auto p = reinterpret_cast<SceneTitle *>(pUserPtr);
+			if(Engine::GetEngine()->IsPermissionGranted(REQUEST_PERMISSION)){
+				ChangeState(SceneTitle::eState_BorneStartMonster);
+			}
+			else {
+				p->m_pEgg->SetActive(false);
+				p->m_pBg->SetActive(false);
+				p->m_pPermissionExplain->Open(REQUEST_PERMISSION);
+			}
+		}
+		void Update(void* pUserPtr) override {
+			auto p = reinterpret_cast<SceneTitle *>(pUserPtr);
+			if(p->m_pPermissionExplain->IsNext()){
+				p->m_pPermissionExplain->Close(REQUEST_PERMISSION);
+				p->m_pEgg->SetActive(true);
+				p->m_pEgg->SetActive(true);
+				ChangeState(SceneTitle::eState_CheckPermission);
+			}
+		}
+	};
+
+	//==========================================
+	//==========================================
+	class StateCheckPermission : public StateBase {
+		void Begin(void* pUserPtr) override {
+			Engine::GetEngine()->CheckPermission(REQUEST_PERMISSION);
+		}
+		void Update(void* pUserPtr) override {
+			const int nResult = Engine::GetEngine()->GetPermissionResult();
+			if(nResult == PermissionResult::eSuccess) {
+				DEBUG_LOG("Permission Result Success\n");
+				ChangeState(SceneTitle::eState_BorneStartMonster);
+			}
+			else if(nResult == PermissionResult::eFailed) {
+				DEBUG_LOG("Permission Result Failed\n");
+				ChangeState(SceneTitle::eState_WaitPressButton);
+			}
+			else if(nResult == PermissionResult::eDetailExplain) {
+				// 詳細な説明は既に前のステートで表示しているのでリクエストだけ出す
+				DEBUG_LOG("Permission Result Detail Explain\n");
+				Engine::GetEngine()->RequestPermission(REQUEST_PERMISSION);
 			}
 		}
 	};
@@ -388,6 +438,7 @@ SceneTitle::SceneTitle()
 , m_aChara()
 , m_aButtonManager()
 , m_pMessageWindow(nullptr)
+, m_pPermissionExplain(nullptr)
 , m_pStateManager(nullptr)
 {
 	DEBUG_LOG("Scene Title Constructor");
@@ -490,10 +541,18 @@ void SceneTitle::SceneSetup() {
 		m_pMessageWindow->SetActive(true);
 	}
 	{
+		m_pPermissionExplain = new PermissionExplain();
+		m_pPermissionExplain->Update(eGameMessage_Setup, nullptr);
+		m_pPermissionExplain->AddPermissionExplain(REQUEST_PERMISSION, "image/permissionExplain.png");
+		m_pPermissionExplain->SetVisible(false);
+	}
+	{
 		m_pStateManager = new StateManager(eState_Max);
 		m_pStateManager->SetUserPtr(this);
 		m_pStateManager->CreateState<StateFadeIn>();
 		m_pStateManager->CreateState<StateWaitPressButton>();
+		m_pStateManager->CreateState<StateExplainPermission>();
+		m_pStateManager->CreateState<StateCheckPermission>();
 		m_pStateManager->CreateState<StateBorneStartMonster>();
 		m_pStateManager->CreateState<StateBorneFadeOut>();
 		m_pStateManager->CreateState<StateBorneFadeIn>();
@@ -567,5 +626,6 @@ void SceneTitle::EntityUpdate(GameMessage message, const void* param)
 			it->Update(message, param);
 		}
 		m_pMessageWindow->Update(message, param);
+		m_pPermissionExplain->Update(message, param);
 	}
 }

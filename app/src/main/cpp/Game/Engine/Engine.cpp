@@ -239,6 +239,45 @@ void Engine::GetInputText(char* pText, int nSize) const
 
 //-----------------------------------------
 //-----------------------------------------
+bool Engine::IsPermissionGranted(const char* pPermission)
+{
+	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SYSTEM);
+	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SYSTEM, "IsPermissionGranted");
+	jstring permission = GetEnv()->NewStringUTF(pPermission);
+	return GetEnv()->CallStaticBooleanMethod(classID, methodID_1, permission);
+}
+
+//-----------------------------------------
+//-----------------------------------------
+void Engine::CheckPermission(const char* pPermission)
+{
+	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SYSTEM);
+	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SYSTEM, "CheckPermission");
+	jstring permission = GetEnv()->NewStringUTF(pPermission);
+	GetEnv()->CallStaticVoidMethod(classID, methodID_1, permission);
+}
+
+//-----------------------------------------
+//-----------------------------------------
+int Engine::GetPermissionResult() const
+{
+	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SYSTEM);
+	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SYSTEM, "GetPermissionResult");
+	return GetEnv()->CallStaticIntMethod(classID, methodID_1);
+}
+
+//-----------------------------------------
+//-----------------------------------------
+void Engine::RequestPermission(const char* pPermission)
+{
+	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SYSTEM);
+	jmethodID  methodID_1 = ObjectLoader::GetObjectLoader()->GetMethodID(CLASS_NAME_SYSTEM, "RequestPermission");
+	jstring permission = GetEnv()->NewStringUTF(pPermission);
+	GetEnv()->CallStaticVoidMethod(classID, methodID_1, permission);
+}
+
+//-----------------------------------------
+//-----------------------------------------
 void Engine::StartNearbyAdvertising(const char* pConnectName)
 {
 	jclass classID = ObjectLoader::GetObjectLoader()->GetClassID(CLASS_NAME_SYSTEM);

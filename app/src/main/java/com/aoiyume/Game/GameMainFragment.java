@@ -1,8 +1,8 @@
 package com.aoiyume.Game;
 
-import android.content.res.AssetFileDescriptor;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
+import android.content.pm.PackageManager;
+import android.media.Ringtone;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -27,9 +27,9 @@ import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 
-import java.io.IOException;
-import java.net.URI;
-
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -63,6 +63,15 @@ public class GameMainFragment extends Fragment {
             }
         }
     };
+
+    static ActivityResultLauncher<String> m_requestPermissionLauncher = null;
+    enum PermissionResult {
+        eNone,
+        eSuccess,
+        eFailed,
+        eDetailExplain,
+    }
+    static PermissionResult m_PermissionResult = PermissionResult.eNone;
 
     @Nullable
     @Override
@@ -127,6 +136,14 @@ public class GameMainFragment extends Fragment {
                 Engine.ReceiveNearbyData(endPointId, data);
             }
         });
+
+        m_requestPermissionLauncher = MainActivity.GetContext().registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
+                    @Override
+                    public void onActivityResult(Boolean result) {
+                        m_PermissionResult = result ? PermissionResult.eSuccess : PermissionResult.eFailed;
+                    }
+                });
     }
 
     @Override
@@ -159,6 +176,49 @@ public class GameMainFragment extends Fragment {
         return m_bShowKeyboard;
     }
     public static String GetInputText() { return m_InputText[m_CurrentInpuTextNo].getText().toString(); }
+
+    public static boolean IsPermissionGranted(String permission)
+    {
+        MainActivity context = MainActivity.GetContext();
+        PackageManager packageManager = context.getPackageManager();
+        int nPermission = packageManager.checkPermission(permission,  context.getPackageName());
+        return nPermission == PackageManager.PERMISSION_GRANTED;
+    }
+
+    public static void CheckPermission(String permission)
+    {
+        MainActivity context = MainActivity.GetContext();
+
+        m_PermissionResult = PermissionResult.eNone;
+        if(IsPermissionGranted(permission)) {
+            m_PermissionResult = PermissionResult.eSuccess;
+        }
+        else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if(context.shouldShowRequestPermissionRationale(permission)) {
+                    // アプリ独自の詳細な説明
+                    m_PermissionResult = PermissionResult.eDetailExplain;
+                }
+                else {
+                   RequestPermission(permission);
+                }
+            }
+            else {
+                RequestPermission(permission);
+            }
+        }
+    }
+
+    public static void RequestPermission(String permission)
+    {
+        m_PermissionResult = PermissionResult.eNone;
+        m_requestPermissionLauncher.launch(permission);
+    }
+
+    public static int GetPermissionResult()
+    {
+        return m_PermissionResult.ordinal();
+    }
 
     public static void StartNearbyAdvertising(String ConnectName)
     {

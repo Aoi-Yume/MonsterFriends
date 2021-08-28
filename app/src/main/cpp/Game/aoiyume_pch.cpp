@@ -176,6 +176,10 @@ void ObjectLoader::SetDefaultLoad() {
 		s_ObjectLoader->SetMethodID(CLASS_NAME_SYSTEM, "ShowSoftwareKeyboard", "()V", true);
 		s_ObjectLoader->SetMethodID(CLASS_NAME_SYSTEM, "IsShowSoftwareKeyboard", "()Z", true);
 		s_ObjectLoader->SetMethodID(CLASS_NAME_SYSTEM, "GetInputText", "()Ljava/lang/String;", true);
+		s_ObjectLoader->SetMethodID(CLASS_NAME_SYSTEM,"IsPermissionGranted", "(Ljava/lang/String;)Z", true);
+		s_ObjectLoader->SetMethodID(CLASS_NAME_SYSTEM,"CheckPermission", "(Ljava/lang/String;)V", true);
+		s_ObjectLoader->SetMethodID(CLASS_NAME_SYSTEM, "GetPermissionResult", "()I", true);
+		s_ObjectLoader->SetMethodID(CLASS_NAME_SYSTEM,"RequestPermission", "(Ljava/lang/String;)V", true);
 		s_ObjectLoader->SetMethodID(CLASS_NAME_SYSTEM, "StartNearbyAdvertising", "(Ljava/lang/String;)V", true);
 		s_ObjectLoader->SetMethodID(CLASS_NAME_SYSTEM,"StopNearbyAdvertising", "()V", true);
 		s_ObjectLoader->SetMethodID(CLASS_NAME_SYSTEM, "StartNearbyDiscovery", "(Ljava/lang/String;)V", true);

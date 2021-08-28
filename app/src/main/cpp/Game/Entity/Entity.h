@@ -11,9 +11,11 @@
 #include "EntityBase.h"
 #include "../../Math/math_Vector.h"
 
-class ComponentBase;
-class LayoutComponent;
-class AnimationComponent;
+#include "CameraComponent.h"
+#include "TransformComponent.h"
+#include "LayoutComponent.h"
+#include "CollisionComponent.h"
+#include "AnimationComponent.h"
 
 class Entity : public EntityBase
 {

@@ -36,5 +36,12 @@ enum GameMessageResult {
 	eGameMessageResult_Max
 };
 
+enum PermissionResult {
+	eNone,
+	eSuccess,
+	eFailed,
+	eDetailExplain,
+};
+
 
 #endif

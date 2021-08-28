@@ -66,6 +66,11 @@ public:
 	bool IsShowSoftwareKeyboard() const;
 	void GetInputText(char* pText, int nSize) const;
 
+	bool IsPermissionGranted(const char* pPermission);
+	void CheckPermission(const char* pPermission);
+	int GetPermissionResult() const;
+	void RequestPermission(const char* pPermission);
+
 	void StartNearbyAdvertising(const char* pConnectName);
 	void StopNearbyAdvertising();
 	void StartNearbyDiscovery(const char* pConnectName);

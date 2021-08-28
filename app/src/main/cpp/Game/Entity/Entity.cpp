@@ -3,12 +3,7 @@
 //
 
 
-#include <CollisionComponent.h>
 #include "Entity.h"
-#include "TransformComponent.h"
-#include "LayoutComponent.h"
-#include "CameraComponent.h"
-#include "AnimationComponent.h"
 
 Entity::Entity()
 : EntityBase()

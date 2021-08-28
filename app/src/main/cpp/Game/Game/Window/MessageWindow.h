@@ -35,8 +35,6 @@ public:
 	void EntityUpdate(GameMessage message, const void* param) override;
 
 public:
-	void SetActive(bool bActive){ m_bActive = bActive; }
-	bool IsActive() const { return m_bActive; }
 	void SetVisible(bool bVisible);
 	void SetControlPlayerId(int nPlayerId = -1);
 	void SetDecideCommand(uint8_t uDecideCommand){ m_uDecideCommand = uDecideCommand; }
@@ -55,7 +53,6 @@ private:
 	void updatePosition();
 
 private:
-	bool 			m_bActive;
 	bool 			m_bSetMessage;
 	bool 			m_bNextMessage;
 	int 			m_nCurrentUseLine;

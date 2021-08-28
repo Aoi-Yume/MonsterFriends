@@ -7,6 +7,7 @@
 
 GameEntity::GameEntity()
 : Entity()
+, m_bActive(true)
 , m_nState(0)
 , m_nNextState(0)
 , m_nStateCnt(0)
@@ -35,6 +36,7 @@ void GameEntity::EntityUpdate(GameMessage message, const void* param)
 		GameEntitySetup(param);
 	}
 	else if(message == eGameMessage_Update){
+		if(!IsActive()){ return; }
 		GameEntityUpdate(param);
 	}
 	else{

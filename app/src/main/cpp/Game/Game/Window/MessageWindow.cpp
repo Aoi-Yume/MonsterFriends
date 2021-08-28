@@ -12,7 +12,6 @@
 
 MessageWindow::MessageWindow(const char* pResName)
 : Super()
-, m_bActive(false)
 , m_bSetMessage(false)
 , m_bNextMessage(false)
 , m_nCurrentUseLine(0)
@@ -58,7 +57,6 @@ void MessageWindow::GameEntitySetup(const void* param)
 
 void MessageWindow::GameEntityUpdate(const void* param)
 {
-	if(!m_bActive){ return; }
 	Super::GameEntityUpdate(param);
 	if(!m_bSetMessage){ return; }
 

@@ -18,6 +18,7 @@ class BackGround;
 class Egg;
 class Character;
 class MessageWindow;
+class PermissionExplain;
 
 class SceneTitle : public SceneBase
 {
@@ -27,6 +28,8 @@ public:
 	enum {
 		eState_FadeIn,
 		eState_WaitPressButton,
+		eState_ExplainPermission,
+		eState_CheckPermission,
 		eState_BorneStartMonster,
 		eState_BorneFadeOut,
 		eState_BorneFadeIn,
@@ -76,6 +79,7 @@ public:
 	std::vector<Character*>	m_aChara;
 	std::vector<ButtonManager*>	m_aButtonManager;
 	MessageWindow*	m_pMessageWindow;
+	PermissionExplain* m_pPermissionExplain;
 
 	StateManager*	m_pStateManager;
 };
