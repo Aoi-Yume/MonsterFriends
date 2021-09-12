@@ -28,7 +28,7 @@ void AppItemList::Load()
 	std::vector<std::string>	aSplitText;
 	Util::SplitCSVText(aSplitText, str);
 
-	const int nParamNum = 7;
+	const int nParamNum = 8;
 	m_aItemInfo.resize(aSplitText.size() / nParamNum);
 	ASSERT(aSplitText.size() % nParamNum == 0);
 	for(int i = 0; i < aSplitText.size(); ++i){
@@ -42,14 +42,15 @@ void AppItemList::Load()
 		else if(nParamNo == 4){ info.explain = aSplitText[i]; }
 		else if(nParamNo == 5){ info.skillName = aSplitText[i]; }
 		else if(nParamNo == 6){ info.nAppearVal = std::stoi(aSplitText[i]); }
+		else if(nParamNo == 7){ info.bBuyUse = (std::stoi(aSplitText[i]) != 0); }
 	}
 	free(pBuffer);
 
 	for(int i = 0; i < m_aItemInfo.size(); ++i) {
 		auto& it = m_aItemInfo[i];
-		DEBUG_LOG_A("ItemNo[%d]：[%s][%s][%s][%d][%s][%s][%d]\n",
+		DEBUG_LOG_A("ItemNo[%d]：[%s][%s][%s][%d][%s][%s][%d][%d]\n",
 				i + 1, it.name.c_str(), it.useType.c_str(), it.fileName.c_str(), it.nCost,
-				it.explain.c_str(), it.skillName.c_str(), it.nAppearVal);
+				it.explain.c_str(), it.skillName.c_str(), it.nAppearVal, it.bBuyUse);
 	}
 }
 

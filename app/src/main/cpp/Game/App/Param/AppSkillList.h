@@ -22,6 +22,7 @@ public:
 		eSKillTiming_None,
 		eSkillTiming_Now,
 		eSkillTiming_SelfTurn,
+		eSkillTiming_BattleWin,
 	};
 
 	struct SkillInfo {

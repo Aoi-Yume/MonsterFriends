@@ -47,6 +47,11 @@ private:
 		eStep_BuyOrCancel,
 		eStep_BuyCheck,
 		eStep_BuyAfterMessageWait,
+		eStep_BuyUseCheck,
+		eStep_BuyUseWait,
+		eStep_UseMessage,
+		eStep_GetItemMessage,
+		eStep_MessageWait3,
 		eStep_ClearCheck,
 		eStep_ClearMessage,
 		eStep_ClearMessageWait,
@@ -66,6 +71,7 @@ private:
 		eBtn_Back = 0,
 	};
 
+	bool 				m_bBuy;
 	int 				m_nStep;
 	MessageWindow* 		m_pMessageWindow;
 	InformationPlate*	m_pInformationPlate;

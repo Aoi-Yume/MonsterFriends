@@ -292,11 +292,11 @@ void Adv::updateBattleStep()
 	}
 	else if(m_nSubStep == 5){
 		const int nGetPoint = AppCharaList::Get()->GetCharaInfo(m_pEnemy->GetCharaId()).nGetPoint;
+		const int nSkillPoint = getWinSkillPoint();
 		char message[128];
-		std::snprintf(message, sizeof(message), "キズナが%d増えた！", nGetPoint);
+		std::snprintf(message, sizeof(message), "キズナが%d増えた！", nGetPoint + nSkillPoint);
 		m_pMessageWindow->SetDirectMessage(message);
-		AppParam::Get()->AddKizunaPoint(AppParam::Get()->GetNetworkInfo().nCurrentPlayerId, nGetPoint);
-//		Engine::GetEngine()->ResetTouchEvent();
+		updateGetKizuna(nGetPoint);
 		m_nSubStep = 6;
 	}
 	else if(m_nSubStep == 6){
@@ -311,4 +311,18 @@ void Adv::updateBattleStep()
 	else{
 		m_nSubStepCnt = 0;
 	}
+}
+
+int Adv::getWinSkillPoint() const
+{
+	const int nSkillNo = SKILL_LIST()->GetSkillNoFromSkillName("バトルプラス");
+	const int nPlayerId = AppParam::Get()->GetNetworkInfo().nCurrentPlayerId;
+	return AppParam::Get()->GetUseSkillInfo(nPlayerId)[nSkillNo].Param;
+}
+
+void Adv::updateGetKizuna(int nGetPoint)
+{
+	const int nPlayerId = AppParam::Get()->GetNetworkInfo().nCurrentPlayerId;
+	AppParam::Get()->AddKizunaPoint(nPlayerId, nGetPoint);
+	SKILL_LIST()->UpdateSkill(nPlayerId, AppSkillList::eSkillTiming_BattleWin);
 }

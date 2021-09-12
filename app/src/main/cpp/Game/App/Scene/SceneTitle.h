@@ -19,6 +19,7 @@ class Egg;
 class Character;
 class MessageWindow;
 class PermissionExplain;
+class OptionMenu;
 
 class SceneTitle : public SceneBase
 {
@@ -40,6 +41,7 @@ public:
 		eState_StartNearby,
 		eState_WaitNearbyConnect,
 		eState_WaitNearbyTransferPlayerId,
+		eState_Option,
 		eState_ShowLicense,
 		eState_FadeOut,
 		eState_Max
@@ -80,6 +82,7 @@ public:
 	std::vector<ButtonManager*>	m_aButtonManager;
 	MessageWindow*	m_pMessageWindow;
 	PermissionExplain* m_pPermissionExplain;
+	OptionMenu* m_pOptionMenu;
 
 	StateManager*	m_pStateManager;
 };

@@ -20,6 +20,7 @@
 #include <Character.h>
 #include <AppCharaList.h>
 #include <Util.h>
+#include <OptionMenu.h>
 
 #define REQUEST_PERMISSION ("android.permission.ACCESS_FINE_LOCATION")
 
@@ -72,7 +73,7 @@ namespace {
 			}
 			else if(nDecide == SceneTitle::eBTN_TUTORIAL){
 				p->m_aButtonManager[SceneTitle::eBTN_MANAGER_TITLE]->Lock();
-				ChangeState(SceneTitle::eState_ShowLicense);
+				ChangeState(SceneTitle::eState_Option);
 			}
 		}
 	};
@@ -400,6 +401,34 @@ namespace {
 
 	//==========================================
 	//==========================================
+	class StateOption : public StateBase {
+		void Begin(void* pUserPtr) override {
+			auto p = reinterpret_cast<SceneTitle*>(pUserPtr);
+			p->m_pOptionMenu->SetVisible(true);
+			p->m_pOptionMenu->Open();
+		}
+		void Update(void* pUserPtr) override {
+			auto p = reinterpret_cast<SceneTitle*>(pUserPtr);
+			const int nResult = p->m_pOptionMenu->GetResult();
+			if(nResult == OptionMenu::eBtn_Tutorial) {
+				// TODO
+			}
+			else if(nResult == OptionMenu::eBtn_License) {
+				ChangeState(SceneTitle::eState_ShowLicense);
+			}
+			else if(nResult == OptionMenu::eBtn_Cancel) {
+				ChangeState(SceneTitle::eState_WaitPressButton);
+			}
+		}
+
+		void End(void* pUserPtr) override {
+			auto p = reinterpret_cast<SceneTitle*>(pUserPtr);
+			p->m_pOptionMenu->Close();
+		}
+	};
+
+	//==========================================
+	//==========================================
 	class StateShowLicense : public StateBase {
 		void Begin(void* pUserPtr) override {
 			Engine::GetEngine()->ShowLicense();
@@ -407,7 +436,7 @@ namespace {
 
 		void Update(void* pUserPtr) override {
 			if(!Engine::GetEngine()->IsShowLicense()){
-				ChangeState(SceneTitle::eState_WaitPressButton);
+				ChangeState(SceneTitle::eState_Option);
 			}
 		}
 	};
@@ -439,6 +468,7 @@ SceneTitle::SceneTitle()
 , m_aButtonManager()
 , m_pMessageWindow(nullptr)
 , m_pPermissionExplain(nullptr)
+, m_pOptionMenu(nullptr)
 , m_pStateManager(nullptr)
 {
 	DEBUG_LOG("Scene Title Constructor");
@@ -547,6 +577,11 @@ void SceneTitle::SceneSetup() {
 		m_pPermissionExplain->SetVisible(false);
 	}
 	{
+		m_pOptionMenu = new OptionMenu();
+		m_pOptionMenu->Update(eGameMessage_Setup, nullptr);
+		m_pOptionMenu->SetVisible(false);
+	}
+	{
 		m_pStateManager = new StateManager(eState_Max);
 		m_pStateManager->SetUserPtr(this);
 		m_pStateManager->CreateState<StateFadeIn>();
@@ -563,6 +598,7 @@ void SceneTitle::SceneSetup() {
 		m_pStateManager->CreateState<StateStartNearby>();
 		m_pStateManager->CreateState<StateWaitNearbyConnect>();
 		m_pStateManager->CreateState<StateWaitNearbyTransferPlayerId>();
+		m_pStateManager->CreateState<StateOption>();
 		m_pStateManager->CreateState<StateShowLicense>();
 		m_pStateManager->CreateState<StateFadeOut>();
 		m_pStateManager->ChangeState(eState_FadeIn);
@@ -627,5 +663,6 @@ void SceneTitle::EntityUpdate(GameMessage message, const void* param)
 		}
 		m_pMessageWindow->Update(message, param);
 		m_pPermissionExplain->Update(message, param);
+		m_pOptionMenu->Update(message, param);
 	}
 }

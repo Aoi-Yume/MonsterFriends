@@ -193,6 +193,9 @@ int AppSkillList::getSkillTiming(const char* str) const
 	else if(std::strcmp(str, "自分のターン開始") == 0) {
 		return eSkillTiming_SelfTurn;
 	}
+	else if(std::strcmp(str, "勝利") == 0) {
+		return eSkillTiming_BattleWin;
+	}
 	DEBUG_LOG("スキルタイミング不正\n");
 	abort();
 	return eSKillTiming_None;

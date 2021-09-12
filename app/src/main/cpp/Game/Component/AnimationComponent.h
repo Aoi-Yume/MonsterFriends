@@ -66,14 +66,17 @@ public:
 	bool IsEnd() const { return m_State == eState_End; }
 	float GetTime() const{ return m_Time; }
 	float GetMaxTime() const{ return m_MaxTime; }
-	float GetRatio() const{ ASSERT(m_MaxTime > 0.0f); return m_Time / m_MaxTime; }
+	float GetRatio() const{
+		ASSERT(m_MaxTime > 0.0f);
+		return (m_fSpeed >= 0.0f ? m_Time / m_MaxTime : 1.0f - m_Time / m_MaxTime);
+	}
 
 	void SetSpeed(float fSpeed) { m_fSpeed = fSpeed; }
 
 protected:
 	virtual void update(const float fDeltaTime){
 		if(m_Time >= m_MaxTime){ m_State = eState_End; }
-		m_Time = std::min(m_Time + fDeltaTime * m_fSpeed, m_MaxTime);
+		m_Time = std::min(m_Time + fDeltaTime * std::abs(m_fSpeed), m_MaxTime);
 	}
 	EntityBase* GetEntityBase() const{ return m_pEntityBase; }
 

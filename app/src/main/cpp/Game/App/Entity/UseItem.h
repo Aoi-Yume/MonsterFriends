@@ -61,6 +61,9 @@ public:
 	void SetInformationPlate(InformationPlate* pPlate);
 	void SetVisible(bool bVisible);
 
+	static bool BeginUseItem(int nItemNo);
+	static bool WaitUseItem();
+
 private:
 	void updateItemList();
 

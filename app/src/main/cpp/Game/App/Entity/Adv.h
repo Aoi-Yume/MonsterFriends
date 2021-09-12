@@ -46,6 +46,9 @@ private:
 	void updateAppearEnemyStep();
 	void updateBattleStep();
 
+	int getWinSkillPoint() const;
+	void updateGetKizuna(int nGetPoint);
+
 private:
 
 	int 		m_nStep;

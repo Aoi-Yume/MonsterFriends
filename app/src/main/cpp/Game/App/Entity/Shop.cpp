@@ -10,6 +10,7 @@
 #include "LayoutComponent.h"
 #include "CollisionComponent.h"
 #include "Shop.h"
+#include "UseItem.h"
 #include <Button/ButtonManager.h>
 #include <Button/SimpleButton.h>
 #include <Window/MessageWindow.h>
@@ -20,6 +21,7 @@
 
 Shop::Shop()
 	: GameEntity()
+	, m_bBuy(false)
 	, m_nStep(eStep_End)
 	, m_pMessageWindow(nullptr)
 	, m_pInformationPlate(nullptr)
@@ -106,7 +108,7 @@ void Shop::GameEntitySetup(const void* param) {
 		{
 			auto pBtnManager = new ButtonManager();
 			const std::tuple<const char *, VEC3, uint8_t, const char*> btnList[] = {
-					{"image/button_buy.png", VEC3(-250.0f, -400.0f, 0), TransferCommand::eCommand_Buy, SE_LABEL_SHOP_BUY},
+					{"image/button_buy.png", VEC3(-250.0f, -400.0f, 0), TransferCommand::eCommand_Buy, nullptr},
 					{"image/button_buyCancel.png", VEC3(250.0f, -400.0f, 0), TransferCommand::eCommand_BuyCancel, SE_LABEL_CANCEL},
 			};
 			for (int i = 0; i < sizeof(btnList) / sizeof(btnList[0]); ++i) {
@@ -214,9 +216,9 @@ void Shop::GameEntityUpdate(const void* param)
 			AppParam::Get()->AddItem(nPlayerId, nSelectItemNo, 1);
 			m_pMessageWindow->SetActive(true);
 			m_pMessageWindow->SetDirectMessage("まいどありにゃ");
-
-			// TODO 直度系のアイテムスキルは使い忘れることが多いので買ったら即反映にしたいけど
-			// TODO 通信が関わってくるので少々面倒か…。
+			m_bBuy = true;
+			auto pSoundManager = Engine::GetEngine()->GetSoundManager();
+			pSoundManager->PlaySE(pSoundManager->LoadSE(SE_LABEL_SHOP_BUY), 1.0f, 1.0f, false);
 		}
 		else{
 			m_pMessageWindow->SetActive(true);
@@ -227,6 +229,39 @@ void Shop::GameEntityUpdate(const void* param)
 	}
 	else if(m_nStep == eStep_BuyAfterMessageWait){
 		if(m_pMessageWindow->IsNextMessage()){
+			m_nStep = eStep_BuyUseCheck;
+		}
+	}
+	else if(m_nStep == eStep_BuyUseCheck){
+		const auto& itemInfo = AppItemList::Get()->GetItemInfo(nSelectItemNo);
+		if(!itemInfo.bBuyUse){ m_nStep = eStep_ClearCheck; return; }
+		m_nStep = UseItem::BeginUseItem(nSelectItemNo) ? eStep_BuyUseWait : eStep_GetItemMessage;
+	}
+	else if(m_nStep == eStep_BuyUseWait) {
+		if(UseItem::WaitUseItem()){
+			m_nStep = eStep_UseMessage;
+		}
+	}
+	else if(m_nStep == eStep_UseMessage){
+		const auto& itemInfo = AppItemList::Get()->GetItemInfo(nSelectItemNo);
+		char str[128];
+		std::snprintf(str, sizeof(str), "%sを使用した", itemInfo.name.c_str());
+		m_pMessageWindow->SetActive(true);
+		m_pMessageWindow->SetDirectMessage(str);
+		m_nStep = eStep_MessageWait3;
+	}
+	else if(m_nStep == eStep_GetItemMessage) {
+		const auto& itemInfo = AppItemList::Get()->GetItemInfo(nSelectItemNo);
+		char str[128];
+		std::snprintf(str, sizeof(str), "%sをバッグに入れた", itemInfo.name.c_str());
+		m_pMessageWindow->SetActive(true);
+		m_pMessageWindow->SetDirectMessage(str);
+		m_nStep = eStep_MessageWait3;
+	}
+	else if(m_nStep == eStep_MessageWait3){
+		if(m_pMessageWindow->IsNextMessage()){
+			m_pMessageWindow->SetActive(false);
+			m_pMessageWindow->SetVisible(false);
 			m_nStep = eStep_ClearCheck;
 		}
 	}
@@ -241,7 +276,9 @@ void Shop::GameEntityUpdate(const void* param)
 				m_nStep = eStep_ClearMessage;
 			}
 		}
-		setNewItem(m_pItemListUI->GetCurrentItemIdx());
+		if(m_bBuy) {
+			setNewItem(m_pItemListUI->GetCurrentItemIdx());
+		}
 	}
 	else if(m_nStep == eStep_ClearMessage){
 		m_pMessageWindow->SetDirectMessage(
@@ -269,6 +306,7 @@ void Shop::GameEntityUpdate(const void* param)
 		m_aButtonManager[eBtnManager_Back]->SetVisible(true);
 		m_pMessageWindow->SetVisible(false);
 		m_pMessageWindow->SetActive(false);
+		m_bBuy = false;
 		m_nStep = (AppParam::Get()->IsClear() ? eStep_End : eStep_SelectItemWait);
 	}
 	else if(m_nStep == eStep_BackMessage){

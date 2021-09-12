@@ -22,6 +22,7 @@ public:
 		std::string explain;
 		std::string skillName;
 		int nAppearVal;
+		bool bBuyUse;
 	};
 	
 public:

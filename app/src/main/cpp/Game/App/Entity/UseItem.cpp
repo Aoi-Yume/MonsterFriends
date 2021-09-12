@@ -181,27 +181,11 @@ void UseItem::GameEntityUpdate(const void* param)
 		}
 	}
 	else if(m_nStep == eStep_Use){
-		const int nPlayer = AppParam::Get()->GetNetworkInfo().nCurrentPlayerId;
-		const bool bUsePossible = AppItemList::Get()->IsUsePossible(nSelectItemNo, nPlayer);
-		if(bUsePossible) {
-			AppParam::Get()->SubItem(nPlayer, nSelectItemNo, 1);
-		}
-		// スキル使用設定
-		const char* pSkillName = AppItemList::Get()->GetItemInfo(nSelectItemNo).skillName.c_str();
-		const int nSkillNo = SKILL_LIST()->GetSkillNoFromSkillName(pSkillName);
-		SKILL_LIST()->BeginItemSkill(nPlayer, nSkillNo);
+		const bool bUsePossible = BeginUseItem(nSelectItemNo);
 		m_nStep = (bUsePossible ? eStep_UseWait : eStep_UseImPossible);
 	}
 	else if(m_nStep == eStep_UseWait){
-		if(SKILL_LIST()->IsEndItemSkill()){
-			auto pManager = TransferManager::Get();
-			if(pManager->IsConnectSucess()) {
-				auto pTransfer = pManager->GetTransfer<TransferSkillInfo>(TransferManager::eTransferKind_SkillInfo);
-				pTransfer->Dump();
-			}
-			const int nPlayer = AppParam::Get()->GetNetworkInfo().nCurrentPlayerId;
-			// スキル使用更新
-			SKILL_LIST()->UpdateSkill(nPlayer, AppSkillList::eSkillTiming_Now);
+		if(WaitUseItem()){
 			m_nStep = eStep_Reset;
 		}
 	}
@@ -276,6 +260,36 @@ void UseItem::SetVisible(bool bVisible)
 			pComponent->SetVisible(bVisible);
 		}
 	}
+}
+
+bool UseItem::BeginUseItem(int nItemNo)
+{
+	const int nPlayer = AppParam::Get()->GetNetworkInfo().nCurrentPlayerId;
+	const bool bUsePossible = AppItemList::Get()->IsUsePossible(nItemNo, nPlayer);
+	if(!bUsePossible) { return false; }
+
+	AppParam::Get()->SubItem(nPlayer, nItemNo, 1);
+	// スキル使用設定
+	const char* pSkillName = AppItemList::Get()->GetItemInfo(nItemNo).skillName.c_str();
+	const int nSkillNo = SKILL_LIST()->GetSkillNoFromSkillName(pSkillName);
+	SKILL_LIST()->BeginItemSkill(nPlayer, nSkillNo);
+	return true;
+}
+
+bool UseItem::WaitUseItem()
+{
+	if(SKILL_LIST()->IsEndItemSkill()){
+		auto pManager = TransferManager::Get();
+		if(pManager->IsConnectSucess()) {
+			auto pTransfer = pManager->GetTransfer<TransferSkillInfo>(TransferManager::eTransferKind_SkillInfo);
+			pTransfer->Dump();
+		}
+		const int nPlayer = AppParam::Get()->GetNetworkInfo().nCurrentPlayerId;
+		// スキル使用更新
+		SKILL_LIST()->UpdateSkill(nPlayer, AppSkillList::eSkillTiming_Now);
+		return true;
+	}
+	return false;
 }
 
 void UseItem::updateItemList()
