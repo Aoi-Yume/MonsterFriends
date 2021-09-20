@@ -98,16 +98,18 @@ bool Entity::IsVisible()
 	return false;
 }
 
-bool Entity::CreateTextImageComponent(Entity* pEntity, const char* pText, int nFontSize)
+TextImageComponent* Entity::CreateTextImageComponent(Entity* pEntity, const char* pText, int nFontSize)
 {
 	CreateTransformComponent(pEntity);
-	if( pEntity->m_pComponent[eComponentKind_Layout] ){ return false; }
+	if( pEntity->m_pComponent[eComponentKind_Layout] ){
+		return reinterpret_cast<TextImageComponent*>(pEntity->m_pComponent[eComponentKind_Layout]);
+	}
 	auto pComponent = new TextImageComponent(pEntity);
 	pComponent->SetText(pText);
 	pComponent->SetFontSize(nFontSize);
 
 	pEntity->m_pComponent[eComponentKind_Layout] = pComponent;
-	return true;
+	return pComponent;
 }
 
 LayoutComponent* Entity::CreateLayoutComponent(Entity* pEntity, const char* pResPath)

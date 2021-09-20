@@ -55,7 +55,7 @@ public:
 	enum {
 		eBTN_SINGLE = 0,
 		eBTN_MULTI,
-		eBTN_TUTORIAL,
+		eBTN_OPTION,
 
 		eBTN_MAKE_ROOM = 0,
 		eBTN_JOIN_ROOM,

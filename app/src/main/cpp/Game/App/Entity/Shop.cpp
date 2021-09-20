@@ -229,7 +229,7 @@ void Shop::GameEntityUpdate(const void* param)
 	}
 	else if(m_nStep == eStep_BuyAfterMessageWait){
 		if(m_pMessageWindow->IsNextMessage()){
-			m_nStep = eStep_BuyUseCheck;
+			m_nStep = (m_bBuy ? eStep_BuyUseCheck : eStep_Reset);
 		}
 	}
 	else if(m_nStep == eStep_BuyUseCheck){
@@ -271,13 +271,16 @@ void Shop::GameEntityUpdate(const void* param)
 		m_nStep = eStep_Reset;
 		if(itemInfo.name == "キズナクリスタル"){
 			const int nNum = AppParam::Get()->GetItemNum(nPlayerId, nSelectItemNo);
-			if(nNum >= 3){
+			if(nNum >= AppParam::Get()->GetClearPoint()){
 				AppParam::Get()->SetClear(true);
 				m_nStep = eStep_ClearMessage;
 			}
 		}
 		if(m_bBuy) {
 			setNewItem(m_pItemListUI->GetCurrentItemIdx());
+		}
+		if(m_pInformationPlate){
+			m_pInformationPlate->UpdatePlate();
 		}
 	}
 	else if(m_nStep == eStep_ClearMessage){

@@ -26,6 +26,7 @@ public:
 	struct GameInfo {
 		int 		playNum = 1;
 		PlayMode 	playMode = eSingleDevice;
+		int 		clearPoint = 3;
 	};
 
 	struct UseSkillInfo {
@@ -84,6 +85,8 @@ public:
 	void AddItem(int nPlayerId, int nItemNo, int nNum);
 	void SubItem(int nPlayerId, int nItemNo, int nNum);
 	int GetItemNum(int nPlayerId, int nItemNo) const;
+
+	int GetClearPoint() const { return m_GameInfo.clearPoint; }
 
 	void SetClear(bool bClear);
 	bool IsClear() const;

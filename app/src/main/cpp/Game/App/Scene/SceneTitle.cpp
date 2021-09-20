@@ -61,6 +61,7 @@ namespace {
 				AppParam::Get()->SetPlayNum(2);
 				p->m_aButtonManager[SceneTitle::eBTN_MANAGER_TITLE]->Lock();
 				p->m_aButtonManager[SceneTitle::eBTN_MANAGER_TITLE]->SetVisible(false);
+				TransferManager::Get()->SetSelfCharaId(p->m_aChara[0]->GetCharaId());	// 自分のキャラとしてひとまず設定
 				ChangeState(SceneTitle::eState_BorneStartMonster);
 			}
 			else if (nDecide == SceneTitle::eBTN_MULTI) {
@@ -68,10 +69,10 @@ namespace {
 				AppParam::Get()->SetPlayNum(1);
 				p->m_aButtonManager[SceneTitle::eBTN_MANAGER_TITLE]->Lock();
 				p->m_aButtonManager[SceneTitle::eBTN_MANAGER_TITLE]->SetVisible(false);
-				ChangeState(SceneTitle::eState_ExplainPermission);
 				TransferManager::Get()->SetSelfCharaId(p->m_aChara[0]->GetCharaId());	// 自分のキャラとしてひとまず設定
+				ChangeState(SceneTitle::eState_ExplainPermission);
 			}
-			else if(nDecide == SceneTitle::eBTN_TUTORIAL){
+			else if(nDecide == SceneTitle::eBTN_OPTION){
 				p->m_aButtonManager[SceneTitle::eBTN_MANAGER_TITLE]->Lock();
 				ChangeState(SceneTitle::eState_Option);
 			}

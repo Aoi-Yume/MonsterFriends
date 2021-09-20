@@ -39,7 +39,7 @@ public:
 	void SetVisible(bool bVisible);
 	bool IsVisible();
 public:
-	static bool CreateTextImageComponent(Entity* pEntity, const char* pText, int nFontSize);
+	static TextImageComponent* CreateTextImageComponent(Entity* pEntity, const char* pText, int nFontSize);
 	static LayoutComponent* CreateLayoutComponent(Entity* pEntity, const char* pResName);
 	static bool CreateTransformComponent(Entity* pEntity);
 	static bool CreateCollision2DRectComponent(Entity* pEntity);
