@@ -39,6 +39,8 @@ protected:
 	bool isCreated() const;
 	void getVertex(float fWidth, float fHeight, void* pBuffer);
 
+	void execBlendMode() const;
+
 	GLuint getVertexBufferId() const;
 	GLuint getTextureId() const;
 	std::vector<float>& getVertexBuffer();
@@ -47,6 +49,7 @@ protected:
 	GLint 		m_nViewportInvLocation;
 	GLint 		m_nViewProjLocation;
 	GLint 		m_nColorLocation;
+	GLint 		m_nDiscardFactorLoacation;
 
 private:
 	bool		m_bCreated;

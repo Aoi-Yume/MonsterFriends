@@ -11,6 +11,7 @@
 #include <AppItemList.h>
 #include <AppSkillList.h>
 #include <AppCharaList.h>
+#include <AppShadowList.h>
 #include <SceneManager.h>
 #include <DelayInput.h>
 #include <FadeCtrl.h>
@@ -54,6 +55,8 @@ Java_com_aoiyume_Game_GameMainRender_SurfaceCreate(
 		AppSkillList::Get()->Load();
 		AppCharaList::Initialize();
 		AppCharaList::Get()->Load();
+		AppShadowList::Initialize();
+		AppShadowList::Get()->Load();
 		FadeCtrl::Initialize();
 	}
 	// Engine に解放コールバックを設定する
@@ -63,6 +66,7 @@ Java_com_aoiyume_Game_GameMainRender_SurfaceCreate(
 		AppItemList::Destroy();
 		AppSkillList::Destroy();
 		AppCharaList::Destroy();
+		AppShadowList::Destroy();
 		FadeCtrl::Destroy();
 		delete s_EntityMgr;
 	};

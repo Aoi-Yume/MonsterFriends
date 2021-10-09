@@ -6,16 +6,19 @@
 #include "TransformComponent.h"
 #include "LayoutComponent.h"
 #include "Egg.h"
+#include "Shadow.h"
 
 Egg::Egg()
 : GameEntity()
 , m_nCurrentImageNo(0)
+, m_pShadow(nullptr)
 {
 	DEBUG_LOG("Create Egg");
 }
 
 Egg::~Egg()
 {
+	delete m_pShadow;
 }
 
 void Egg::GameEntitySetup(const void* param)
@@ -34,6 +37,9 @@ void Egg::GameEntitySetup(const void* param)
 		AddChild(pChild);
 	}
 	GetChild(0)->SetVisible(true);
+
+	m_pShadow = new Shadow("たまご影", GetChild(0));
+	m_pShadow->Update(eGameMessage_Setup, nullptr);
 }
 
 void Egg::GameEntityUpdate(const void* param)
@@ -49,6 +55,9 @@ void Egg::GameEntityUpdate(const void* param)
 
 void Egg::EntityUpdate(GameMessage message, const void* param)
 {
+	if(m_pShadow){
+		m_pShadow->Update(message, param);
+	}
 	Super::EntityUpdate(message, param);
 }
 
@@ -74,6 +83,9 @@ void Egg::actBorneState()
 	}
 	for(int i = 0; i < eEGG_BORNE_KIND_MAX; ++i){
 		GetChild(i)->SetVisible(i == nIdx);
+	}
+	if(m_pShadow){
+		m_pShadow->ChangeReferenceEntity(GetChild(nIdx));
 	}
 	if(nStateCount >= nOneCount * (eEGG_BORNE_KIND_MAX + 1)){
 		SetNextState(eSTATE_BORNE_END);

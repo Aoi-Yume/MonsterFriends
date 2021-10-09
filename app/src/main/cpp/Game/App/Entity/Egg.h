@@ -10,6 +10,7 @@
 #include "entity_define.h"
 #include "GameEntity.h"
 
+class Shadow;
 class Egg : public GameEntity
 {
 	typedef GameEntity Super;
@@ -43,6 +44,7 @@ private:
 
 private:
 	int m_nCurrentImageNo;
+	Shadow*		m_pShadow;
 };
 
 #endif

@@ -11,6 +11,8 @@ DrawComponent::DrawComponent(ComponentKind nKind, EntityBase* pEntityBase)
 , m_bUseTex(false)
 , m_bAnimation(false)
 , m_bVisible(true)
+, m_BlendMode(eBlend_Alpha)
+, m_fDiscardFactor(0.1f)
 , m_Color(1, 1, 1, 1)
 , m_nVtxShader(0)
 , m_nFragShader(0)
@@ -62,6 +64,25 @@ void DrawComponent::SetVisible(bool bVisible)
 bool DrawComponent::IsVisible() const
 {
 	return m_bVisible;
+}
+
+void DrawComponent::SetBlendMode(BlendMode mode)
+{
+	m_BlendMode = mode;
+}
+DrawComponent::BlendMode DrawComponent::GetBlendMode() const
+{
+	return m_BlendMode;
+}
+
+void DrawComponent::SetDiscardFactor(float fFactor)
+{
+	m_fDiscardFactor = fFactor;
+}
+
+float DrawComponent::GetDiscardFactor() const
+{
+	return m_fDiscardFactor;
 }
 
 void DrawComponent::SetUVOffset(const VEC2& offset)

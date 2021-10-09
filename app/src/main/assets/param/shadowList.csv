@@ -1,0 +1,4 @@
+﻿#, 影名, 画像ファイル名, オフセットX, オフセットY
+, スライム影, image/chara_01_shadow.png, -2.0, -129.0
+, ドラゴン影, image/chara_03_shadow.png, 0.0, -140.0
+, たまご影, image/egg_shadow.png, 0.0, -265.0

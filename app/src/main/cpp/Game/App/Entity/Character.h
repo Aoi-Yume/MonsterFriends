@@ -11,6 +11,7 @@
 #include "GameEntity.h"
 
 class Dice;
+class Shadow;
 class Character : public GameEntity
 {
 	typedef GameEntity Super;
@@ -25,7 +26,7 @@ public:
 		eState_EndDice,
 	};
 	enum {
-		eDice_Max = 3
+		eDice_Max = 3,
 	};
 
 public:
@@ -70,6 +71,8 @@ private:
 	int 	m_nUseDice;
 	int 	m_nStopDice;
 	float	m_fJumpStartY;
+
+	Shadow* m_pShadow;
 };
 
 #endif

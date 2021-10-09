@@ -22,8 +22,8 @@
 #define SHADER_UNIFORM_VIEW_PROJ 3
 #define SHADER_UNIFORM_VIEWPORT_INV 4
 #define SHADER_UNIFORM_SAMPLER 5
-#define SHADER_UNIFORM_ALPHA 6
-#define SHADER_UNIFORM_COLOR 7
+#define SHADER_UNIFORM_COLOR 6
+#define SHADER_UNIFORM_DISCARD_FACTOR 7
 
 static const char* s_vtxShaderSrc =
 		"#version 300 es\n"
@@ -56,26 +56,26 @@ static const char* s_fragShaderSrc =
 		"#version 300 es\n"
 		"precision mediump float; \n"
   		"layout(location=" STRV(SHADER_UNIFORM_SAMPLER) ") uniform sampler2D uni_sampler; \n"
-		"layout(location=" STRV(SHADER_UNIFORM_ALPHA) ") uniform float uni_Alpha; \n"
+		"layout(location=" STRV(SHADER_UNIFORM_COLOR) ") uniform vec4 uni_simpleColor; \n"
+		"layout(location=" STRV(SHADER_UNIFORM_DISCARD_FACTOR) ") uniform float discardFactor; \n"
 		"in vec2 vary_uv; \n"
 		"out vec4 out_color; \n"
 		"void main() { \n"
 		"out_color = texture(uni_sampler, vec2(vary_uv.x, 1.0f - vary_uv.y)); \n"
-		"out_color.w *= uni_Alpha; \n"
-		"if(out_color.w <= 0.1f) { discard; } \n"
+		"out_color.w *= uni_simpleColor; \n"
+		"if(out_color.w <= discardFactor) { discard; } \n"
 		"}";
 
 static const char* s_fragColorShaderSrc =
 		"#version 300 es\n"
 		"precision mediump float; \n"
 		"layout(location=" STRV(SHADER_UNIFORM_COLOR) ") uniform vec4 uni_simpleColor; \n"
-		"layout(location=" STRV(SHADER_UNIFORM_ALPHA) ") uniform float uni_Alpha; \n"
+		"layout(location=" STRV(SHADER_UNIFORM_DISCARD_FACTOR) ") uniform float discardFactor; \n"
 		"in vec2 vary_uv; \n"
   		"out vec4 out_color; \n"
 		"void main() { \n"
 		"out_color = uni_simpleColor; \n"
-		"out_color.w *= uni_Alpha; \n"
-		"if(out_color.w <= 0.1f) { discard; } \n"
+		"if(out_color.w <= discardFactor) { discard; } \n"
 		"}";
 #else
 static const char* s_vtxShaderSrc =
@@ -107,20 +107,22 @@ static const char* s_fragShaderSrc =
 		"precision mediump float; \n"
   		"uniform sampler2D uni_sampler; \n"
 		"uniform vec4 uni_simpleColor; \n"
+  		"uniform float discardFactor; \n"
 		"varying vec2 vary_uv; \n"
 		"void main() { \n"
 		"gl_FragColor = texture2D(uni_sampler, vec2(vary_uv.x, 1.0 - vary_uv.y)); \n"
 		"gl_FragColor *= uni_simpleColor; \n"
-		"if(gl_FragColor.w <= 0.1) { discard; } \n"
+		"if(gl_FragColor.w <= discardFactor) { discard; } \n"
 		"}";
 
 static const char* s_fragColorShaderSrc =
 		"precision mediump float; \n"
   		"uniform vec4 uni_simpleColor; \n"
+		"uniform float discardFactor; \n"
 		"varying vec2 vary_uv; \n"
 		"void main() { \n"
 		"gl_FragColor = uni_simpleColor; \n"
-		"if(gl_FragColor.w <= 0.1) { discard; } \n"
+		"if(gl_FragColor.w <= discardFactor) { discard; } \n"
 		"}";
 #endif
 
@@ -132,6 +134,7 @@ LayoutComponent::LayoutComponent(EntityBase* pEntityBase)
 , m_nViewportInvLocation(0)
 , m_nViewProjLocation(0)
 , m_nColorLocation(0)
+, m_nDiscardFactorLoacation(0)
 , m_bCreated(false)
 , m_cResPath()
 , m_nVtxBuffer(0)
@@ -253,8 +256,10 @@ void LayoutComponent::setupUniformShaderParam()
 
 #if OPENGL_VERTION >= 3
 	glUniform4fv(SHADER_UNIFORM_COLOR, 1, (const GLfloat*)&GetColor());
+	glUniform1f(SHADER_UNIFORM_DISCARD_FACTOR, GetDiscardFactor());
 #else
 	glUniform4fv(m_nColorLocation, 1, (const GLfloat*)&GetColor());
+	glUniform1f(m_nDiscardFactorLoacation, GetDiscardFactor());
 #endif
 }
 
@@ -334,17 +339,19 @@ void LayoutComponent::setup()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 #if OPENGL_VERTION >= 3
-	m_nViewportInvLocation = SHADER_UNIFORM_VIEWPORT_INV;
 	m_nTransformLocation = SHADER_UNIFORM_TRANSFORM;
 	m_nViewProjLocation = SHADER_UNIFORM_VIEW_PROJ;
+	m_nViewportInvLocation = SHADER_UNIFORM_VIEWPORT_INV;
 	m_nSamplerLocation = SHADER_UNIFORM_SAMPLER;
-	m_nAlphaLocation = SHADER_UNIFORM_ALPHA;
+	m_nColorLocation = SHADER_UNIFORM_COLOR;
+	m_nDiscardFactorLoacation = SHADER_UNIFORM_DISCARD_FACTOR;
 #else
 	m_nTransformLocation = glGetUniformLocation(getShaderProgram(), "uni_transform");
 	m_nViewProjLocation = glGetUniformLocation(getShaderProgram(), "uni_viewProj");
 	m_nViewportInvLocation = glGetUniformLocation(getShaderProgram(), "uni_viewportInv");
 	m_nSamplerLocation = glGetUniformLocation(getShaderProgram(), "uni_sampler");
 	m_nColorLocation = glGetUniformLocation(getShaderProgram(), "uni_simpleColor");
+	m_nDiscardFactorLoacation = glGetUniformLocation(getShaderProgram(), "discardFactor");
 
 #endif
 
@@ -378,14 +385,14 @@ void LayoutComponent::draw()
 	glUseProgram(getShaderProgram());
 
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//glBlendFunc(GL_ONE, GL_ZERO);
+	execBlendMode();
 	setupUniformShaderParam();
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_nTexId);
 	// GL_TEXTURE0 を使うように指定
 	glUniform1i(m_nSamplerLocation, 0);
+
 
 	glEnableVertexAttribArray(m_nVtxLocation);
 	glEnableVertexAttribArray(m_nUvLocation);
@@ -440,6 +447,17 @@ void LayoutComponent::getVertex(float fWidth, float fHeight, void* pBuffer)
 			fWidth * 0.5f, -fHeight * 0.5f, 0.0f, 1.0f, 0.0f,
 	};
 	memcpy(pBuffer, vertices, sizeof(vertices));
+}
+
+void LayoutComponent::execBlendMode() const
+{
+	const BlendMode mode = GetBlendMode();
+	if(mode == eBlend_Alpha){
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	}
+	else if(mode == eBlend_Multiply) {
+		glBlendFunc(GL_ZERO, GL_SRC_COLOR);
+	}
 }
 
 //------------------------------------------

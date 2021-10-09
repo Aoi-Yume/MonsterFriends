@@ -17,6 +17,7 @@ public:
 	struct CharaInfo {
 		std::string name;
 		std::string fileName;
+		std::string shadowName;
 		int nDice;
 		float fDiceOffsetY;
 		int nGetPoint;

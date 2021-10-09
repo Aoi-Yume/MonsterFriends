@@ -15,6 +15,14 @@
 class DrawComponent : public ComponentBase
 {
     typedef ComponentBase Super;
+
+public:
+	enum BlendMode {
+		eBlend_None = 0,
+		eBlend_Alpha,
+		eBlend_Multiply,
+	};
+
 public:
 	DrawComponent(ComponentKind nKind, EntityBase* pEntityBase);
 	virtual ~DrawComponent();
@@ -31,6 +39,12 @@ public:
 
 	void SetVisible(bool bVisible);
 	bool IsVisible() const;
+
+	void SetBlendMode(BlendMode mode);
+	BlendMode GetBlendMode() const;
+
+	void SetDiscardFactor(float fFactor);
+	float GetDiscardFactor() const;
 
 	void SetUVOffset(const VEC2& offset);
 	const VEC2& GetUVOffset() const;
@@ -56,7 +70,9 @@ private:
 	bool 		m_bUseTex;
 	bool 		m_bAnimation;
 	bool 		m_bVisible;
+	BlendMode	m_BlendMode;
 
+	float 		m_fDiscardFactor;
 	VEC2		m_uvOffset;
 	VEC4		m_Color;
 

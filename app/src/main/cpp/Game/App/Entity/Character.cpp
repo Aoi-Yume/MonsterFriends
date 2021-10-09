@@ -9,6 +9,7 @@
 #include "Character.h"
 #include <AppCharaList.h>
 #include <Dice.h>
+#include "Shadow.h"
 
 Character::Character(int charaId)
 : GameEntity()
@@ -16,12 +17,14 @@ Character::Character(int charaId)
 , m_nCharaId(charaId)
 , m_nUseDice(1)
 , m_nStopDice(0)
+, m_pShadow(nullptr)
 {
 	DEBUG_LOG_A("Create Character[%d]", m_nCharaId);
 }
 
 Character::~Character()
 {
+	delete m_pShadow;
 }
 
 void Character::GameEntitySetup(const void* param)
@@ -29,10 +32,15 @@ void Character::GameEntitySetup(const void* param)
 	Super::GameEntitySetup(param);
 
 	Entity::CreateLayoutComponent(this, AppCharaList::Get()->GetCharaInfo(m_nCharaId).fileName.c_str());
-	reinterpret_cast<LayoutComponent*>(GetComponent(eComponentKind_Layout))->SetOrtho(true);
+	GetComponent<LayoutComponent*>(eComponentKind_Layout)->SetOrtho(true);
 
 	for(int i = 0; i < eDice_Max; ++i){
 		AddChild(new Dice(), false);
+	}
+
+	{
+		m_pShadow = new Shadow(AppCharaList::Get()->GetCharaInfo(m_nCharaId).shadowName.c_str(), this);
+		m_pShadow->Update(eGameMessage_Setup, nullptr);
 	}
 }
 
@@ -54,6 +62,9 @@ void Character::GameEntityUpdate(const void* param)
 
 void Character::EntityUpdate(GameMessage message, const void* param)
 {
+	if(m_pShadow) {
+		m_pShadow->Update(message, param);
+	}
 	Super::EntityUpdate(message, param);
 }
 
@@ -121,7 +132,11 @@ void Character::actAttention()
 
 	jump(nJumpCount, nJumpFrameMax, fJumpPow);
 
-	if(nStateCount >= nJumpFrameMax * 2) {
+	if(nStateCount == 0) {
+		m_pShadow->SetAerial(true);
+	}
+	else if(nStateCount >= nJumpFrameMax * 2) {
+		m_pShadow->SetAerial(false);
 		SetState(eState_Wait);
 	}
 }
@@ -145,10 +160,14 @@ void Character::actStopDiceState()
 
 	jump(nStateCnt, nJumpFrameMax, 25.0f);
 
-	if(nStateCnt == nJumpFrameMaxHalf){
+	if(nStateCnt == 0){
+		m_pShadow->SetAerial(true);
+	}
+	else if(nStateCnt == nJumpFrameMaxHalf){
 		GetChild<Dice*>(m_nStopDice)->StopDice();
 	}
 	else if(nStateCnt >= nJumpFrameMax){
+		m_pShadow->SetAerial(false);
 		SetNextState(eState_CheckEndDice);
 	}
 }

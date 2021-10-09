@@ -28,7 +28,7 @@ void AppCharaList::Load()
 	std::vector<std::string>	aSplitText;
 	Util::SplitCSVText(aSplitText, str);
 
-	const int nParamNum = 5;
+	const int nParamNum = 6;
 	m_aCharaInfo.resize(aSplitText.size() / nParamNum);
 	ASSERT(aSplitText.size() % nParamNum == 0);
 	for(int i = 0; i < aSplitText.size(); ++i){
@@ -37,16 +37,18 @@ void AppCharaList::Load()
 		auto& info = m_aCharaInfo[nIdx];
 		if(nParamNo == 0){ info.name = aSplitText[i]; }
 		else if(nParamNo == 1){ info.fileName = aSplitText[i]; }
-		else if(nParamNo == 2){ info.nDice = std::stoi(aSplitText[i]); }
-		else if(nParamNo == 3){ info.fDiceOffsetY = std::stof(aSplitText[i]); }
-		else if(nParamNo == 4){ info.nGetPoint = std::stoi(aSplitText[i]); }
+		else if(nParamNo == 2){ info.shadowName = aSplitText[i]; }
+		else if(nParamNo == 3){ info.nDice = std::stoi(aSplitText[i]); }
+		else if(nParamNo == 4){ info.fDiceOffsetY = std::stof(aSplitText[i]); }
+		else if(nParamNo == 5){ info.nGetPoint = std::stoi(aSplitText[i]); }
 	}
 	free(pBuffer);
 
 	for(int i = 0; i < m_aCharaInfo.size(); ++i) {
 		auto& it = m_aCharaInfo[i];
-		DEBUG_LOG_A("EnemyNo[%d]：[%s][%s][%d][%.1f][%d]\n",
-				i + 1, it.name.c_str(), it.fileName.c_str(), it.nDice, it.fDiceOffsetY, it.nGetPoint);
+		DEBUG_LOG_A("EnemyNo[%d]：[%s][%s][%s][%d][%.1f][%d]\n",
+				i + 1, it.name.c_str(), it.fileName.c_str(), it.shadowName.c_str(),
+				it.nDice, it.fDiceOffsetY, it.nGetPoint);
 	}
 }
 

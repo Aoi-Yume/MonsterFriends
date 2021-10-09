@@ -96,11 +96,13 @@ add_library(	app_param-lib SHARED
 				src/main/cpp/Game/App/Param/AppParam.cpp
 				src/main/cpp/Game/App/Param/AppItemList.cpp
 				src/main/cpp/Game/App/Param/AppSkillList.cpp
-				src/main/cpp/Game/App/Param/AppCharaList.cpp)
+				src/main/cpp/Game/App/Param/AppCharaList.cpp
+				src/main/cpp/Game/App/Param/AppShadowList.cpp)
 
 add_library(	app_entity-lib SHARED
 				src/main/cpp/Game/App/Entity/BackGround.cpp
 				src/main/cpp/Game/App/Entity/Character.cpp
+				src/main/cpp/Game/App/Entity/Shadow.cpp
 				src/main/cpp/Game/App/Entity/Egg.cpp
 				src/main/cpp/Game/App/Entity/Dice.cpp
 				src/main/cpp/Game/App/Entity/Shop.cpp
