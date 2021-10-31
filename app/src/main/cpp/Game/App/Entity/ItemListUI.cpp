@@ -87,8 +87,12 @@ void ItemListUI::GameEntitySetup(const void* param) {
 		};
 		for (int i = 0; i < sizeof(btnList) / sizeof(btnList[0]); ++i) {
 			auto pBtn = pBtnManager->CreateButton(std::get<0>(btnList[i]));
-			pBtn->SetPosition(std::get<1>(btnList[i]));
+			auto pos = std::get<1>(btnList[i]);
+			pBtn->SetPosition(pos);
 			pBtn->SetDecideCommand(std::get<2>(btnList[i]));
+			auto pAnim = pBtn->GetComponent<AnimationComponent*>(eComponentKind_Animation);
+			pAnim->AddAnimation("loopS", new LinearAnimation({1, 1.2f}, {}, {pos, pos}, {1, 1}, 3.0f));
+			pAnim->AddAnimation("loopE", new LinearAnimation({1.2f, 1}, {}, {pos, pos}, {1, 1},3.0f));
 		}
 		pBtnManager->SetVisible(false);
 		pBtnManager->Lock();
@@ -128,6 +132,22 @@ void ItemListUI::GameEntityUpdate(const void* param)
 			}
 			else{
 				Lock();
+			}
+		}
+	}
+	{
+		auto& pBtnMgr = m_aButtonManager[eButtonManager_LeftRight];
+		for(int i = 0; i < pBtnMgr->GetButtonSize(); ++i){
+			auto pBtn = pBtnMgr->GetButton(i);
+			auto pAnim = pBtn->GetComponent<AnimationComponent*>(eComponentKind_Animation);
+			if(pAnim->IsEnd("loopS")){
+				pAnim->Play("loopE");
+			}
+			else if(pAnim->IsEnd("loopE")){
+				pAnim->Play("loopS");
+			}
+			else if(pAnim->IsEnd("Open")){
+				pAnim->Play("loopS");
 			}
 		}
 	}

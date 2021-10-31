@@ -23,7 +23,9 @@ public:
 	void Play(const char* pName, float fSpeed = 1.0f);
 	void Stop(const char* pName);
 	bool IsEnd(const char* pName) const;
-	
+
+	int GetState(const char* pName) const;
+
 	virtual GameMessageResult Update(GameMessage message, const void* param) override;
 
 private:
@@ -31,7 +33,8 @@ private:
 	void destroy();
 	
 private:
-	std::map<const char*, AnimationBase*>		m_aAnimation;
+	AnimationBase*	m_pLastAnim;
+	std::map<std::string_view, AnimationBase*>		m_aAnimation;
 };
 
 class AnimationBase
@@ -70,6 +73,7 @@ public:
 		ASSERT(m_MaxTime > 0.0f);
 		return (m_fSpeed >= 0.0f ? m_Time / m_MaxTime : 1.0f - m_Time / m_MaxTime);
 	}
+	State GetState() const { return m_State; }
 
 	void SetSpeed(float fSpeed) { m_fSpeed = fSpeed; }
 
@@ -120,7 +124,7 @@ public:
 	virtual ~LinearAnimation();
 
 protected:
-	void update(const float fDeltaTaime) override;
+	void update(const float fDeltaTime) override;
 
 private:
 	std::pair<float, float> m_LinearScale;

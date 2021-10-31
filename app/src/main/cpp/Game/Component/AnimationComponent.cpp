@@ -14,6 +14,7 @@
 //==========================================
 AnimationComponent::AnimationComponent(EntityBase* pEntityBase)
 : Super(eComponentKind_Animation, pEntityBase)
+, m_pLastAnim(nullptr)
 , m_aAnimation()
 {
 //	DEBUG_LOG("Call LayoutComponent Constructor");
@@ -40,8 +41,10 @@ void AnimationComponent::AddAnimation(const char* pName, AnimationBase *pAnimati
 void AnimationComponent::Play(const char* pName, float fSpeed)
 {
 	if(m_aAnimation.find(pName) == m_aAnimation.end()){ return; }
+	if(m_pLastAnim) { m_pLastAnim->Stop(); }
 	m_aAnimation[pName]->SetSpeed(fSpeed);
 	m_aAnimation[pName]->Play();
+	m_pLastAnim = m_aAnimation[pName];
 }
 //------------------------------------------
 //------------------------------------------
@@ -49,6 +52,7 @@ void AnimationComponent::Stop(const char* pName)
 {
 	if(m_aAnimation.find(pName) == m_aAnimation.end()){ return; }
 	m_aAnimation[pName]->Stop();
+	m_pLastAnim = nullptr;
 }
 
 //------------------------------------------
@@ -57,6 +61,14 @@ bool AnimationComponent::IsEnd(const char* pName) const
 {
 	if(m_aAnimation.find(pName) == m_aAnimation.end()){ return false; }
 	return m_aAnimation.at(pName)->IsEnd();
+}
+
+//------------------------------------------
+//------------------------------------------
+int AnimationComponent::GetState(const char* pName) const
+{
+	if(m_aAnimation.find(pName) == m_aAnimation.end()){ return -1; }
+	return m_aAnimation.at(pName)->GetState();
 }
 
 //------------------------------------------

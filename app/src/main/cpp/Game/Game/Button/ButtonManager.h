@@ -42,6 +42,8 @@ public:
 
 	void Update(GameMessage message, const void* param);
 
+	size_t GetButtonSize() const{ return m_aButtons.size(); }
+
 private:
 	bool		m_bLock;
 	int 		m_nSelectNo;

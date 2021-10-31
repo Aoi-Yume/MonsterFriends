@@ -441,10 +441,10 @@ void LayoutComponent::getVertex(float fWidth, float fHeight, void* pBuffer)
 	const ScreenInfo& info = Engine::GetEngine()->GetScreenInfo();
 	float vertices[] = {
 			// x, y, z, u, v
-			-fWidth * 0.5f, fHeight * 0.5f, 0.0f, 0.0f, 1.0f,
-			-fWidth * 0.5f, -fHeight * 0.5f, 0.0f, 0.0f, 0.0f,
-			fWidth * 0.5f, fHeight * 0.5f, 0.0f, 1.0f, 1.0f,
-			fWidth * 0.5f, -fHeight * 0.5f, 0.0f, 1.0f, 0.0f,
+			-fWidth * 0.5f - 0.5f, fHeight * 0.5f - 0.5f, 0.0f, 0.0f, 1.0f,
+			-fWidth * 0.5f - 0.5f, -fHeight * 0.5f - 0.5f, 0.0f, 0.0f, 0.0f,
+			fWidth * 0.5f - 0.5f, fHeight * 0.5f - 0.5f, 0.0f, 1.0f, 1.0f,
+			fWidth * 0.5f - 0.5f, -fHeight * 0.5f - 0.5f, 0.0f, 1.0f, 0.0f,
 	};
 	memcpy(pBuffer, vertices, sizeof(vertices));
 }
