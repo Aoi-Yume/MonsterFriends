@@ -43,9 +43,9 @@ void Shadow::GameEntityUpdate(const void* param)
 		pos.SetY(m_fGroundY);
 	}
 	else{
-		m_fGroundY = pos.GetY();
+		m_fGroundY = pos.Y();
 	}
-	VEC3 offset = VEC3(m_ShadowInfo.offsetX * scale.GetX(), m_ShadowInfo.offsetY, 0);
+	VEC3 offset = VEC3(m_ShadowInfo.offsetX * scale.X(), m_ShadowInfo.offsetY, 0);
 	pos += offset;
 	SetPosition(pos);
 	SetVisible(m_pRefEntity->IsVisible());

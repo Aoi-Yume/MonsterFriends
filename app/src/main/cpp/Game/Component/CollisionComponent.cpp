@@ -101,23 +101,20 @@ bool CollisionComponent::IsIntersect(const CollisionComponent* pComponent) const
 //------------------------------------------
 bool CollisionComponent::IsIntersect2DRect2DRect(const void* p1, const void* p2, const MAT4* p3, const MAT4* p4)
 {
-	CameraComponent *pCamera = reinterpret_cast<CameraComponent*>(Engine::GetEngine()->GetCameraComponent());
-	auto pCamMat = pCamera->GetViewOrtho();
-
 	auto param1 = reinterpret_cast<const CollisionParam_2DRect*>(p1);
 	auto param2 = reinterpret_cast<const CollisionParam_2DRect*>(p2);
 	VEC3 pos1 = VEC3(*(p3->Get() + 12), *(p3->Get() + 13), *(p3->Get() + 14));
 	VEC3 pos2 = VEC3(*(p4->Get() + 12), *(p4->Get() + 13), *(p4->Get() + 14));
 
-	const float l1 = (pCamMat * VEC3(param1->m_Rect.GetX() + pos1.GetX(), 0, 0)).GetX();
-	const float t1 = (pCamMat * VEC3(0, param1->m_Rect.GetY() + pos1.GetY(), 0)).GetY();
-	const float r1 = (pCamMat * VEC3(param1->m_Rect.GetZ() + pos1.GetX(), 0, 0)).GetX();
-	const float b1 = (pCamMat * VEC3(0, param1->m_Rect.GetW() + pos1.GetY(), 0)).GetY();
+	const float l1 = param1->m_Rect.X() + pos1.X();
+	const float t1 = param1->m_Rect.Y() + pos1.Y();
+	const float r1 = param1->m_Rect.Z() + pos1.X();
+	const float b1 = param1->m_Rect.W() + pos1.Y();
 	
-	const float l2 = (pCamMat * VEC3(param2->m_Rect.GetX() + pos2.GetX(), 0, 0)).GetX();
-	const float t2 = (pCamMat * VEC3(0, param2->m_Rect.GetY() + pos2.GetY(), 0)).GetY();
-	const float r2 = (pCamMat * VEC3(param2->m_Rect.GetZ() + pos2.GetX(), 0, 0)).GetX();
-	const float b2 = (pCamMat * VEC3(0, param2->m_Rect.GetW() + pos2.GetY(), 0)).GetY();
+	const float l2 = param2->m_Rect.X() + pos2.X();
+	const float t2 = param2->m_Rect.Y() + pos2.Y();
+	const float r2 = param2->m_Rect.Z() + pos2.X();
+	const float b2 = param2->m_Rect.W() + pos2.Y();
 
 
 #if 0
@@ -147,14 +144,6 @@ Collision2DRectComponent::~Collision2DRectComponent()
 //------------------------------------------
 void Collision2DRectComponent::SetSize(float fSizeW, float fSizeH)
 {
-	/*
-	VEC3 rectSize(fSizeW, fSizeH, 0.0f);
-	auto pCamera = (CameraComponent*)Engine::GetEngine()->GetCameraComponent();
-	MAT4 viewOrtho = pCamera->GetViewOrtho();
-	VEC4 orthoSize = viewOrtho * rectSize;
-	orthoSize /= orthoSize.GetW();
-	DEBUG_LOG_A("orthoSize:[%.1f, %.1f]", orthoSize.GetX(), orthoSize.GetY());
-	 */
 	m_rectParam = CollisionParam_2DRect(fSizeW, fSizeH);
 }
 

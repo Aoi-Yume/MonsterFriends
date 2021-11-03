@@ -124,9 +124,9 @@ const VEC3 CameraComponent::ScreentoProjection(float fSx, float fSY) const
 const VEC3 CameraComponent::ProjectiontoWorld(const VEC3 &projPos, const float fZRatio) const
 {
 	MAT4 vpInv = GetViewProjectionInv();
-	VEC4 wPos = vpInv * VEC3(projPos.GetX(), projPos.GetY(), fZRatio);
-	wPos *= wPos.GetW();
-	wPos.SetX(-wPos.GetX());
-	wPos.SetY(-wPos.GetY());
-	return VEC3(wPos.GetX(), wPos.GetY(), wPos.GetZ());
+	VEC4 wPos = vpInv * VEC3(projPos.X(), projPos.Y(), fZRatio);
+	wPos *= wPos.W();
+	wPos.SetX(-wPos.X());
+	wPos.SetY(-wPos.Y());
+	return VEC3(wPos.X(), wPos.Y(), wPos.Z());
 }

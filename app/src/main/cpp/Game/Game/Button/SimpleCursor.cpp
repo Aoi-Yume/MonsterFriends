@@ -16,16 +16,6 @@ SimpleCursor::SimpleCursor(const char* pResName, ButtonManager* pManager)
 , m_pLayoutComponent(nullptr)
 , m_pButtonManager(pManager)
 {
-#if 0
-	{
-		Entity *pEntity = new Entity();
-		Entity::CreateLayoutComponent(pEntity, pResName);
-		AddChild(pEntity);
-
-		m_pLayoutComponent = (LayoutComponent *) pEntity->GetComponent(eComponentKind_Layout);
-		m_pLayoutComponent->SetOrtho(true);
-	}
-#endif
 	Entity::CreateTransformComponent(this);
 	Entity::CreateCollision2DRectComponent(this);
 	auto pColl = (Collision2DRectComponent *)GetComponent(eComponentKind_Collision);
@@ -50,12 +40,12 @@ void SimpleCursor::EntityUpdate(GameMessage message, const void *param) {
 		const float fTouchY = info.fTouchY;
 		const float fScreenX = Engine::GetEngine()->GetScreenInfo().m_nScreenX;
 		const float fScreenY = Engine::GetEngine()->GetScreenInfo().m_nScreenY;
-		const float fFixDisplaySizeX = 1920.0f / (float)fScreenX;
-		const float fFixDisplaySizeY = 1080.0f / (float)fScreenY;
+		const float fFixDisplaySizeX = 1920.0f / (float) fScreenX;
+		const float fFixDisplaySizeY = 1080.0f / (float) fScreenY;
 		auto pCamera = (CameraComponent *) Engine::GetEngine()->GetCameraComponent();
 		VEC3 projPos = pCamera->ScreentoProjection(fTouchX, fTouchY);
-		VEC3 pos = VEC3(projPos.GetX() * fFixDisplaySizeX * fScreenX * 0.5f, projPos.GetY() * fFixDisplaySizeX *  fScreenY * 0.5f, 0.0f);
-		SetPosition(pos.GetX(), pos.GetY(), 0.0f);
+		VEC3 pos = VEC3(projPos.X() * fFixDisplaySizeX * fScreenX * 0.5f, projPos.Y() * fFixDisplaySizeX * fScreenY * 0.5f, 0.0f);
+		SetPosition(pos.X(), pos.Y(), 0.0f);
 	}
 
 	EntityBase::EntityUpdate(message, param);

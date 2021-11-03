@@ -18,6 +18,7 @@ ButtonManager::ButtonManager()
 : m_bLock(false)
 , m_nSelectNo(-1)
 , m_nDecideNo(-1)
+, m_fDecideDelay(0.0f)
 , m_nControlPlayerId(-1)
 , m_pCursorEntity(nullptr)
 {
@@ -110,6 +111,7 @@ void ButtonManager::Reset()
 {
 	m_nSelectNo = -1;
 	m_nDecideNo = -1;
+	m_fDecideDelay = 0.0f;
 	Update(eGameMessage_Update, nullptr);
 }
 
@@ -131,7 +133,7 @@ int ButtonManager::GetControlPlayerId() const
 //-----------------------------------------
 int ButtonManager::GetDecide() const
 {
-	return m_nDecideNo;
+	return (m_fDecideDelay > 0.0f ? -1 : m_nDecideNo);
 }
 
 //-----------------------------------------
@@ -147,6 +149,7 @@ void ButtonManager::Update(GameMessage message, const void* param)
 	}
 	if(message != eGameMessage_Update){ return; }
 
+	m_fDecideDelay = std::max(m_fDecideDelay - Engine::GetEngine()->GetDeltaTime(), 0.0f);
 	if(m_bLock){ return; }
 	if(!m_pCursorEntity){ return; }
 	if(m_nDecideNo != -1){ return; }
@@ -154,11 +157,13 @@ void ButtonManager::Update(GameMessage message, const void* param)
 	auto pCursorCollision = (CollisionComponent*)m_pCursorEntity->GetComponent(eComponentKind_Collision);
 	if(!pCursorCollision){ return; }
 
+	const float fDecideDelay = 0.15f;
 	for(int i = 0; i < size; ++i){
 		ButtonBase* pButton = m_aButtons.at(i);
 		if(!pButton->IsEnable()){ continue; }
 
 		auto pTransferManager = TransferManager::Get();
+		// 通信時操作側処理
 		{
 			auto pBtnCollision = (CollisionComponent*)pButton->GetComponent(eComponentKind_Collision);
 			TouchInputInfo info = {};
@@ -168,17 +173,20 @@ void ButtonManager::Update(GameMessage message, const void* param)
 					if(!pTransferManager->IsConnectSucess()) {
 						m_nDecideNo = i;
 						pButton->Select();
+						m_fDecideDelay = fDecideDelay;
 						return;
 					}
 					else if(pTransferManager->GetSelfConnect().nPlayerId == m_nControlPlayerId){
 						m_nDecideNo = i;
 						pButton->Select();
+						m_fDecideDelay = fDecideDelay;
 						pTransferManager->GetTransfer<TransferCommand>(TransferManager::eTransferKind_Command)->SetSendCommand((TransferCommand::CommandKind)pButton->GetDecideCommand());
 						return;
 					}
 				}
 			}
 		}
+		// 通信時コマンド受付
 		{
 			if(!pTransferManager->IsConnectSucess()) { continue; }
 			auto pCommand = pTransferManager->GetTransfer<TransferCommand>(TransferManager::eTransferKind_Command);;
@@ -189,6 +197,7 @@ void ButtonManager::Update(GameMessage message, const void* param)
 				m_nDecideNo = i;
 				pButton->Select();
 				pCommand->PopFrontCommand();
+				m_fDecideDelay = fDecideDelay;
 				return;
 			}
 		}

@@ -15,7 +15,18 @@ SimpleButton::SimpleButton(const char* pResName)
 {
 	{
 		Entity::CreateLayoutComponent(this, pResName);
-		Entity::CreateAnimationComponent(this)->AddAnimation("Open", new SimpleOpenAnimation());
+		auto pAnimComponent = Entity::CreateAnimationComponent(this);
+		pAnimComponent->AddAnimation("Open", new SimpleOpenAnimation());
+		{
+			auto pAddAnim = new LinearAnimation({1.0f, 0.9f}, {}, {}, {VEC4::One(), VEC4::One()}, 0.05f);
+			pAddAnim->SetCallBack([=]() { pAnimComponent->Play("Off"); });
+			pAnimComponent->AddAnimation("On", pAddAnim);
+		}
+		{
+			auto pAddAnim = new LinearAnimation({0.9f, 1.0f}, {}, {}, {VEC4::One(), VEC4::One()}, 0.05f);
+			pAnimComponent->AddAnimation("Off", pAddAnim);
+		}
+
 
 		m_pLayoutComponent = (LayoutComponent *) GetComponent(eComponentKind_Layout);
 		m_pLayoutComponent->SetOrtho(true);
@@ -33,6 +44,7 @@ void SimpleButton::SetSize(float fSizeW, float fSizeH)
 
 void SimpleButton::Select()
 {
+	GetComponent<AnimationComponent*>(eComponentKind_Animation)->Play("On");
 	Super::Select();
 }
 

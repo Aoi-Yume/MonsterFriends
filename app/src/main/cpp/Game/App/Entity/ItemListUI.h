@@ -49,6 +49,7 @@ public:
 private:
 	void updateItemButton();
 	void updateItemIcon();
+	void updateInvisibleItemIcon(bool bMoveRight);
 
 private:
 	int m_nCurrentItemIdx;

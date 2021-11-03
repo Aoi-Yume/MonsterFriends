@@ -373,7 +373,6 @@ void SceneGameMain::SceneSetup() {
 			for (int i = 0; i < sizeof(btnList) / sizeof(btnList[0]); ++i) {
 				auto pBtn = pBtnManager->CreateButton(std::get<0>(btnList[i]));
 				pBtn->SetPosition(std::get<1>(btnList[i]));
-				pBtn->SetScale(VEC3(0.8f, 0.8f, 0.8f));
 				pBtn->SetDecideCommand(std::get<2>(btnList[i]));
 				pBtn->SetSelectSELabel(SE_LABEL_DECIDE);
 			}

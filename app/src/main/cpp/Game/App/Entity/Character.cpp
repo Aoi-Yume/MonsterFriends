@@ -91,8 +91,8 @@ void Character::BeginDice()
 		auto pDice = GetChild<Dice *>(i);
 		pDice->StartDice();
 		VEC3 pos = GetPosition();
-		pos.SetX(pos.GetX() + fStartX + fAddX * (i + 1));
-		pos.SetY(pos.GetY() + fOffset);
+		pos.SetX(pos.X() + fStartX + fAddX * (i + 1));
+		pos.SetY(pos.Y() + fOffset);
 		pDice->SetPosition(pos);
 	}
 }
@@ -195,7 +195,7 @@ void Character::jump(int nFrame, int nFrameMax, float fJumpPow)
 	const float fJumpRatio = CLAMP(cosf(DEGTORAD(180.0f * fRatio)), 0.0f, 1.0f);
 
 	if(nFrame == 0) {
-		m_fJumpStartY = GetPosition().GetY();
+		m_fJumpStartY = GetPosition().Y();
 	}
 
 	VEC3 pos = GetPosition();

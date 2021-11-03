@@ -22,9 +22,13 @@ public:
 	void AddAnimation(const char* pName, AnimationBase* pAnimation);
 	void Play(const char* pName, float fSpeed = 1.0f);
 	void Stop(const char* pName);
+	bool IsPlay(const char* pName) const;
 	bool IsEnd(const char* pName) const;
 
 	int GetState(const char* pName) const;
+
+	template<class T = AnimationBase>
+	T* GetAnimation(const char* pName) { return reinterpret_cast<T*>(m_aAnimation.at(pName)); }
 
 	virtual GameMessageResult Update(GameMessage message, const void* param) override;
 
@@ -34,7 +38,7 @@ private:
 	
 private:
 	AnimationBase*	m_pLastAnim;
-	std::map<std::string_view, AnimationBase*>		m_aAnimation;
+	std::unordered_map<std::string_view, AnimationBase*>		m_aAnimation;
 };
 
 class AnimationBase
@@ -76,16 +80,20 @@ public:
 	State GetState() const { return m_State; }
 
 	void SetSpeed(float fSpeed) { m_fSpeed = fSpeed; }
+	void SetCallBack(const std::function<void()>& func) { m_CallBack = func; }
 
 protected:
 	virtual void update(const float fDeltaTime){
-		if(m_Time >= m_MaxTime){ m_State = eState_End; }
+		if(m_Time >= m_MaxTime){
+			if(m_CallBack) { m_CallBack(); }
+			m_State = eState_End;
+		}
 		m_Time = std::min(m_Time + fDeltaTime * std::abs(m_fSpeed), m_MaxTime);
 	}
 	EntityBase* GetEntityBase() const{ return m_pEntityBase; }
 
 private:
-	void SetEntityBase(EntityBase* pEntityBase){ m_pEntityBase = pEntityBase; };
+	void setEntityBase(EntityBase* pEntityBase){ m_pEntityBase = pEntityBase; };
 
 private:
 	State		m_State;
@@ -93,6 +101,7 @@ private:
 	float		m_MaxTime;
 	float_t 	m_fSpeed;
 	EntityBase*	m_pEntityBase;
+	std::function<void()> m_CallBack;
 };
 
 class SimpleOpenAnimation : public AnimationBase
@@ -106,7 +115,6 @@ protected:
 	void update(const float fDeltaTime) override;
 
 private:
-	VEC3 m_BaseScale;
 	float m_fDefaultScale;
 	float m_fOverScale;
 };
@@ -119,7 +127,7 @@ public:
 			std::pair<float, float>&& scale,
 			std::pair<float, float>&& rotZ,
 			std::pair<VEC3, VEC3>&& pos,
-			std::pair<float, float>&& alpha,
+			std::pair<VEC4, VEC4>&& color,
 			float fMaxTime = 0.2f);
 	virtual ~LinearAnimation();
 
@@ -130,6 +138,6 @@ private:
 	std::pair<float, float> m_LinearScale;
 	std::pair<float, float> m_LinearRotZ;
 	std::pair<VEC3, VEC3> m_LinearPos;
-	std::pair<float, float> m_LinearAlpha;
+	std::pair<VEC4, VEC4> m_LinearColor;
 };
 #endif

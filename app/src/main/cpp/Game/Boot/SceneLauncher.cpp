@@ -85,7 +85,7 @@ void SceneLauncher::SceneUpdate()
 		case eButton_Title:{ SCENE_MANAGER()->AddNextCallScene(SceneTitle::CreateScene()); break; }
 		case eButton_GameMain:{ SCENE_MANAGER()->AddNextCallScene(SceneGameMain::CreateScene()); break;}
 		case eButton_Result:{ SCENE_MANAGER()->AddNextCallScene(SceneResult::CreateScene()); break; }
-		default: { 	m_pSimpleBtnMgr->Reset(); break; }
+//		default: { 	m_pSimpleBtnMgr->Reset(); break; }
 	}
 #endif
 }

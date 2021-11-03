@@ -76,7 +76,7 @@ void FadeCtrl::fadeUpdate()
 	auto p = (LayoutComponent*)m_pFadeEntity->GetComponent(eComponentKind_Layout);
 	if(m_FadeState == eFadeState_In) {
 		const float alpha = 1.0f - std::min(m_fFadeTime / m_fFadeDuration, 1.0f);
-		p->SetColor({m_Color.GetX(), m_Color.GetY(), m_Color.GetZ(), alpha});
+		p->SetColor({m_Color.X(), m_Color.Y(), m_Color.Z(), alpha});
 		m_pFadeEntity->SetVisible(true);
 
 		if(m_fFadeTime >= m_fFadeDuration){
@@ -85,7 +85,7 @@ void FadeCtrl::fadeUpdate()
 	}
 	else if(m_FadeState == eFadeState_Out){
 		const float alpha = std::min(m_fFadeTime / m_fFadeDuration, 1.0f);
-		p->SetColor({m_Color.GetX(), m_Color.GetY(), m_Color.GetZ(), alpha});
+		p->SetColor({m_Color.X(), m_Color.Y(), m_Color.Z(), alpha});
 		m_pFadeEntity->SetVisible(true);
 
 		if(m_fFadeTime >= m_fFadeDuration){

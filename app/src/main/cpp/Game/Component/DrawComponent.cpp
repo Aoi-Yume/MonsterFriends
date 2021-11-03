@@ -14,6 +14,7 @@ DrawComponent::DrawComponent(ComponentKind nKind, EntityBase* pEntityBase)
 , m_BlendMode(eBlend_Alpha)
 , m_fDiscardFactor(0.1f)
 , m_Color(1, 1, 1, 1)
+, m_AnimColor(1, 1, 1, 1)
 , m_nVtxShader(0)
 , m_nFragShader(0)
 , m_nShaderProgram(0)
@@ -109,6 +110,16 @@ void DrawComponent::SetColor(const VEC4& color)
 const VEC4& DrawComponent::GetColor() const
 {
 	return m_Color;
+}
+
+void DrawComponent::SetAnimColor(const VEC4& color)
+{
+	m_AnimColor = color;
+}
+
+const VEC4& DrawComponent::GetAnimColor() const
+{
+	return m_AnimColor;
 }
 
 GLuint DrawComponent::loadShader(GLenum type, const GLchar* pShaderCode)

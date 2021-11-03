@@ -22,8 +22,8 @@ public:
 	void SetX(float fx);
 	void SetY(float fy);
 
-	float GetX() const;
-	float GetY() const;
+	float X() const;
+	float Y() const;
 
 	VEC2 operator+(const VEC2& add) const;
 	VEC2 operator-(const VEC2& sub) const;
@@ -45,8 +45,8 @@ public:
 	float Dot(const VEC2& vec) const;
 	float Cross(const VEC2& vec) const;
 private:
-	float m_fx;
-	float m_fy;
+	float x;
+	float y;
 };
 
 class VEC3 {
@@ -57,6 +57,7 @@ public:
     ~VEC3();
 
     static VEC3 Zero();
+    static VEC3 One();
 
     void Set(float fx, float fy, float fz);
 
@@ -64,17 +65,19 @@ public:
     void SetY(float fy);
     void SetZ(float fz);
 
-    float GetX() const;
-    float GetY() const;
-    float GetZ() const;
+    float X() const;
+    float Y() const;
+    float Z() const;
 
     VEC3 operator+(const VEC3& add) const;
     VEC3 operator-(const VEC3& sub) const;
+    VEC3 operator*(const VEC3& multi) const;
     VEC3 operator*(const float multi) const;
     VEC3 operator/(const float div) const;
 
     void operator+=(const VEC3& add);
     void operator-=(const VEC3& sub);
+	void operator*=(const VEC3& multi);
     void operator*=(const float multi);
     void operator/=(const float div);
 
@@ -94,9 +97,9 @@ public:
     float CrossYZ(const VEC3& vec) const;
     float CrossZX(const VEC3& vec) const;
 private:
-    float m_fx;
-    float m_fy;
-    float m_fz;
+    float x;
+    float y;
+    float z;
 };
 
 
@@ -108,6 +111,7 @@ public:
 	~VEC4();
 
 	static VEC4 Zero();
+	static VEC4 One();
 
 	void Set(float fx, float fy, float fz, float fw);
 
@@ -116,18 +120,20 @@ public:
 	void SetZ(float fz);
 	void SetW(float fw);
 
-	float GetX() const;
-	float GetY() const;
-	float GetZ() const;
-	float GetW() const;
+	float X() const;
+	float Y() const;
+	float Z() const;
+	float W() const;
 
 	VEC4 operator+(const VEC4& add) const;
 	VEC4 operator-(const VEC4& sub) const;
+	VEC4 operator*(const VEC4& multi) const;
 	VEC4 operator*(const float multi) const;
 	VEC4 operator/(const float div) const;
 
 	void operator+=(const VEC4& add);
 	void operator-=(const VEC4& sub);
+	void operator*=(const VEC4& multi);
 	void operator*=(const float multi);
 	void operator/=(const float div);
 
@@ -138,10 +144,10 @@ public:
 
 	VEC4 Normalize() const;
 private:
-	float m_fx;
-	float m_fy;
-	float m_fz;
-	float m_fw;
+	float x;
+	float y;
+	float z;
+	float w;
 };
 
 

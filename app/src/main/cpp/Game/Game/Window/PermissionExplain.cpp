@@ -54,8 +54,8 @@ void PermissionExplain::AddPermissionExplain(const char* pName, const char* pRes
 	auto pAnim = Entity::CreateAnimationComponent(pEntity);
 	pEntity->Update(eGameMessage_Setup, nullptr);
 
-	pAnim->AddAnimation("Open", new LinearAnimation({1.0f, 1.0f}, {0.0f, 0.0f}, {VEC3(0, 55.0f, 0), VEC3(0, 25.0f, 0)}, {0.0f, 1.0f}));
-	pAnim->AddAnimation("Close", new LinearAnimation({1.0f, 1.0f}, {0.0f, 0.0f}, {VEC3(0, 25.0f, 0), VEC3(0, 55.0f, 0)}, {1.0f, 0.0f}));
+	pAnim->AddAnimation("Open", new LinearAnimation({1.0f, 1.0f}, {0.0f, 0.0f}, {VEC3(0, 55.0f, 0), VEC3(0, 25.0f, 0)}, {VEC4(1, 1, 1, 0), VEC4::One()}));
+	pAnim->AddAnimation("Close", new LinearAnimation({1.0f, 1.0f}, {0.0f, 0.0f}, {VEC3(0, 25.0f, 0), VEC3(0, 55.0f, 0)}, {VEC4::One(), VEC4(1, 1, 1, 0)}));
 	pEntity->SetVisible(false);
 	AddChild(pEntity);
 

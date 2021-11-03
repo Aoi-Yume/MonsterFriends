@@ -36,7 +36,7 @@ void MAT4::SetScale(float x, float y, float z)
 
 void MAT4::SetScale(const VEC3& scale)
 {
-    SetScale(scale.GetX(), scale.GetY(), scale.GetZ());
+    SetScale(scale.X(), scale.Y(), scale.Z());
 }
 
 void MAT4::SetRotate(float x, float y, float z)
@@ -65,7 +65,7 @@ void MAT4::SetRotate(float x, float y, float z)
 
 void MAT4::SetRotate(const VEC3 &rotate)
 {
-    SetRotate(rotate.GetX(), rotate.GetY(), rotate.GetZ());
+    SetRotate(rotate.X(), rotate.Y(), rotate.Z());
 }
 
 void MAT4::SetTranslate(float x, float y, float z)
@@ -130,17 +130,17 @@ void MAT4::SetView(VEC3& camPos, VEC3& eyePos, VEC3& upVec)
 	VEC3 xAngle = upAngle.Cross(zAngle);
 	VEC3 yAngle = zAngle.Cross(xAngle);
 
-	m_fMatrix[0][0] = xAngle.GetX();
-	m_fMatrix[0][1] = yAngle.GetX();
-	m_fMatrix[0][2] = zAngle.GetX();
+	m_fMatrix[0][0] = xAngle.X();
+	m_fMatrix[0][1] = yAngle.X();
+	m_fMatrix[0][2] = zAngle.X();
 
-	m_fMatrix[1][0] = xAngle.GetY();
-	m_fMatrix[1][1] = yAngle.GetY();
-	m_fMatrix[1][2] = zAngle.GetY();
+	m_fMatrix[1][0] = xAngle.Y();
+	m_fMatrix[1][1] = yAngle.Y();
+	m_fMatrix[1][2] = zAngle.Y();
 
-	m_fMatrix[2][0] = xAngle.GetZ();
-	m_fMatrix[2][1] = yAngle.GetZ();
-	m_fMatrix[2][2] = zAngle.GetZ();
+	m_fMatrix[2][0] = xAngle.Z();
+	m_fMatrix[2][1] = yAngle.Z();
+	m_fMatrix[2][2] = zAngle.Z();
 	VEC3 invCamPos = camPos * -1.0f;
 	memcpy(m_fMatrix[3], &invCamPos, sizeof(VEC3));
 }
@@ -197,10 +197,10 @@ MAT4 MAT4::operator*(const MAT4 mtxA)
 VEC4 MAT4::operator*(const VEC3& vecA)
 {
 	VEC4 ret;
-	float x = m_fMatrix[0][0] * vecA.GetX() + m_fMatrix[1][0] * vecA.GetY() + m_fMatrix[2][0] * vecA.GetZ() + m_fMatrix[3][0];
-	float y = m_fMatrix[0][1] * vecA.GetX() + m_fMatrix[1][1] * vecA.GetY() + m_fMatrix[2][1] * vecA.GetZ() + m_fMatrix[3][1];
-	float z = m_fMatrix[0][2] * vecA.GetX() + m_fMatrix[1][2] * vecA.GetY() + m_fMatrix[2][2] * vecA.GetZ() + m_fMatrix[3][2];
-	float w = m_fMatrix[0][3] * vecA.GetX() + m_fMatrix[1][3] * vecA.GetY() + m_fMatrix[2][3] * vecA.GetZ() + m_fMatrix[3][3];
+	float x = m_fMatrix[0][0] * vecA.X() + m_fMatrix[1][0] * vecA.Y() + m_fMatrix[2][0] * vecA.Z() + m_fMatrix[3][0];
+	float y = m_fMatrix[0][1] * vecA.X() + m_fMatrix[1][1] * vecA.Y() + m_fMatrix[2][1] * vecA.Z() + m_fMatrix[3][1];
+	float z = m_fMatrix[0][2] * vecA.X() + m_fMatrix[1][2] * vecA.Y() + m_fMatrix[2][2] * vecA.Z() + m_fMatrix[3][2];
+	float w = m_fMatrix[0][3] * vecA.X() + m_fMatrix[1][3] * vecA.Y() + m_fMatrix[2][3] * vecA.Z() + m_fMatrix[3][3];
 	ret.Set(x, y, z, w);
 	return ret;
 }

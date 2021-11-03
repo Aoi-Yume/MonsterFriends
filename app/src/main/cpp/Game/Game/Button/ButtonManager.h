@@ -48,6 +48,7 @@ private:
 	bool		m_bLock;
 	int 		m_nSelectNo;
 	int 		m_nDecideNo;
+	float 		m_fDecideDelay;
 	int 		m_nControlPlayerId;
 	Entity*		m_pCursorEntity;
 	std::vector<ButtonBase*>	m_aButtons;

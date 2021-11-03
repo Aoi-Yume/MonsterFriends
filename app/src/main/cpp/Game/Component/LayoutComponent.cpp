@@ -255,10 +255,12 @@ void LayoutComponent::setupUniformShaderParam()
 	glUniformMatrix4fv(m_nViewProjLocation, 1, GL_FALSE, pCamMtx);
 
 #if OPENGL_VERTION >= 3
-	glUniform4fv(SHADER_UNIFORM_COLOR, 1, (const GLfloat*)&GetColor());
+	VEC4 color = GetColor() * GetAnimColor();
+	glUniform4fv(SHADER_UNIFORM_COLOR, 1, (const GLfloat*)&color);
 	glUniform1f(SHADER_UNIFORM_DISCARD_FACTOR, GetDiscardFactor());
 #else
-	glUniform4fv(m_nColorLocation, 1, (const GLfloat*)&GetColor());
+	VEC4 color = GetColor() * GetAnimColor();
+	glUniform4fv(m_nColorLocation, 1, (const GLfloat*)&color);
 	glUniform1f(m_nDiscardFactorLoacation, GetDiscardFactor());
 #endif
 }
@@ -363,10 +365,10 @@ void LayoutComponent::setup()
 void LayoutComponent::updateAnim()
 {
 	const auto& uvOffset = GetUVOffset();
-	m_aVtxBuffer[3] = uvOffset.GetX(); m_aVtxBuffer[4] = 1.0f + uvOffset.GetY();
-	m_aVtxBuffer[8] = uvOffset.GetX(); m_aVtxBuffer[9] = uvOffset.GetY();
-	m_aVtxBuffer[13] = 1.0f + uvOffset.GetX(); m_aVtxBuffer[14] = 1.0f + uvOffset.GetY();
-	m_aVtxBuffer[18] = 1.0f + uvOffset.GetX(); m_aVtxBuffer[19] = uvOffset.GetY();
+	m_aVtxBuffer[3] = uvOffset.X(); m_aVtxBuffer[4] = 1.0f + uvOffset.Y();
+	m_aVtxBuffer[8] = uvOffset.X(); m_aVtxBuffer[9] = uvOffset.Y();
+	m_aVtxBuffer[13] = 1.0f + uvOffset.X(); m_aVtxBuffer[14] = 1.0f + uvOffset.Y();
+	m_aVtxBuffer[18] = 1.0f + uvOffset.X(); m_aVtxBuffer[19] = uvOffset.Y();
 
 	const uint vtxNum = 5 * 4;
 	glBindBuffer(GL_ARRAY_BUFFER, m_nVtxBuffer);
@@ -646,25 +648,25 @@ void TextImageComponent::setupTexture(float &fSizeW, float &fSizeH)
 				// アウトライン
 				// TODO アウトライン色のRに0以外が入るとバグるので修正
 				if(m_bOutLine && isOutline((uint)i, (uint)j)){
-					pColorData[baseIdx + 0] = static_cast<unsigned char>(m_OutlineColor.GetX() * 255.0f);
-					pColorData[baseIdx + 1] = static_cast<unsigned char>(m_OutlineColor.GetY() * 255.0f);
-					pColorData[baseIdx + 2] = static_cast<unsigned char>(m_OutlineColor.GetZ() * 255.0f);
-					pColorData[baseIdx + 3] = static_cast<unsigned char>(m_OutlineColor.GetW() * 255.0f);
+					pColorData[baseIdx + 0] = static_cast<unsigned char>(m_OutlineColor.X() * 255.0f);
+					pColorData[baseIdx + 1] = static_cast<unsigned char>(m_OutlineColor.Y() * 255.0f);
+					pColorData[baseIdx + 2] = static_cast<unsigned char>(m_OutlineColor.Z() * 255.0f);
+					pColorData[baseIdx + 3] = static_cast<unsigned char>(m_OutlineColor.W() * 255.0f);
 				}
 				// 背景色
 				else{
-					pColorData[baseIdx + 0] = static_cast<unsigned char>(m_BackColor.GetX() * 255.0f);
-					pColorData[baseIdx + 1] = static_cast<unsigned char>(m_BackColor.GetY() * 255.0f);
-					pColorData[baseIdx + 2] = static_cast<unsigned char>(m_BackColor.GetZ() * 255.0f);
-					pColorData[baseIdx + 3] = static_cast<unsigned char>(m_BackColor.GetW() * 255.0f);
+					pColorData[baseIdx + 0] = static_cast<unsigned char>(m_BackColor.X() * 255.0f);
+					pColorData[baseIdx + 1] = static_cast<unsigned char>(m_BackColor.Y() * 255.0f);
+					pColorData[baseIdx + 2] = static_cast<unsigned char>(m_BackColor.Z() * 255.0f);
+					pColorData[baseIdx + 3] = static_cast<unsigned char>(m_BackColor.W() * 255.0f);
 				}
 			}
 			// 文字部分
 			else{
-				pColorData[baseIdx + 0] = static_cast<unsigned char>(m_FontColor.GetX() * 255.0f);
-				pColorData[baseIdx + 1] = static_cast<unsigned char>(m_FontColor.GetY() * 255.0f);
-				pColorData[baseIdx + 2] = static_cast<unsigned char>(m_FontColor.GetZ() * 255.0f);
-				pColorData[baseIdx + 3] = static_cast<unsigned char>(m_FontColor.GetW() * 255.0f);
+				pColorData[baseIdx + 0] = static_cast<unsigned char>(m_FontColor.X() * 255.0f);
+				pColorData[baseIdx + 1] = static_cast<unsigned char>(m_FontColor.Y() * 255.0f);
+				pColorData[baseIdx + 2] = static_cast<unsigned char>(m_FontColor.Z() * 255.0f);
+				pColorData[baseIdx + 3] = static_cast<unsigned char>(m_FontColor.W() * 255.0f);
 			}
 		}
 	}

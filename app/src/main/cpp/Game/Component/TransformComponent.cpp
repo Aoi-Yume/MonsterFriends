@@ -8,9 +8,13 @@
 
 TransformComponent::TransformComponent(EntityBase* pEntityBase)
 : Super(eComponentKind_Transform, pEntityBase)
+, m_bBusy(false)
 , m_scale(1, 1, 1)
 , m_rotate(0, 0, 0)
 , m_translate(0, 0, 0)
+, m_AnimScale(1, 1, 1)
+, m_AnimRotate(0, 0, 0)
+, m_AnimTranslate(0, 0, 0)
 , m_transform()
 , m_worldTransform()
 {
@@ -25,52 +29,105 @@ TransformComponent::~TransformComponent()
 void TransformComponent::SetScale(const VEC3& scale)
 {
     m_scale  = scale;
-	CalcLocalMatrix();
+	m_bBusy = true;
 }
 
 void TransformComponent::SetRotate(const VEC3 &rotate)
 {
     m_rotate = rotate;
-	CalcLocalMatrix();
+	m_bBusy = true;
 }
 
 void TransformComponent::SetTranslate(const VEC3 &translate)
 {
     m_translate  = translate;
-    CalcLocalMatrix();
+	m_bBusy = true;
 }
 
-VEC3 TransformComponent::GetScale() const
+void TransformComponent::SetAnimScale(const VEC3& scale)
+{
+	m_AnimScale = scale;
+	m_bBusy = true;
+}
+void TransformComponent::SetAnimRotate(const VEC3& rotate)
+{
+	m_AnimRotate = rotate;
+	m_bBusy = true;
+}
+void TransformComponent::SetAnimTranslate(const VEC3& translate)
+{
+	m_AnimTranslate = translate;
+	m_bBusy = true;
+}
+
+const VEC3& TransformComponent::GetScale() const
 {
 	return m_scale;
 }
 
-VEC3 TransformComponent::GetRotate() const
+const VEC3& TransformComponent::GetRotate() const
 {
 	return m_rotate;
 }
 
-VEC3 TransformComponent::GetTranslate() const
+const VEC3& TransformComponent::GetTranslate() const
 {
 	return m_translate;
 }
 
-void TransformComponent::CalcLocalMatrix()
+const VEC3& TransformComponent::GetAnimScale() const
 {
-    m_transform.Set(m_scale, m_rotate, m_translate);
+	return m_AnimScale;
 }
 
-const MAT4* TransformComponent::GetLocalMatrix() const
+const VEC3& TransformComponent::GetAnimRotate() const
 {
+	return m_AnimRotate;
+}
+
+const VEC3& TransformComponent::GetAnimTranslate() const
+{
+	return m_AnimTranslate;
+}
+
+void TransformComponent::CalcLocalMatrix()
+{
+    m_transform.Set(m_scale * m_AnimScale, m_rotate + m_AnimRotate, m_translate + m_AnimTranslate);
+}
+
+const MAT4* TransformComponent::GetLocalMatrix()
+{
+	if(m_bBusy){
+		CalcLocalMatrix();
+		m_bBusy = false;
+	}
     return &m_transform;
 }
 
 const MAT4* TransformComponent::GetWorldMatrix()
 {
 	MAT4 worldMtx = getParentMatrix();
-	m_worldTransform = worldMtx * m_transform;
+	m_worldTransform = worldMtx * (*GetLocalMatrix());
 
 	return &m_worldTransform;
+}
+
+//------------------------------------------
+//------------------------------------------
+GameMessageResult TransformComponent::Update(GameMessage message, const void* param)
+{
+	switch(message)
+	{
+		case eGameMessage_Setup:
+		case eGameMessage_Update: {
+			if(m_bBusy){ CalcLocalMatrix(); }
+			break;
+		}
+		default:{
+			break;
+		}
+	}
+	return eGameMessageResult_Break;
 }
 
 MAT4 TransformComponent::getParentMatrix()

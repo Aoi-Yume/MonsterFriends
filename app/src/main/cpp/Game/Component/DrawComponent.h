@@ -53,6 +53,9 @@ public:
 	void SetColor(const VEC4& color);
 	const VEC4& GetColor() const;
 
+	void SetAnimColor(const VEC4& color);
+	const VEC4& GetAnimColor() const;
+
 protected:
 	GLuint loadShader(GLenum type, const char* pShaderCode);
 	void createShader(const char* pVtxSource, const char* pFragSource);
@@ -75,6 +78,7 @@ private:
 	float 		m_fDiscardFactor;
 	VEC2		m_uvOffset;
 	VEC4		m_Color;
+	VEC4		m_AnimColor;
 
 	GLuint		m_nVtxShader;
 	GLuint		m_nFragShader;

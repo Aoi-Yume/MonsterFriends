@@ -41,13 +41,13 @@ void PlayerNotice::GameEntitySetup(const void* param)
 		{
 			const VEC3 pos = {-100.0f + pResInfo[m_nType].second, 0, 0};
 			const VEC3 targetPos = {pResInfo[m_nType].second, 0, 0};
-			auto pAnim = new LinearAnimation({1, 1}, {0, 0}, {pos, targetPos}, {0, 1}, 0.5f);
+			auto pAnim = new LinearAnimation({1, 1}, {0, 0}, {pos, targetPos}, {VEC4(1, 1, 1, 0), VEC4::One()}, 0.5f);
 			pAnimComponent->AddAnimation("Open", pAnim);
 		}
 		{
 			const VEC3 pos = {pResInfo[m_nType].second, 0, 0};
 			const VEC3 targetPos = {pResInfo[m_nType].second + 100.0f, 0, 0};
-			auto pAnim = new LinearAnimation({1, 1}, {0, 0}, {pos, targetPos}, {1, 0}, 0.5f);
+			auto pAnim = new LinearAnimation({1, 1}, {0, 0}, {pos, targetPos}, {VEC4::One(), VEC4(1, 1, 1, 0)}, 0.5f);
 			pAnimComponent->AddAnimation("Close", pAnim);
 		}
 		AddChild(pChild);
@@ -59,11 +59,11 @@ void PlayerNotice::GameEntitySetup(const void* param)
 		Entity::CreateLayoutComponent(pChild, resName)->SetOrtho(true);
 		auto pAnimComponent = Entity::CreateAnimationComponent(pChild);
 		{
-			auto pAnim = new LinearAnimation({2, 1}, {0, 0}, {{-460, 48, 0},{-460, 48, 0}}, {0, 1}, 0.5f);
+			auto pAnim = new LinearAnimation({2, 1}, {0, 0}, {{-460, 48, 0},{-460, 48, 0}}, {VEC4(1, 1, 1, 0), VEC4::One()}, 0.5f);
 			pAnimComponent->AddAnimation("Open", pAnim);
 		}
 		{
-			auto pAnim = new LinearAnimation({1, 2}, {0, 0}, {{-460, 48, 0},{-460, 48, 0}}, {1, 0}, 0.5f);
+			auto pAnim = new LinearAnimation({1, 2}, {0, 0}, {{-460, 48, 0},{-460, 48, 0}}, {VEC4::One(), VEC4(1, 1, 1, 0)}, 0.5f);
 			pAnimComponent->AddAnimation("Close", pAnim);
 		}
 		AddChild(pChild);
